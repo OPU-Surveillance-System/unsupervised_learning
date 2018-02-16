@@ -53,7 +53,7 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
                     errors += tmp.data.cpu().numpy().tolist()
                     labels += sample['lbl'].numpy().tolist()
             if p == 'test':
-                fpr, tpr, thresholds = metrics.roc_curve(groundtruth, error)
+                fpr, tpr, thresholds = metrics.roc_curve(labels, error)
                 auc = metrics.auc(fpr, tpr)
             else:
                 auc = 0
