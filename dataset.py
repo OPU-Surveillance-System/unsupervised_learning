@@ -47,5 +47,3 @@ class VideoDataset(Dataset):
         sample = {'img': img, 'lbl': lbl, 'name': name}
 
         return sample
-
-ds = VideoDataset('/home/scom/Documents/opu_surveillance_system/anomaly_detection/data/umn_trainset_labels', '/home/scom/Documents/opu_surveillance_system/anomaly_detection/data/')
