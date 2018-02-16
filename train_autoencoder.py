@@ -42,6 +42,7 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
             for i_batch, sample in enumerate(tqdm(dataloader)):
                 model.zero_grad()
                 inputs = Variable(sample['img'].float().cuda())[0]
+                print(inputs.shape)
                 logits, pred = model(inputs)
                 loss = loss_function(logits, inputs)
                 if p == 'train':
@@ -80,6 +81,7 @@ def main(args):
 
     #Variables
     ae = models.autoencoder.Autoencoder(args.nb_f, args.nb_l, args.nb_b, args.dense, args.ips, args.act)
+    ae = ae.cuda()
     print(ae)
     loss_function = torch.nn.MSELoss()
     optimizer = torch.optim.Adam(ae.parameters(), args.learning_rate)
