@@ -1,7 +1,7 @@
 import argparse
 import os
 import torch
-from torch.utils.data import Dataset
+from torch.utils.data import Dataloader
 from torch.autograd import Variable
 from tqdm import tqdm
 from sklearn import metrics
