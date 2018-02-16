@@ -1,6 +1,7 @@
 import argparse
 import os
 import torch
+import copy
 from torch.utils.data import DataLoader
 from torch.autograd import Variable
 from tqdm import tqdm
@@ -27,6 +28,8 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
     phase = ('train', 'test')
     datasets = {'train': trainset, 'test': testset}
     dist = torch.nn.PairwiseDistance(p=2, eps=1e-06)
+    best_auc = 0
+    best_model = copy.deepcopy(model)
 
     for e in range(epoch):
         print('Epoch {}'.format(e))
@@ -59,8 +62,13 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
                 auc = 0
             epoch_loss = running_loss / len(datasets[p])
             print('{} -- Loss: {} AUC: {}'.format(p, epoch_loss, auc))
+            if p == 'test':
+                if auc > best_auc:
+                    best_model = copy.deepcopy(model)
+            if e % 10 == 0:
+                torch.save(model, os.path.join(directory, 'serial', 'model_{}'.format(e)))
 
-    return 0
+    return best_model
 
 def main(args):
     """
@@ -90,7 +98,7 @@ def main(args):
 
     #Train the model and save it
     best_model = train(ae, loss_function, optimizer, trainset, testset, args.epoch, args.batch_size, args.directory)
-    #torch.save(best_model, os.path.join(args.directory, 'serial', 'best_model'))
+    torch.save(best_model, os.path.join(args.directory, 'serial', 'best_model'))
 
     return 0
 
