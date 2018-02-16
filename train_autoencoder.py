@@ -42,7 +42,6 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
             for i_batch, sample in enumerate(tqdm(dataloader)):
                 model.zero_grad()
                 inputs = Variable(sample['img'].float().cuda())
-                print(inputs.shape)
                 logits, pred = model(inputs)
                 loss = loss_function(logits, inputs)
                 if p == 'train':
