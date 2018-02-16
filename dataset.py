@@ -1,6 +1,7 @@
 from torch.utils.data import Dataset, DataLoader
 from scipy import misc
 import os
+import numpy as np
 
 import utils.process
 
@@ -39,6 +40,7 @@ class VideoDataset(Dataset):
 
         img = misc.imread(self.frames[idx])
         img = utils.process.preprocess(img) #Normalize the image
+        img = np.rollaxis(img, 2, 0)
 
         lbl = self.labels[idx]
 
