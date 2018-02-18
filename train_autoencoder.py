@@ -66,7 +66,7 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
                 if auc > best_auc:
                     best_model = copy.deepcopy(model)
             if e % 10 == 0:
-                torch.save(model, os.path.join(directory, 'serial', 'model_{}'.format(e)))
+                torch.save(model.state_dict(), os.path.join(directory, 'serial', 'model_{}'.format(e)))
 
     return best_model
 
@@ -98,7 +98,7 @@ def main(args):
 
     #Train the model and save it
     best_model = train(ae, loss_function, optimizer, trainset, testset, args.epoch, args.batch_size, args.directory)
-    torch.save(best_model, os.path.join(args.directory, 'serial', 'best_model'))
+    torch.save(best_model.state_dict(), os.path.join(args.directory, 'serial', 'best_model'))
 
     return 0
 
