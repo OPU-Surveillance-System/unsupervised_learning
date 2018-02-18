@@ -84,7 +84,7 @@ def main(args):
     d = vars(args)
     with open(os.path.join(args.directory, 'hyper-parameters'), 'w') as f:
         for k in d.keys():
-            f.write('{}:\n'.format(k, d[k]))
+            f.write('{}:{}\n'.format(k, d[k]))
 
     #Variables
     ae = models.autoencoder.Autoencoder(args.nb_f, args.nb_l, args.nb_b, args.dense, args.ips, args.act)
