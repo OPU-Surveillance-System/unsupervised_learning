@@ -7,6 +7,7 @@ from torch.utils.data import DataLoader
 from torch.autograd import Variable
 from tqdm import tqdm
 from sklearn import metrics
+from tensorboardX import SummaryWriter
 
 import dataset
 import models.autoencoder
@@ -33,6 +34,7 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
     dist = torch.nn.PairwiseDistance(p=2, eps=1e-06)
     best_auc = 0
     best_model = copy.deepcopy(model)
+    writer = SummaryWriter()
 
     for e in range(epoch):
         print('Epoch {}'.format(e))
@@ -58,14 +60,18 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
                     tmp = utils.metrics.per_image_error(dist, pred, inputs)
                     errors += tmp.data.cpu().numpy().tolist()
                     labels += sample['lbl'].numpy().tolist()
+
             if p == 'test':
                 fpr, tpr, thresholds = metrics.roc_curve(labels, errors)
                 auc = metrics.auc(fpr, tpr)
             else:
                 auc = 0
             epoch_loss = running_loss / len(datasets[p])
+            scalar = {p: epoch_loss}
             print('{} -- Loss: {} AUC: {}'.format(p, epoch_loss, auc))
             if p == 'test':
+                writer.add_scalars('learning_curve', scalar, e)
+                writer.add_scalar('auc', auc, e)
                 if auc > best_auc:
                     best_model = copy.deepcopy(model)
                 if e % 10 == 0:
@@ -88,10 +94,12 @@ def main(args):
     Train an autoencoder and save it
     """
 
-    #Create results directory if it doesn't exists
+    #Create directories if it don't exists
     if not os.path.exists(args.directory):
         os.makedirs(args.directory)
+    if not os.path.exists(os.path.join(args.directory, 'serial')):
         os.makedirs(os.path.join(args.directory, 'serial'))
+    if not os.path.exists(os.path.join(args.directory, 'example_reconstruction')):
         os.makedirs(os.path.join(args.directory, 'example_reconstruction'))
 
     #Write arguments in a file
