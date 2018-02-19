@@ -68,15 +68,15 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
             if p == 'test':
                 if auc > best_auc:
                     best_model = copy.deepcopy(model)
-            if e % 10 == 0:
-                torch.save(model.state_dict(), os.path.join(directory, 'serial', 'model_{}'.format(e)))
-                pred = utils.process.deprocess(pred)
-                pred = pred.data.cpu().numpy()
-                pred = np.rollaxis(pred, 1, 4)
-                inputs = utils.process.deprocess(inputs)
-                inputs = inputs.data.cpu().numpy()
-                inputs = np.rollaxis(inputs, 1, 4)
-                utils.plot.plot_reconstruction_images(inputs[0], pred[0], os.path.join(directory, 'example_reconstruction', 'epoch_{}.svg'.format(e)))
+                if e % 10 == 0:
+                    torch.save(model.state_dict(), os.path.join(directory, 'serial', 'model_{}'.format(e)))
+                    pred = utils.process.deprocess(pred)
+                    pred = pred.data.cpu().numpy()
+                    pred = np.rollaxis(pred, 1, 4)
+                    inputs = utils.process.deprocess(inputs)
+                    inputs = inputs.data.cpu().numpy()
+                    inputs = np.rollaxis(inputs, 1, 4)
+                    utils.plot.plot_reconstruction_images(inputs[0], pred[0], os.path.join(directory, 'example_reconstruction', 'epoch_{}.svg'.format(e)))
 
     return best_model
 
