@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 
 def plot_auc(fpr, tpr, auc, name=None):
     """
-    fpr: False positive rate
-    tpr: True positive rate
+    fpr (numpy.array): False positive rate
+    tpr (numpy.array): True positive rate
     auc (float): Area under the curve
     name (str): name to save the figure (if None: show the figure)
     """
