@@ -56,6 +56,7 @@ def plot_reconstruction_images(inputs, pred, name):
     #pred
     ax2 = plt.subplot2grid((2, 1), (1, 0), rowspan=1, colspan=1)
     ax2.imshow(pred)
+    ax2.axis('off')
 
     if name != None:
         plt.savefig(name, format='svg', bbox_inches='tight')
