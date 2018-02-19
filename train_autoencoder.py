@@ -44,7 +44,7 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
             dataloader = DataLoader(datasets[p], batch_size=batch_size, shuffle=True, num_workers=4)
             for i_batch, sample in enumerate(tqdm(dataloader)):
                 model.zero_grad()
-                inputs = Variable(sample['img'].float().cuda())
+                inputs = Variable(utils.process.preprocess(sample['img'].float().cuda()))
                 logits, pred = model(inputs)
                 loss = loss_function(logits, inputs)
                 if p == 'train':
