@@ -36,8 +36,8 @@ def test(model, testset, batch_size, directory):
         e = utils.metrics.per_image_error(dist, pred.contiguous(), inputs.contiguous())
         e = e.cpu().data.numpy().tolist()
         answer += e
+        print(sample['lbl'])
         groundtruth += sample['lbl']
-        print(groundtruth)
         for i in range(len(sample['lbl'])):
             if sample['lbl'][i] == 0:
                 errors['normal'].append(e[i])
