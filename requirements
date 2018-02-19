@@ -4,3 +4,5 @@ scipy
 matplotlib
 tqdm
 sklearn
+tensorboardX
+tensorflow

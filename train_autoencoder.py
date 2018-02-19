@@ -34,7 +34,7 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
     dist = torch.nn.PairwiseDistance(p=2, eps=1e-06)
     best_auc = 0
     best_model = copy.deepcopy(model)
-    writer = SummaryWriter()
+    writer = SummaryWriter(os.path.join(directory, 'logs'))
 
     for e in range(epoch):
         print('Epoch {}'.format(e))
@@ -67,10 +67,9 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
             else:
                 auc = 0
             epoch_loss = running_loss / len(datasets[p])
-            scalar = {p: epoch_loss}
+            writer.add_scalar('learning_curve/{}'.format(p), epoch_loss, e)
             print('{} -- Loss: {} AUC: {}'.format(p, epoch_loss, auc))
             if p == 'test':
-                writer.add_scalars('learning_curve', scalar, e)
                 writer.add_scalar('auc', auc, e)
                 if auc > best_auc:
                     best_model = copy.deepcopy(model)
