@@ -72,6 +72,8 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
                     torch.save(model.state_dict(), os.path.join(directory, 'serial', 'model_{}'.format(e)))
                     pred = utils.process.deprocess(pred)
                     pred = pred.data.cpu().numpy()
+                    q = set(pred.flatten())
+                    print(q.max(), q.min())
                     pred = np.rollaxis(pred, 1, 4)
                     inputs = utils.process.deprocess(inputs)
                     inputs = inputs.data.cpu().numpy()
