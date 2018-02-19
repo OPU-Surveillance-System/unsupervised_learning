@@ -59,7 +59,7 @@ def test(model, testset, batch_size, directory):
     fpr, tpr, thresholds = metrics.roc_curve(groundtruth, answer)
     auc = metrics.auc(fpr, tpr)
     utils.plot.plot_auc(fpr, tpr, auc, os.path.join(directory, 'plots', 'auc.svg'))
-
+    print('AUC: {}'.format(auc))
 
     return 0
 
