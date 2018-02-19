@@ -27,6 +27,7 @@ def test(model, testset, batch_size, directory):
     answer = []
     groundtruth = []
     dataloader = DataLoader(testset, batch_size=batch_size, shuffle=False, num_workers=4)
+    dist = torch.nn.PairwiseDistance(p=2, eps=1e-06)
 
     #Process the testset
     for i_batch, sample in enumerate(tqdm(dataloader)):
