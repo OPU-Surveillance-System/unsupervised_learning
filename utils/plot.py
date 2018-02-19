@@ -52,6 +52,7 @@ def plot_reconstruction_images(inputs, pred, name):
     #inputs
     ax1 = plt.subplot2grid((2, 1), (0, 0), rowspan=1, colspan=1)
     ax1.imshow(inputs)
+    ax1.axis('off')
     #pred
     ax2 = plt.subplot2grid((2, 1), (1, 0), rowspan=1, colspan=1)
     ax2.imshow(pred)
