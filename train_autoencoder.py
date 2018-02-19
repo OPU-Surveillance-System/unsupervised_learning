@@ -73,6 +73,7 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
                 pred = utils.process.deprocess(pred)
                 pred = pred.data.cpu().numpy()
                 pred = np.rollaxis(pred, 1, 4)
+                print(pred.shape)
                 inputs = utils.process.deprocess(inputs)
                 inputs = inputs.data.cpu().numpy()
                 inputs = np.rollaxis(inputs, 1, 4)
