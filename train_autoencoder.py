@@ -78,7 +78,7 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
                     q = set(pred.flatten())
                     print(max(q), min(q))
                     pred = np.rollaxis(pred, 1, 4)
-                    q = set(inputs.flatten())
+                    q = set(inputs.data.cpu().numpy().flatten())
                     print(max(q), min(q))
                     inputs = utils.process.deprocess(inputs)
                     inputs = inputs.data.cpu().numpy()
