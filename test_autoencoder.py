@@ -71,6 +71,7 @@ def main(args):
         with open(os.path.join(args.directory, 'hyper-parameters'), 'r') as f:
             hp = f.read().split('\n')[:-1]
         hp = {e.split(':')[0]:e.split(':')[1] for e in hp}
+        print(hp)
         if hp['dense'] == 'None':
             hp['dense'] = None
         else:
