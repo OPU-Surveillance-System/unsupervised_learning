@@ -67,6 +67,11 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
                     best_model = copy.deepcopy(model)
             if e % 10 == 0:
                 torch.save(model.state_dict(), os.path.join(directory, 'serial', 'model_{}'.format(e)))
+                pred = utils.process.deprocess(pred)
+                pred = pred.data.cpu().numpy()
+                inputs = utils.process.deprocess(inputs)
+                inputs = inputs.data.cpu().numpy()
+                utils.plot.plot_reconstruction_images(inputs[0:4], pred[0:4], os.path.join(directory, 'example_reconstruction', 'epoch_{}.svg'.format(e)))
 
     return best_model
 
@@ -79,6 +84,7 @@ def main(args):
     if not os.path.exists(args.directory):
         os.makedirs(args.directory)
         os.makedirs(os.path.join(args.directory, 'serial'))
+        os.makedirs(os.path.join(args.directory, 'example_reconstruction'))
 
     #Write arguments in a file
     d = vars(args)
