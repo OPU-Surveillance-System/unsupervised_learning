@@ -11,6 +11,7 @@ import dataset
 import models.autoencoder
 import utils.metrics
 import utils.plot
+import utils.process
 
 def test(model, testset, batch_size, directory):
     """
@@ -29,7 +30,7 @@ def test(model, testset, batch_size, directory):
 
     #Process the testset
     for i_batch, sample in enumerate(tqdm(dataloader)):
-        inputs = Variable(preprocess(sample['img'].float().cuda()))
+        inputs = Variable(utils.process.preprocess(sample['img'].float().cuda()))
         pred = model(inputs)[1]
         e = get_per_image_error(dist, logits.contiguous(), data.contiguous())
         e = error.cpu().data.numpy().tolist()
