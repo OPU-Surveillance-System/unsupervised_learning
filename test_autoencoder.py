@@ -71,11 +71,10 @@ def main(args):
         with open(os.path.join(args.directory, 'hyper-parameters'), 'r') as f:
             hp = f.read().split('\n')[:-1]
         hp = {e.split(':')[0]:e.split(':')[1] for e in hp}
-        print(hp)
         if hp['dense'] == 'None':
             hp['dense'] = None
         else:
-            hp['dense'] = int(hp[dense])
+            hp['dense'] = int(hp['dense'])
         ae = models.autoencoder.Autoencoder(int(hp['nb_f']), int(hp['nb_l']), int(hp['nb_b']), hp['dense'], int(hp['ips']), hp['act'])
     #Use hyper-parameters passed as arguments
     else:
