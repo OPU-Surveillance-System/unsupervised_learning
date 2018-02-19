@@ -2,6 +2,7 @@ import argparse
 import os
 import torch
 import copy
+import numpy as np
 from torch.utils.data import DataLoader
 from torch.autograd import Variable
 from tqdm import tqdm
@@ -71,8 +72,12 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
                 torch.save(model.state_dict(), os.path.join(directory, 'serial', 'model_{}'.format(e)))
                 pred = utils.process.deprocess(pred)
                 pred = pred.data.cpu().numpy()
+                pred = np.rollaxis(pred, 1, 3)
+                print(pred.shape)
                 inputs = utils.process.deprocess(inputs)
                 inputs = inputs.data.cpu().numpy()
+                inputs = np.rollaxis(inputs, 1, 3)
+                print(inputs.shape)
                 utils.plot.plot_reconstruction_images(inputs[0:4], pred[0:4], os.path.join(directory, 'example_reconstruction', 'epoch_{}.svg'.format(e)))
 
     return best_model
