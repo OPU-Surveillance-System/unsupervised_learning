@@ -33,7 +33,7 @@ def test(model, testset, batch_size, directory):
     for i_batch, sample in enumerate(tqdm(dataloader)):
         inputs = Variable(utils.process.preprocess(sample['img'].float().cuda()))
         pred = model(inputs)[1]
-        e = utils.metrics.per_image_error(dist, pred.contiguous(), data.contiguous())
+        e = utils.metrics.per_image_error(dist, pred.contiguous(), inputs.contiguous())
         e = error.cpu().data.numpy().tolist()
         answer += e
         groundtruth += sample['lbl']
