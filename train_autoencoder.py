@@ -69,12 +69,17 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
                 if auc > best_auc:
                     best_model = copy.deepcopy(model)
                 if e % 10 == 0:
+                    #Save model
                     torch.save(model.state_dict(), os.path.join(directory, 'serial', 'model_{}'.format(e)))
+
+                    #Plot example of reconstructed images
                     pred = utils.process.deprocess(pred)
                     pred = pred.data.cpu().numpy()
                     q = set(pred.flatten())
                     print(max(q), min(q))
                     pred = np.rollaxis(pred, 1, 4)
+                    q = set(inputs.flatten())
+                    print(max(q), min(q))
                     inputs = utils.process.deprocess(inputs)
                     inputs = inputs.data.cpu().numpy()
                     q = set(inputs.flatten())
