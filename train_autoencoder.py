@@ -101,6 +101,8 @@ def main(args):
         os.makedirs(os.path.join(args.directory, 'serial'))
     if not os.path.exists(os.path.join(args.directory, 'example_reconstruction')):
         os.makedirs(os.path.join(args.directory, 'example_reconstruction'))
+    if not os.path.exists(os.path.join(args.directory, 'logs')):
+        os.makedirs(os.path.join(args.directory, 'logs'))
 
     #Write arguments in a file
     d = vars(args)
