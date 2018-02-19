@@ -2,10 +2,12 @@ import matplotlib.pyplot as plt
 
 def plot_auc(fpr, tpr, auc, name=None):
     """
-    fpr (numpy.array): False positive rate
-    tpr (numpy.array): True positive rate
-    auc (float): Area under the curve
-    name (str): name to save the figure (if None: show the figure)
+    Plot the ROC curve]
+    Args:
+        fpr (numpy.array): False positive rate
+        tpr (numpy.array): True positive rate
+        auc (float): Area under the curve
+        name (str): name to save the figure (if None: show the figure)
     """
 
     plt.clf()
@@ -24,9 +26,11 @@ def plot_auc(fpr, tpr, auc, name=None):
 
 def plot_reconstruction_hist(n, a, name=None):
     """
-    n (numpy.array): Normal distribution
-    a (numpy.array): Abnormal distribution
-    name (str): name to save the figure (if None: show the figure)
+    Plot histograms of reconstruction error distributions
+    Args:
+        n (numpy.array): Normal distribution
+        a (numpy.array): Abnormal distribution
+        name (str): name to save the figure (if None: show the figure)
     """
 
     plt.clf()
@@ -43,9 +47,11 @@ def plot_reconstruction_hist(n, a, name=None):
 
 def plot_reconstruction_images(inputs, pred, name):
     """
-    inputs (numpy.array): True image
-    pred (numpy.array): Reconstructed image
-    name (str): name to save the figure (if None: show the figure)
+    Plot example of reconstruction images
+    Args:
+        inputs (numpy.array): True images
+        pred (numpy.array): Reconstructed images
+        name (str): name to save the figure (if None: show the figure)
     """
 
     plt.clf()
