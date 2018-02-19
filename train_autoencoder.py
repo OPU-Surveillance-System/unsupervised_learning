@@ -48,6 +48,8 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
             for i_batch, sample in enumerate(tqdm(dataloader)):
                 model.zero_grad()
                 inputs = Variable(utils.process.preprocess(sample['img'].float().cuda()))
+                q = set(inputs.data.cpu().numpy().flatten())
+                print(max(q), min(q))
                 logits, pred = model(inputs)
                 loss = loss_function(logits, inputs)
                 if p == 'train':
