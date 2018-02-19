@@ -75,15 +75,9 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
                     #Plot example of reconstructed images
                     pred = utils.process.deprocess(pred)
                     pred = pred.data.cpu().numpy()
-                    q = set(pred.flatten())
-                    print(max(q), min(q))
                     pred = np.rollaxis(pred, 1, 4)
-                    q = set(inputs.data.cpu().numpy().flatten())
-                    print(max(q), min(q))
                     inputs = utils.process.deprocess(inputs)
                     inputs = inputs.data.cpu().numpy()
-                    q = set(inputs.flatten())
-                    print(max(q), min(q))
                     inputs = np.rollaxis(inputs, 1, 4)
                     utils.plot.plot_reconstruction_images(inputs[0], pred[0], os.path.join(directory, 'example_reconstruction', 'epoch_{}.svg'.format(e)))
 
