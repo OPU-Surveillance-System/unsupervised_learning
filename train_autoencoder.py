@@ -10,6 +10,8 @@ from sklearn import metrics
 import dataset
 import models.autoencoder
 import utils.metrics
+import utils.plot
+import utils.process
 
 def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size, directory):
     """
