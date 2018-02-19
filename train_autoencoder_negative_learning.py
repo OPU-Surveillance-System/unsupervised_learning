@@ -65,6 +65,7 @@ def train(model, loss_function, optimizer, n_trainset, a_trainset, testset, nega
                     errors += tmp.data.cpu().numpy().tolist()
                     labels += sample['lbl'].numpy().tolist()
 
+            #Compute AUC
             if p == 'test':
                 fpr, tpr, thresholds = metrics.roc_curve(labels, errors)
                 auc = metrics.auc(fpr, tpr)
@@ -73,6 +74,7 @@ def train(model, loss_function, optimizer, n_trainset, a_trainset, testset, nega
             epoch_loss = running_loss / len(datasets[p])
             writer.add_scalar('learning_curve/{}'.format(p), epoch_loss, e)
             print('{} -- Loss: {} AUC: {}'.format(p, epoch_loss, auc))
+            #Memorize model with the best AUC, save model every 10 epochs and save some examples of reconstructed images
             if p == 'test':
                 writer.add_scalar('auc', auc, e)
                 if auc > best_auc:
