@@ -33,7 +33,7 @@ def plot_reconstruction_hist(n, a, name=None):
     plt.hist(a, bins=100, alpha=0.75, label='Abnormal')
     plt.xlabel('Reconstruction error')
     plt.ylabel('Number of frames')
-    plt.legend(loc='upper right')
+    plt.legend(loc='upper left')
     if name != None:
         plt.savefig(name, format='svg', bbox_inches='tight')
     else:
