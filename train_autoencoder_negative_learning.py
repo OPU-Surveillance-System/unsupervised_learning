@@ -76,6 +76,7 @@ def train(model, loss_function, optimizer, n_trainset, a_trainset, testset, nega
             if p == 'test':
                 writer.add_scalar('auc', auc, e)
                 if auc > best_auc:
+                    best_auc = auc
                     best_model = copy.deepcopy(model)
                 if e % 10 == 0:
                     #Save model
