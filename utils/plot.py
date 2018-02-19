@@ -49,6 +49,7 @@ def plot_reconstruction_images(inputs, pred, name):
     """
 
     plt.clf()
+    print(inputs.shape)
     nb_plots = max(inputs.shape[0], 4)
     #inputs
     for i in range(nb_plots):
