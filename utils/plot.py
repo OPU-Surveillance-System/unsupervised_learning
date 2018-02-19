@@ -51,10 +51,10 @@ def plot_reconstruction_images(inputs, pred, name):
     plt.clf()
     #inputs
     ax1 = plt.subplot2grid((2, 1), (0, 0), rowspan=1, colspan=1)
-    ax1.imshow(inputs[0])
+    ax1.imshow(inputs)
     #pred
     ax2 = plt.subplot2grid((2, 1), (1, 0), rowspan=1, colspan=1)
-    ax2.imshow(pred[0])
+    ax2.imshow(pred)
 
     if name != None:
         plt.savefig(name, format='svg', bbox_inches='tight')
