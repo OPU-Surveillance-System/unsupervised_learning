@@ -9,13 +9,12 @@ def plot_auc(fpr, tpr, auc, name=None):
     """
 
     plt.clf()
-    plt.plot(fpr, tpr, color='darkorange', lw=lw, label='ROC curve (AUC = {:.4f})'.format(auc))
-    plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
+    plt.plot(fpr, tpr, color='darkorange', label='ROC curve (AUC = {:.4f})'.format(auc))
+    plt.plot([0, 1], [0, 1], color='navy', linestyle='--')
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title('Receiver operating characteristic curve')
+    plt.xlabel('False Positive rate')
+    plt.ylabel('True Positive rate')
     plt.legend(loc="lower right")
     if name != None:
         plt.savefig(name, format='svg', bbox_inches='tight')
@@ -30,8 +29,11 @@ def plot_reconstruction_hist(n, a, name=None):
     """
 
     plt.clf()
-    plt.hist(n, bins=100, alpha=0.75)
-    plt.hist(a, bins=100, alpha=0.75)
+    plt.hist(n, bins=100, alpha=0.75, label='Normal')
+    plt.hist(a, bins=100, alpha=0.75, label='Abnormal')
+    plt.xlabel('Reconstruction error')
+    plt.ylabel('Number of frames')
+    plt.legend(loc='upper right')
     if name != None:
         plt.savefig(name, format='svg', bbox_inches='tight')
     else:
