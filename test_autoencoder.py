@@ -68,6 +68,10 @@ def main(args):
     Evaluates a serialized model
     """
 
+    #Create directories
+    if not os.path.exists(os.path.join(args.directory, 'plots')):
+        os.makedirs(os.path.join(args.directory, 'plots'))
+
     #Create a model with the hyper-parameters used during training
     if os.path.exists(os.path.join(args.directory, 'hyper-parameters')):
         with open(os.path.join(args.directory, 'hyper-parameters'), 'r') as f:
