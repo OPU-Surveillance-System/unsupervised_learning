@@ -49,14 +49,17 @@ def plot_reconstruction_images(inputs, pred, name):
     """
 
     plt.clf()
+    nb_plots = max(inputs.shape[0], 4)
     #inputs
-    ax1 = plt.subplot2grid((2, 1), (0, 0), rowspan=1, colspan=1)
-    ax1.imshow(inputs)
-    ax1.axis('off')
+    for i in range(nb_plots):
+        ax = plt.subplot2grid((2, nb_plots), (0, i), rowspan=1, colspan=1)
+        ax.imshow(inputs[i])
+        ax.axis('off')
     #pred
-    ax2 = plt.subplot2grid((2, 1), (1, 0), rowspan=1, colspan=1)
-    ax2.imshow(pred)
-    ax2.axis('off')
+    for i in range(nb_plots):
+        ax = plt.subplot2grid((2, nb_plots), (1, i), rowspan=1, colspan=1)
+        ax.imshow(pred[i])
+        ax.axis('off')
 
     if name != None:
         plt.savefig(name, format='svg', bbox_inches='tight')
