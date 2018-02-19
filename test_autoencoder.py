@@ -36,13 +36,12 @@ def test(model, testset, batch_size, directory):
         e = utils.metrics.per_image_error(dist, pred.contiguous(), inputs.contiguous())
         e = e.cpu().data.numpy().tolist()
         answer += e
-        print(sample['lbl'])
         groundtruth += sample['lbl'].cpu().numpy().tolist()
         for i in range(len(sample['lbl'])):
             if sample['lbl'][i] == 0:
                 errors['normal'].append(e[i])
             else:
-                sample['abnormal'].append(e[i])
+                errors['abnormal'].append(e[i])
 
     #Get histograms of reconstruction error for normal and abnormal patterns
     normal_distribution = np.array(errors['normal'])
