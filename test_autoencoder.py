@@ -37,7 +37,7 @@ def test(model, testset, batch_size, directory):
         e = e.cpu().data.numpy().tolist()
         answer += e
         print(sample['lbl'])
-        groundtruth += sample['lbl'].cpu().data.numpy().tolist()
+        groundtruth += sample['lbl'].cpu().numpy().tolist()
         for i in range(len(sample['lbl'])):
             if sample['lbl'][i] == 0:
                 errors['normal'].append(e[i])
