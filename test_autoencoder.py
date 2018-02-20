@@ -61,6 +61,12 @@ def test(model, testset, batch_size, directory):
     utils.plot.plot_auc(fpr, tpr, auc, os.path.join(directory, 'plots', 'auc.svg'))
     print('AUC: {}'.format(auc))
 
+    with open(os.path.join(directory, 'results'), 'w') as f:
+        f.write('Normal: mean={}, var={}, std={}\n'.format(normal_distribution.mean(), normal_distribution.var(), normal_distribution.std()))
+        f.write('Abnormal: mean={}, var={}, std={}\n'.format(abnormal_distribution.mean(), abnormal_distribution.var(), abnormal_distribution.std()))
+        f.write('Intersection: {}\n'.format(intersection))
+        f.write('AUC: {}\n'.format(auc))
+
     return 0
 
 def main(args):
