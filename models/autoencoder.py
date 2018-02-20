@@ -42,10 +42,10 @@ class Autoencoder(torch.nn.Module):
 
         def build_bottleneck(in_dim, h_dim, act):
             layers = [torch.nn.Linear(in_dim, h_dim)]
-            if act == 'selu':
-                layers.append(torch.nn.SELU())
-            elif act == 'relu':
-                layers.append(torch.nn.ReLU())
+            # if act == 'selu':
+            #     layers.append(torch.nn.SELU())
+            # elif act == 'relu':
+            #     layers.append(torch.nn.ReLU())
             layers.append(torch.nn.Linear(h_dim, in_dim))
             if act == 'selu':
                 layers.append(torch.nn.SELU())
