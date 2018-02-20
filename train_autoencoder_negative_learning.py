@@ -61,7 +61,7 @@ def train(model, loss_function, optimizer, n_trainset, a_trainset, testset, nega
                     optimizer.step()
                 running_loss += loss.data[0]
                 if p == 'test':
-                    tmp = utils.metrics.per_image_error(dist, pred, inputs)
+                    tmp = utils.metrics.per_image_error(dist, logits, inputs)
                     errors += tmp.data.cpu().numpy().tolist()
                     labels += sample['lbl'].numpy().tolist()
 
