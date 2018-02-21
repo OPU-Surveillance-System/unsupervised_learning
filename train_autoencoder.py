@@ -79,13 +79,13 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
                     torch.save(model.state_dict(), os.path.join(directory, 'serial', 'model_{}'.format(e)))
 
                     #Plot example of reconstructed images
-                    pred = utils.process.deprocess(pred)
+                    pred = utils.process.deprocess(logits)
                     pred = pred.data.cpu().numpy()
                     pred = np.rollaxis(pred, 1, 4)
                     inputs = utils.process.deprocess(inputs)
                     inputs = inputs.data.cpu().numpy()
                     inputs = np.rollaxis(inputs, 1, 4)
-                    utils.plot.plot_reconstruction_images(inputs, logits, os.path.join(directory, 'example_reconstruction', 'epoch_{}.svg'.format(e)))
+                    utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(directory, 'example_reconstruction', 'epoch_{}.svg'.format(e)))
     writer.export_scalars_to_json(os.path.join(directory, 'logs', 'scalars.json'))
     writer.close()
 
