@@ -10,7 +10,7 @@ from sklearn import metrics
 from tensorboardX import SummaryWriter
 
 import dataset
-import models.autoencoder
+import models.adversarial_autoencoder
 import utils.metrics
 import utils.plot
 import utils.process
