@@ -166,7 +166,7 @@ def main(args):
 
     #Optimizers
     encoder_optimizer = torch.optim.Adam(encoder.parameters(), args.reconstruction_learning_rate)
-    decoder_optimizer = torch.optim.Adam(decoders.parameters(), args.reconstruction_learning_rate)
+    decoder_optimizer = torch.optim.Adam(decoder.parameters(), args.reconstruction_learning_rate)
     discriminator_optimizer = torch.optim.Adam(discriminator.parameters(), args.adversarial_learning_rate)
     adversarial_encoder_optimizer = torch.optim.Adam(encoder.parameters(), args.adversarial_learning_rate)
 
