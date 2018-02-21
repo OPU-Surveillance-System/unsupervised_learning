@@ -77,7 +77,7 @@ def train(encoder, decoder, discriminator, reconstruction_loss_function, adversa
                 else:
                     discriminator.eval()
                 z_real = Variable(torch.randn(batch_size, latent_size)).cuda() #~N(0, 1)
-                z_fake = z
+                z_fake = encoder(inputs)
                 real_logits, real_pred = discriminator(z_real)
                 fake_logits, fake_pred = discriminator(z_fake)
                 logits = torch.cat((real_logits, fake_logits), 0)
@@ -94,7 +94,8 @@ def train(encoder, decoder, discriminator, reconstruction_loss_function, adversa
                     encoder.zero_grad()
                 else:
                     encoder.eval()
-                logits, pred = discriminator(z_fake)
+                z_real = encoder(inputs)
+                logits, pred = discriminator(z_real)
                 loss = adversarial_loss_function(logits, zeros)
                 if p == 'train':
                     loss.backward()
