@@ -51,7 +51,7 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
                 model.zero_grad()
                 inputs = Variable(sample['img'].float().cuda())
                 logits, pred = model(inputs)
-                loss = loss_function(pred, inputs)
+                loss = loss_function(logits, inputs)
                 if p == 'train':
                     loss.backward()
                     optimizer.step()
@@ -85,7 +85,7 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
                     inputs = utils.process.deprocess(inputs)
                     inputs = inputs.data.cpu().numpy()
                     inputs = np.rollaxis(inputs, 1, 4)
-                    utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(directory, 'example_reconstruction', 'epoch_{}.svg'.format(e)))
+                    utils.plot.plot_reconstruction_images(inputs, logits, os.path.join(directory, 'example_reconstruction', 'epoch_{}.svg'.format(e)))
     writer.export_scalars_to_json(os.path.join(directory, 'logs', 'scalars.json'))
     writer.close()
 
