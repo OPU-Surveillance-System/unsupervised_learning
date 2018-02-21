@@ -119,6 +119,7 @@ def train(encoder, decoder, discriminator, reconstruction_loss_function, adversa
                     inputs = utils.process.deprocess(inputs)
                     inputs = inputs.data.cpu().numpy()
                     inputs = np.rollaxis(inputs, 1, 4)
+                    print(pred.shape, inputs.shape)
                     utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(directory, 'example_reconstruction', 'epoch_{}.svg'.format(e)))
             # if p == 'test':
             #     writer.add_scalar('auc', auc, e)
