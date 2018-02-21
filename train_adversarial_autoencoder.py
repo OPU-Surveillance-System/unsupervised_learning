@@ -35,10 +35,6 @@ def train(encoder, decoder, discriminator, reconstruction_loss_function, adversa
     best_auc = 0
     best_model = 0
     writer = SummaryWriter(os.path.join(directory, 'logs'))
-    zeros = torch.zeros((batch_size, 1)) * -1
-    ones = torch.ones((batch_size, 1))
-    discriminator_labels = Variable(torch.cat((zeros, ones), 0).float().cuda())
-    zeros = Variable(zeros.float().cuda())
 
     for e in range(epoch):
         print('Epoch {}'.format(e))
@@ -76,11 +72,14 @@ def train(encoder, decoder, discriminator, reconstruction_loss_function, adversa
                     discriminator.zero_grad()
                 else:
                     discriminator.eval()
-                z_real = Variable(torch.randn(batch_size, latent_size)).cuda() #~N(0, 1)
+                z_real = Variable(torch.randn(inputs.shape(0), latent_size)).cuda() #~N(0, 1)
                 z_fake = encoder(inputs)
                 real_logits, real_pred = discriminator(z_real)
                 fake_logits, fake_pred = discriminator(z_fake)
                 logits = torch.cat((real_logits, fake_logits), 0)
+                zeros = torch.zeros((inputs.shape(0), 1)) * -1
+                ones = torch.ones((inputs.shape(0), 1))
+                discriminator_labels = Variable(torch.cat((zeros, ones), 0).float().cuda())
                 loss = adversarial_loss_function(logits, discriminator_labels)
                 if p == 'train':
                     loss.backward()
@@ -96,6 +95,7 @@ def train(encoder, decoder, discriminator, reconstruction_loss_function, adversa
                     encoder.eval()
                 z_real = encoder(inputs)
                 logits, pred = discriminator(z_real)
+                zeros = Variable(torch.zeros((inputs.shape(0), 1)) * -1).cuda()
                 loss = adversarial_loss_function(logits, zeros)
                 if p == 'train':
                     loss.backward()
