@@ -35,8 +35,8 @@ def train(encoder, decoder, discriminator, reconstruction_loss_function, adversa
     best_auc = 0
     best_model = 0
     writer = SummaryWriter(os.path.join(directory, 'logs'))
-    zeros = torch.zeros(batch_size) * -1
-    ones = torch.ones(batch_size)
+    zeros = torch.zeros((batch_size, 1)) * -1
+    ones = torch.ones((batch_size, 1))
     discriminator_labels = Variable(torch.cat((zeros, ones), 0).float().cuda())
     zeros = Variable(zeros.float().cuda())
 
