@@ -106,7 +106,7 @@ class Decoder(torch.nn.Module):
         x = self.latent(x)
         x = x.view((-1, self.in_dim, self.h, self.h))
         logits = self.conv(x)
-        pred = self.pred(x)
+        pred = self.pred(logits)
 
         return logits, pred
 
