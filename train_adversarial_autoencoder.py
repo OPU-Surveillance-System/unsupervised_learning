@@ -94,9 +94,9 @@ def train(encoder, decoder, discriminator, reconstruction_loss_function, adversa
                 else:
                     encoder.eval()
                 z_real = encoder(inputs)
-                logits, pred = discriminator(z_real)
+                ad_logits, ad_pred = discriminator(z_real)
                 zeros = Variable(torch.zeros((inputs.size(0), 1)) * -1).cuda()
-                loss = adversarial_loss_function(logits, zeros)
+                loss = adversarial_loss_function(ad_logits, zeros)
                 if p == 'train':
                     loss.backward()
                     adversarial_encoder_optimizer.step()
@@ -110,6 +110,16 @@ def train(encoder, decoder, discriminator, reconstruction_loss_function, adversa
             writer.add_scalar('learning_curve/adversarial_loss/{}'.format(p), adversarial_loss, e)
 
             print('{} -- Reconstruction Loss: {}, Discriminator Loss: {}, Adversarial Loss: {}'.format(p, reconstruction_loss, discriminator_loss, adversarial_loss))
+            if p == 'test':
+                if e % 10 == 0:
+                    #Plot example of reconstructed images
+                    pred = utils.process.deprocess(pred)
+                    pred = pred.data.cpu().numpy()
+                    pred = np.rollaxis(pred, 1, 4)
+                    inputs = utils.process.deprocess(inputs)
+                    inputs = inputs.data.cpu().numpy()
+                    inputs = np.rollaxis(inputs, 1, 4)
+                    utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(directory, 'example_reconstruction', 'epoch_{}.svg'.format(e)))
             # if p == 'test':
             #     writer.add_scalar('auc', auc, e)
             #     if auc > best_auc:
