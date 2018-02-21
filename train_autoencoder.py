@@ -51,7 +51,7 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
                 model.zero_grad()
                 inputs = Variable(sample['img'].float().cuda())
                 logits, pred = model(inputs)
-                loss = loss_function(logits, inputs)
+                loss = loss_function(pred, inputs)
                 if p == 'train':
                     loss.backward()
                     optimizer.step()
