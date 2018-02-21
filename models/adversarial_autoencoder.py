@@ -124,7 +124,7 @@ class Discriminator(torch.nn.Module):
             s = l
         layers.append(torch.nn.Linear(s, 1))
         self.fc = torch.nn.Sequential(*layers)
-        self.pred = torch.nn.SELU()
+        self.pred = torch.nn.Tanh()
 
         #Weights initialization
         for m in self.modules():
@@ -137,15 +137,3 @@ class Discriminator(torch.nn.Module):
         pred = self.pred(logits)
 
         return logits, pred
-
-# nb_b = 2
-# nb_f = 32
-# nb_l = 1
-# latent_size = 512
-# dense = '512, 256'
-# e = Encoder(nb_f, nb_l, nb_b, latent_size)
-# d = Decoder(e.out_dim, nb_l, nb_b, latent_size)
-# di = Discriminator(latent_size, dense)
-# print(e)
-# print(d)
-# print(di)
