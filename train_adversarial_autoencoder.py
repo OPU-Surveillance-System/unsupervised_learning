@@ -33,7 +33,7 @@ def train(encoder, decoder, discriminator, reconstruction_loss_function, adversa
     datasets = {'train': trainset, 'test': testset}
     dist = torch.nn.PairwiseDistance(p=2, eps=1e-06)
     best_auc = 0
-    best_model = copy.deepcopy(model)
+    best_model = 0
     writer = SummaryWriter(os.path.join(directory, 'logs'))
     zeros = torch.zeros(batch_size) * -1
     ones = torch.ones(batch_size)
