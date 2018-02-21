@@ -49,13 +49,14 @@ def train(encoder, decoder, discriminator, reconstruction_loss_function, adversa
 
             dataloader = DataLoader(datasets[p], batch_size=batch_size, shuffle=True, num_workers=4)
             for i_batch, sample in enumerate(tqdm(dataloader)):
-                model.zero_grad()
                 inputs = Variable(sample['img'].float().cuda())
 
                 #Reconstruction training
                 if p == 'train':
                     encoder.train()
                     decoder.train()
+                    encoder.zero_grad()
+                    decoder.zero_grad()
                 else:
                     encoder.eval()
                     decoder.eval()
@@ -72,6 +73,7 @@ def train(encoder, decoder, discriminator, reconstruction_loss_function, adversa
                 encoder.eval()
                 if p == 'train':
                     discriminator.train()
+                    discriminator.zero_grad()
                 else:
                     discriminator.eval()
                 z_real = Variable(torch.randn(batch_size, latent_size)).cuda() #~N(0, 1)
@@ -89,6 +91,7 @@ def train(encoder, decoder, discriminator, reconstruction_loss_function, adversa
                 discriminator.eval()
                 if p == 'train':
                     encoder.train()
+                    encoder.zero_grad()
                 else:
                     encoder.eval()
                 logits, pred = discriminator(z_fake)
