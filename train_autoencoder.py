@@ -51,7 +51,8 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
                 model.zero_grad()
                 inputs = Variable(sample['img'].float().cuda())
                 logits, pred = model(inputs)
-                loss = loss_function(logits, inputs) + reg * torch.norm(logits.view(-1, logits.size(1) * logits.size(2) * logits.size(3)), 2, 1)
+                print(torch.norm(logits.view(-1, logits.size(1) * logits.size(2) * logits.size(3)), 2, 1))
+                loss = loss_function(logits, inputs) + reg * torch.mean(torch.norm(logits.view(-1, logits.size(1) * logits.size(2) * logits.size(3)), 2, 1))
                 if p == 'train':
                     loss.backward()
                     optimizer.step()
