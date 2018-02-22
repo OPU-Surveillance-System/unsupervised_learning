@@ -3,7 +3,6 @@ import os
 import torch
 import copy
 import numpy as np
-import itertools
 from torch.utils.data import DataLoader
 from torch.autograd import Variable
 from tqdm import tqdm
@@ -122,7 +121,7 @@ def main(args):
     ae = ae.cuda()
     print(ae)
     loss_function = torch.nn.MSELoss()
-    parameters = itertools.ifilter(lambda p: p.requires_grad, ae.parameters())
+    parameters = [p for p in ae.parameters() if p.requires_grad]
     optimizer = torch.optim.Adam(parameters(), args.learning_rate)
 
     trainset = dataset.VideoDataset(args.trainset, args.root_dir)
