@@ -122,7 +122,7 @@ def main(args):
     print(ae)
     loss_function = torch.nn.MSELoss()
     parameters = [p for p in ae.parameters() if p.requires_grad]
-    optimizer = torch.optim.Adam(parameters(), args.learning_rate)
+    optimizer = torch.optim.Adam(parameters, args.learning_rate)
 
     trainset = dataset.VideoDataset(args.trainset, args.root_dir)
     testset = dataset.VideoDataset(args.testset, args.root_dir)
