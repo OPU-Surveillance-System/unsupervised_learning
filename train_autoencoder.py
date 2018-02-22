@@ -3,7 +3,7 @@ import os
 import torch
 import copy
 import numpy as np
-from itertools
+import itertools
 from torch.utils.data import DataLoader
 from torch.autograd import Variable
 from tqdm import tqdm
