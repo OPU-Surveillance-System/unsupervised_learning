@@ -10,7 +10,7 @@ class Autoencoder(torch.nn.Module):
         self.nb_b = nb_b
         self.fc = fc
         self.ips = input_size
-        self.rate
+        self.rate = rate
 
         def downsampling_block(in_dim, nb_f, nb_l, rate):
             layers = []
