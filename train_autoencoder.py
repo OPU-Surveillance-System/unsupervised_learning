@@ -15,7 +15,7 @@ import utils.metrics
 import utils.plot
 import utils.process
 
-def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size, directory):
+def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size, reg, directory):
     """
     Train a model and log the process
     Args:
@@ -51,7 +51,7 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
                 model.zero_grad()
                 inputs = Variable(sample['img'].float().cuda())
                 logits, pred = model(inputs)
-                loss = loss_function(logits, inputs)
+                loss = loss_function(logits, inputs) + reg * torch.norm(logits.view(-1, logits.size(1) * logits.size(2) * logits.size(3)), 2, 1)
                 if p == 'train':
                     loss.backward()
                     optimizer.step()
@@ -123,7 +123,7 @@ def main(args):
     testset = dataset.VideoDataset(args.testset, args.root_dir)
 
     #Train the model and save it
-    best_model = train(ae, loss_function, optimizer, trainset, testset, args.epoch, args.batch_size, args.directory)
+    best_model = train(ae, loss_function, optimizer, trainset, testset, args.epoch, args.batch_size, args.regularization, args.directory)
     torch.save(best_model.state_dict(), os.path.join(args.directory, 'serial', 'best_model'))
 
     return 0
@@ -136,6 +136,7 @@ if __name__ == '__main__':
     parser.add_argument('--rd', dest='root_dir', type=str, default='/datasets', help='Path to the images')
     parser.add_argument('--bs', dest='batch_size', type=int, default=16, help='Mini batch size')
     parser.add_argument('--lr', dest='learning_rate', type=float, default=0.0001, help='Learning rate')
+    parser.add_argument('--reg', dest='regularization', type=float, default=0.0001, help='Regularization')
     parser.add_argument('--ep', dest='epoch', type=int, default=100, help='Number of training epochs')
     parser.add_argument('--dir', dest='directory', type=str, default='train_autoencoder', help='Directory to store results')
     #Model arguments
