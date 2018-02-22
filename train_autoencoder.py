@@ -121,7 +121,8 @@ def main(args):
     ae = ae.cuda()
     print(ae)
     loss_function = torch.nn.MSELoss()
-    optimizer = torch.optim.Adam(ae.parameters(), args.learning_rate)
+    parameters = ifilter(lambda p: p.requires_grad, ae.parameters())
+    optimizer = torch.optim.Adam(parameters(), args.learning_rate)
 
     trainset = dataset.VideoDataset(args.trainset, args.root_dir)
     testset = dataset.VideoDataset(args.testset, args.root_dir)
