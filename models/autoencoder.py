@@ -17,7 +17,7 @@ class Autoencoder(torch.nn.Module):
             layers = []
             for n in range(nb_l):
                 layers.append(torch.nn.Conv2d(in_dim, nb_f, (3, 3), padding=1))
-                layers.append(torch.nn.Dropout2d(p=rate))
+                #layers.append(torch.nn.Dropout2d(p=rate))
                 layers.append(torch.nn.SELU())
                 in_dim = nb_f
             layers.append(torch.nn.MaxPool2d((2, 2), (2, 2)))
@@ -26,21 +26,21 @@ class Autoencoder(torch.nn.Module):
 
         def upsampling_block(in_dim, nb_f, nb_l, rate):
             layers = [torch.nn.ConvTranspose2d(in_dim, nb_f, (2, 2), (2, 2))]
-            layers.append(torch.nn.Dropout2d(p=rate))
+            #layers.append(torch.nn.Dropout2d(p=rate))
             layers.append(torch.nn.SELU())
             for n in range(nb_l):
                 layers.append(torch.nn.Conv2d(nb_f, nb_f, (3, 3), padding=1))
-                layers.append(torch.nn.Dropout2d(p=rate))
+                #layers.append(torch.nn.Dropout2d(p=rate))
                 layers.append(torch.nn.SELU())
 
             return layers
 
         def build_bottleneck(in_dim, h_dim, rate):
             layers = [torch.nn.Linear(in_dim, h_dim)]
-            layers.append(torch.nn.Dropout2d(p=rate))
+            #layers.append(torch.nn.Dropout2d(p=rate))
             layers.append(torch.nn.Linear(h_dim, in_dim))
-            layers.append(torch.nn.Dropout2d(p=rate))
-            layers.append(torch.nn.SELU())
+            #layers.append(torch.nn.Dropout2d(p=rate))
+            #layers.append(torch.nn.SELU())
 
             return layers
 
@@ -67,7 +67,7 @@ class Autoencoder(torch.nn.Module):
             next_f = prev_f // 2
             layers += upsampling_block(prev_f, next_f, self.nb_l, self.rate)
         layers.append(torch.nn.Conv2d(next_f, self.in_dim, (3, 3), padding=1))
-        layers.append(torch.nn.Dropout2d(p=rate))
+        #layers.append(torch.nn.Dropout2d(p=rate))
         self.decoder = torch.nn.Sequential(*layers)
 
         self.activation = torch.nn.Tanh()
