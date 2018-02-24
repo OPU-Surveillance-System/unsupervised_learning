@@ -49,7 +49,7 @@ class Autoencoder(torch.nn.Module):
 
         #Bottleneck
         if self.fc:
-            in_dim = ((self.shape//(2**self.nb_b))**2)*(prev_f//2) #last_feature_map.h * last_feature_map.w * last_feature_map.c
+            in_dim = ((self.patch//(2**self.nb_b))**2)*(prev_f//2) #last_feature_map.h * last_feature_map.w * last_feature_map.c
             layers = build_bottleneck(in_dim, self.fc, self.rate)
             self.bottleneck = torch.nn.Sequential(*layers)
 
