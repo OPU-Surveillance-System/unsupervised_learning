@@ -12,7 +12,7 @@ class Autoencoder(torch.nn.Module):
         self.ips = input_size
         self.patch = patch
 
-        def downsampling_block(in_dim, nb_f, nb_l, rate):
+        def downsampling_block(in_dim, nb_f, nb_l):
             layers = []
             for n in range(nb_l):
                 layers.append(torch.nn.Conv2d(in_dim, nb_f, (3, 3), padding=1))
@@ -22,7 +22,7 @@ class Autoencoder(torch.nn.Module):
 
             return layers
 
-        def upsampling_block(in_dim, nb_f, nb_l, rate):
+        def upsampling_block(in_dim, nb_f, nb_l):
             layers = [torch.nn.ConvTranspose2d(in_dim, nb_f, (2, 2), (2, 2))]
             layers.append(torch.nn.SELU())
             for n in range(nb_l):
@@ -31,7 +31,7 @@ class Autoencoder(torch.nn.Module):
 
             return layers
 
-        def build_bottleneck(in_dim, h_dim, rate):
+        def build_bottleneck(in_dim, h_dim):
             layers = [torch.nn.Linear(in_dim, h_dim)]
             layers.append(torch.nn.Linear(h_dim, in_dim))
 
@@ -42,7 +42,7 @@ class Autoencoder(torch.nn.Module):
         prev_in = self.in_dim
         prev_f = self.nb_f
         for n in range(self.nb_b):
-            layers += downsampling_block(prev_in, prev_f, self.nb_l, self.rate)
+            layers += downsampling_block(prev_in, prev_f, self.nb_l)
             prev_in = prev_f
             prev_f *= 2
         self.encoder = torch.nn.Sequential(*layers)
@@ -50,7 +50,7 @@ class Autoencoder(torch.nn.Module):
         #Bottleneck
         if self.fc:
             in_dim = ((self.patch//(2**self.nb_b))**2)*(prev_f//2) #last_feature_map.h * last_feature_map.w * last_feature_map.c
-            layers = build_bottleneck(in_dim, self.fc, self.rate)
+            layers = build_bottleneck(in_dim, self.fc)
             self.bottleneck = torch.nn.Sequential(*layers)
 
         #Decoder
@@ -58,7 +58,7 @@ class Autoencoder(torch.nn.Module):
         for n in range(self.nb_b):
             prev_f //= 2
             next_f = prev_f // 2
-            layers += upsampling_block(prev_f, next_f, self.nb_l, self.rate)
+            layers += upsampling_block(prev_f, next_f, self.nb_l)
         layers.append(torch.nn.Conv2d(next_f, self.in_dim, (3, 3), padding=1))
         self.decoder = torch.nn.Sequential(*layers)
 
