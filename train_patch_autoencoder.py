@@ -114,11 +114,7 @@ def main(args):
             f.write('{}:{}\n'.format(k, d[k]))
 
     #Variables
-    if args.random_projection == 0:
-        rp = False
-    else:
-        rp = True
-    ae = models.autoencoder.Autoencoder(args.nb_f, args.nb_l, args.nb_b, args.dense, rp, args.ips, args.dropout_rate)
+    ae = models.autoencoder.Autoencoder(args.nb_f, args.nb_l, args.nb_b, args.dense, args.ips, args.patch)
     ae = ae.cuda()
     print(ae)
     loss_function = torch.nn.MSELoss()
@@ -151,8 +147,6 @@ if __name__ == '__main__':
     parser.add_argument('-b', dest='nb_b', type=int, default=2, help='Number of upsampling blocks')
     parser.add_argument('-d', dest='dense', type=int, default=None, help='Number of neurons in the middle denser layer (if None: no dense layer)')
     parser.add_argument('-i', dest='ips', type=int, default=256, help='Image height (assume width = height)')
-    parser.add_argument('--do', dest='dropout_rate', type=float, default=0.5, help='Dropout rate')
-    parser.add_argument('-r', dest='random_projection', type=int, default=0, help='Random projection')
     parser.add_argument('-p', dest='patch', type=int, default=32, help='Image patch size')
     args = parser.parse_args()
 

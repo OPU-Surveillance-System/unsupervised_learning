@@ -2,14 +2,13 @@ import torch
 import math
 
 class Autoencoder(torch.nn.Module):
-    def __init__(self, nb_f, nb_l, nb_b, fc=None, random_projection=False, input_size=256, patch=32):
+    def __init__(self, nb_f, nb_l, nb_b, fc=None, input_size=256, patch=32):
         super(Autoencoder, self).__init__()
         self.in_dim = 3
         self.nb_f = nb_f
         self.nb_l = nb_l
         self.nb_b = nb_b
         self.fc = fc
-        self.random_projection = random_projection
         self.ips = input_size
         self.patch = patch
 
@@ -73,10 +72,6 @@ class Autoencoder(torch.nn.Module):
             elif isinstance(m, torch.nn.Linear):
                 m.weight.data.normal_(0, math.sqrt(2. / m.in_features))
                 m.bias.data.zero_()
-
-        if self.random_projection:
-            for p in self.bottleneck.parameters():
-                p.requires_grad = False
 
     def forward(self, x):
         x = x.view(-1, 3, self.patch, self.patch)
