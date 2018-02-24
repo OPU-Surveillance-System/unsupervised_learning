@@ -10,7 +10,7 @@ from sklearn import metrics
 from tensorboardX import SummaryWriter
 
 import dataset
-import models.autoencoder
+import models.patch_autoencoder
 import utils.metrics
 import utils.plot
 import utils.process
@@ -114,7 +114,7 @@ def main(args):
             f.write('{}:{}\n'.format(k, d[k]))
 
     #Variables
-    ae = models.autoencoder.Autoencoder(args.nb_f, args.nb_l, args.nb_b, args.dense, args.ips, args.patch)
+    ae = models.patch_autoencoder.Autoencoder(args.nb_f, args.nb_l, args.nb_b, args.dense, args.ips, args.patch)
     ae = ae.cuda()
     print(ae)
     loss_function = torch.nn.MSELoss()

@@ -76,7 +76,6 @@ class Autoencoder(torch.nn.Module):
     def forward(self, x):
         x = x.view(-1, 3, self.patch, self.patch)
         x = self.encoder(x)
-        print(x.shape)
         if self.fc:
             x = x.view(x.size(0), -1)
             x = self.bottleneck(x)
