@@ -87,7 +87,7 @@ def main(args):
             hp['dense'] = None
         else:
             hp['dense'] = int(hp['dense'])
-        ae = models.patch_autoencoder.Autoencoder(int(hp['nb_f']), int(hp['nb_l']), int(hp['nb_b']), hp['dense'], int(hp['ips']), hp['patch'])
+        ae = models.patch_autoencoder.Autoencoder(int(hp['nb_f']), int(hp['nb_l']), int(hp['nb_b']), hp['dense'], int(hp['ips']), int(hp['patch']))
     #Use hyper-parameters passed as arguments
     else:
         ae = models.patch_autoencoder.Autoencoder(args.nb_f, args.nb_l, args.nb_b, args.dense, args.ips, args.patch)
