@@ -67,8 +67,8 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
                 loss = reconstruction_loss_function(reconstruction, inputs.view(-1, 3, patch_size, patch_size))
                 if p == 'train':
                     loss.backward()
-                    decoder.step()
-                    encoder.step()
+                    decoder_optimizer.step()
+                    encoder_optimizer.step()
                 running_reconstruction_loss += loss.data[0]
 
                 #Discriminator
