@@ -98,7 +98,7 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
                     encoder.eval()
                 z_real = encoder(inputs)
                 logits_real = discriminator(z_real)[0]
-                labels = Variable(torch.zeros(logits_real.size(0)).float().cuda())
+                labels = Variable(torch.zeros((logits_real.size(0), 1)).float().cuda())
                 loss = adversarial_loss_function(logits_real, labels)
                 if p == 'train':
                     loss.backward()
