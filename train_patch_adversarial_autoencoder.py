@@ -82,7 +82,7 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
                 z_fake = encoder(inputs)
                 logits_real = discriminator(z_real)[0]
                 logits_fake = discriminator(z_fake)[0]
-                labels = Variable(torch.cat((torch.zeros(logits_real.size(0)), torch.ones(logits_fake.size(0))), 0).float().cuda())
+                labels = Variable(torch.cat((torch.zeros((logits_real.size(0), 1)), torch.ones((logits_fake.size(0), 1))), 0).float().cuda())
                 loss = adversarial_loss_function(torch.cat((logits_real, logits_fake), 0), labels)
                 if p == 'train':
                     loss.backward()
