@@ -80,8 +80,8 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
                     discriminator.eval()
                 z_real = Variable(torch.randn(inputs.size(0) * ((256//patch_size)**2), latent_size).cuda()) #Sample from N(0, 1)
                 z_fake = encoder(inputs)
-                logits_real = discriminator(z_real)
-                logits_fake = discriminator(z_fake)
+                logits_real = discriminator(z_real)[0]
+                logits_fake = discriminator(z_fake)[0]
                 labels = Variable(torch.cat((torch.zeros(logits_real.size(0)), torch.ones(logits_fake.size(0))), 0).float().cuda())
                 loss = adversarial_loss_function(torch.cat((logits_real, logits_fake), 0), labels)
                 if p == 'train':
@@ -97,7 +97,7 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
                 else:
                     encoder.eval()
                 z_real = encoder(inputs)
-                logits_real = discriminator(z_real)
+                logits_real = discriminator(z_real)[0]
                 labels = Variable(torch.zeros(logits_real.size(0)).float().cuda())
                 loss = adversarial_loss_function(logits_real, labels)
                 if p == 'train':
