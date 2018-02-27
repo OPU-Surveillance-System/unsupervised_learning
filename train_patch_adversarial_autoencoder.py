@@ -112,6 +112,7 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
             writer.add_scalar('learning_curve/reconstruction_loss/{}'.format(p), epoch_reconstruction_loss, e)
             writer.add_scalar('learning_curve/discriminator_loss/{}'.format(p), epoch_discriminator_loss, e)
             writer.add_scalar('learning_curve/adversarial_loss/{}'.format(p), epoch_adversarial_loss, e)
+            print('{} -- Reconstruction loss: {}, Discriminator loss: {}, Adversarial loss: {}'.format(p, epoch_reconstruction_loss, epoch_discriminator_loss, epoch_adversarial_loss))
 
             if p == 'test':
                 if e % 10 == 0:
