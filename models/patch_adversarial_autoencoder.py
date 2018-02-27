@@ -85,7 +85,7 @@ class Decoder(torch.nn.Module):
             layers += upsampling_block(prev_f, next_f, self.nb_l)
             prev_f = next_f
             next_f //= 2
-        layers.append(torch.nn.Conv2d(next_f, 3, (3, 3), padding=1))
+        layers.append(torch.nn.Conv2d(prev_f, 3, (3, 3), padding=1))
         self.conv = torch.nn.Sequential(*layers)
 
         #Weights initialization
@@ -102,7 +102,6 @@ class Decoder(torch.nn.Module):
     def forward(self, x):
         x = self.bottleneck(x)
         x = x.view(-1, self.encoder_dim[0], self.encoder_dim[1], self.encoder_dim[2])
-        print(x.shape)
         x = self.conv(x)
 
         return x
