@@ -64,7 +64,7 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
                 inputs = Variable(sample['img'].float().cuda())
                 latent = encoder(inputs)
                 reconstruction = decoder(latent)
-                loss = reconstruction_loss_function(reconstruction, inputs.view(-1, 3, patch_size, patch_zise))
+                loss = reconstruction_loss_function(reconstruction, inputs.view(-1, 3, patch_size, patch_sise))
                 if p == 'train':
                     loss.backward()
                     decoder.step()
