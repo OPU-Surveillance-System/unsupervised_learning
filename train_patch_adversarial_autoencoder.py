@@ -15,11 +15,11 @@ import utils.metrics
 import utils.plot
 import utils.process
 
-def train(models, loss_functions, optimizers, trainset, testset, epoch, batch_size, latent_size, patch_size, directory):
+def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_size, latent_size, patch_size, directory):
     """
     Train an adversarial autoencoder and log the process
     Args:
-        models (list of torch.nn.Module): List of models to train (encoder, decoder, discriminator)
+        networks (list of torch.nn.Module): List of models to train (encoder, decoder, discriminator)
         loss_functions (list of torch.optim.Module): Loss functions (reconstruction, adversarial)
         optimizers (list of torch.optim.Optimizer): Optimizers (encoder, decoder, discriminator, adversarial encoder)
         trainset (torch.utils.data.Dataset): Training set
@@ -31,7 +31,7 @@ def train(models, loss_functions, optimizers, trainset, testset, epoch, batch_si
         directory (str): Directory to store the logs
     """
 
-    encoder, decoder, discriminator = models
+    encoder, decoder, discriminator = networks
     reconstruction_loss_function, adversarial_loss_function = loss_functions
     encoder_optimizer, decoder_optimizer, discriminator_optimizer, adversarial_encoder_optimizer = optimizers
     phase = ('train', 'test')
@@ -165,7 +165,7 @@ def main(args):
     print(encoder)
     print(decoder)
     print(discriminator)
-    models = [encoder, decoder, discriminator]
+    networks = [encoder, decoder, discriminator]
 
     #Loss functions
     reconstruction_loss_function = torch.nn.MSELoss()
@@ -185,7 +185,7 @@ def main(args):
     testset = dataset.VideoDataset(args.testset, args.root_dir)
 
     #Train the model and save it
-    encoder, decoder, discriminator = train(models, loss_functions, optimizers, trainset, testset, args.epoch, args.batch_size, args.latent_size, args.patch, args.directory)
+    encoder, decoder, discriminator = train(networks, loss_functions, optimizers, trainset, testset, args.epoch, args.batch_size, args.latent_size, args.patch, args.directory)
     #torch.save(best_model.state_dict(), os.path.join(args.directory, 'serial', 'best_model'))
 
     return 0
