@@ -102,6 +102,7 @@ class Decoder(torch.nn.Module):
     def forward(self, x):
         x = self.bottleneck(x)
         x = x.view(-1, self.encoder_dim[0], self.encoder_dim[1], self.encoder_dim[2])
+        print(x.shape)
         x = self.conv(x)
 
         return x
