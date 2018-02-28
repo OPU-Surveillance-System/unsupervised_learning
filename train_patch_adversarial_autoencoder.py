@@ -125,14 +125,14 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
 
                 #Store labels
                 if p == 'test':
-                    labels += sample['lbl'].numpy().tolist()
+                    label += sample['lbl'].numpy().tolist()
 
             if p == 'test':
                 reconstruction_errors = torch.from_numpy(reconstruction_errors).float().cuda()
                 discriminator_ouput = torch.from_numpy(discriminator_ouput).float().cuda()
                 image_abnormal_score = utils.metrics.mean_image_abnormal_score(reconstruction_errors, discriminator_ouput, alpha, patch_size)
                 image_abnormal_score = image_abnormal_score.data.cpu().numpy().tolist()
-                fpr, tpr, thresholds = metrics.roc_curve(labels, image_abnormal_score)
+                fpr, tpr, thresholds = metrics.roc_curve(label, image_abnormal_score)
                 auc = metrics.auc(fpr, tpr)
             else:
                 auc = 0
