@@ -31,6 +31,7 @@ def test(networks, testset, batch_size, patch_size, directory):
     dataloader = DataLoader(testset, batch_size=batch_size, shuffle=False, num_workers=4)
     dist = torch.nn.PairwiseDistance(p=2, eps=1e-06)
 
+    encoder, decoder, discriminator = networks
     encoder.eval()
     decoder.eval()
     discriminator.eval()
