@@ -43,8 +43,8 @@ def test(networks, testset, batch_size, patch_size, directory):
         r = decoder(latent)
         r_ = utils.metrics.per_image_error(dist, r, inputs.view(-1, 3, patch_size, patch_size))
         d = discriminator(latent)[1]
-        reconstruction_errors += r_.cpu().numpy().tolist()
-        discriminator_outputs += d.cpu().numpy().tolist()
+        reconstruction_errors += r_.data.cpu().numpy().tolist()
+        discriminator_outputs += d.data.cpu().numpy().tolist()
         groundtruth += sample['lbl'].cpu().numpy().tolist()
 
     # #Get histograms of reconstruction error for normal and abnormal patterns
