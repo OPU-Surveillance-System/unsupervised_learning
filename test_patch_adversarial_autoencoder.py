@@ -48,7 +48,7 @@ def test(networks, testset, batch_size, patch_size, directory):
         groundtruth += sample['lbl'].cpu().numpy().tolist()
 
     #Compute AUC
-    alphas = np.arange(0.0, 1.5, 0.05)
+    alphas = np.arange(0.0, 1.05, 0.05)
     reconstruction_errors = np.array(reconstruction_errors)
     discriminator_outputs = np.array(discriminator_outputs)
     reconstruction_errors = torch.from_numpy(reconstruction_errors).float().cuda()
@@ -58,8 +58,8 @@ def test(networks, testset, batch_size, patch_size, directory):
         image_abnormal_score = image_abnormal_score.cpu().numpy().tolist()
         fpr, tpr, thresholds = metrics.roc_curve(groundtruth, image_abnormal_score)
         auc = metrics.auc(fpr, tpr)
-        utils.plot.plot_auc(fpr, tpr, auc, os.path.join(directory, 'plots', 'auc_{}.svg.'.format(alphas[a])))
-        print('Alpha = {} AUC: {}'.format(alphas[a], auc))
+        utils.plot.plot_auc(fpr, tpr, auc, os.path.join(directory, 'plots', 'auc_{.3f}.svg.'.format(alphas[a])))
+        print('Alpha = {.3f} AUC: {.5f}'.format(alphas[a], auc))
 
     # with open(os.path.join(directory, 'results'), 'w') as f:
     #     f.write('Normal: mean={}, var={}, std={}\n'.format(normal_distribution.mean(), normal_distribution.var(), normal_distribution.std()))
