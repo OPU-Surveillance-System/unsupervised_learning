@@ -97,7 +97,7 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
                 labels_fake = Variable(torch.ones((logits_fake.size(0), 1)).float().cuda())
                 loss_real = adversarial_loss_function(logits_real, labels_real)
                 loss_fake = adversarial_loss_function(logits_fake, labels_fake)
-                loss = loss_real + loss fake
+                loss = loss_real + loss_fake
                 if p == 'train':
                     loss.backward()
                     discriminator_optimizer.step()
