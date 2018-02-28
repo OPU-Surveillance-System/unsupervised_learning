@@ -108,9 +108,9 @@ def main(args):
         sd = 'best_decoder'
         sdi = 'best_discriminator'
     else:
-        se = 'encoder_'.format(args.model)
-        sd = 'decoder_'.format(args.model)
-        sdi = 'discriminator_'.format(args.model)
+        se = 'encoder_{}'.format(args.model)
+        sd = 'decoder_{}'.format(args.model)
+        sdi = 'discriminator_{}'.format(args.model)
     encoder.load_state_dict(torch.load(os.path.join(args.directory, 'serial', se)))
     decoder.load_state_dict(torch.load(os.path.join(args.directory, 'serial', sd)))
     discriminator.load_state_dict(torch.load(os.path.join(args.directory, 'serial', sdi)))
