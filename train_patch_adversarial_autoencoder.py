@@ -54,7 +54,7 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
 
             reconstruction_errors = []
             discriminator_ouput = []
-            labels = []
+            label = []
 
             nb_patch = len(datasets[p]) * ((256//patch_size)**2)
 
