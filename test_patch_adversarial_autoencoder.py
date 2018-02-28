@@ -62,7 +62,9 @@ def test(networks, testset, batch_size, patch_size, directory):
     #Compute AUC
     alphas = np.arange(0.0, 1.5, 0.05)
     for a in range(len(alphas)):
-        image_abnormal_score = utils.metrics.mean_image_abnormal_score(reconstruction_errors, discriminator_ouput, alphas[a], patch_size)
+        reconstruction_errors = torch.from_numpy(np.array(reconstruction_errors)).float().cuda()
+        discriminator_ouputs = torch.from_numpy(np.array(discriminator_ouputs)).float().cuda()
+        image_abnormal_score = utils.metrics.mean_image_abnormal_score(reconstruction_errors, discriminator_ouputs, alphas[a], patch_size)
         image_abnormal_score = image_abnormal_score.cpu().numpy().tolist()
         fpr, tpr, thresholds = metrics.roc_curve(label, image_abnormal_score)
         auc = metrics.auc(fpr, tpr)
