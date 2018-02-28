@@ -24,6 +24,7 @@ def normalize_reconstruction_errors(r):
 
     max_error = torch.max(r, 0)
     min_error = torch.min(r, 0)
+    print(r, max_error, min_error)
     r_ = (r - min_error) / max_error
 
     return r_
