@@ -92,9 +92,9 @@ def main(args):
         with open(os.path.join(args.directory, 'hyper-parameters'), 'r') as f:
             hp = f.read().split('\n')[:-1]
         hp = {e.split(':')[0]:e.split(':')[1] for e in hp}
-        encoder = models.patch_autoencoder.Encoder(int(hp['nb_f']), int(hp['nb_l']), int(hp['nb_b']), int(hp['latent_size']), int(hp['patch']))
-        decoder = models.patch_autoencoder.Decoder(encoder.last_map_dim, int(hp['nb_l']), int(hp['nb_b']), int(hp['latent_size']))
-        discriminator = models.patch_autoencoder.Discriminator(int(hp['latent_size']), hp['denses'])
+        encoder = models.patch_adversarial_autoencoder.Encoder(int(hp['nb_f']), int(hp['nb_l']), int(hp['nb_b']), int(hp['latent_size']), int(hp['patch']))
+        decoder = models.patch_adversarial_autoencoder.Decoder(encoder.last_map_dim, int(hp['nb_l']), int(hp['nb_b']), int(hp['latent_size']))
+        discriminator = models.patch_adversarial_autoencoder.Discriminator(int(hp['latent_size']), hp['denses'])
     # #Use hyper-parameters passed as arguments
     # else:
     #     ae = models.patch_autoencoder.Autoencoder(args.nb_f, args.nb_l, args.nb_b, args.dense, args.ips, args.patch)
