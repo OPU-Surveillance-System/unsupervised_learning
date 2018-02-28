@@ -22,9 +22,8 @@ def normalize_reconstruction_errors(r):
         r (torch.tensor): Tensor containing the reconstruction errors
     """
 
-    max_error = torch.max(r, 0)
-    min_error = torch.min(r, 0)
-    print(r, max_error, min_error)
+    max_error = torch.max(r, 0)[0]
+    min_error = torch.min(r, 0)[0]
     r_ = (r - min_error) / max_error
 
     return r_
