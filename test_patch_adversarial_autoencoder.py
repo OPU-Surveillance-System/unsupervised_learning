@@ -42,7 +42,7 @@ def test(networks, testset, batch_size, patch_size, directory):
         latent = encoder(inputs)
         r = decoder(latent)
         r_ = utils.metrics.per_image_error(dist, r, inputs.view(-1, 3, patch_size, patch_size))
-        d = torch.nn.functional.tanh(discriminator(latent))
+        d = discriminator(latent)[1]
         reconstruction_errors += r_.cpu().numpy().tolist()
         discriminator_outputs += d.cpu().numpy().tolist()
         groundtruth += sample['lbl'].cpu().numpy().tolist()
