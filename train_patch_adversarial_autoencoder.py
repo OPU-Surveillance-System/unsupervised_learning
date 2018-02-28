@@ -47,7 +47,8 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
         print('Epoch {}'.format(e))
         for p in phase:
             running_reconstruction_loss = 0
-            running_discriminator_loss = 0
+            running_discriminator_loss_real = 0
+            running_discriminator_loss_fake = 0
             running_adversarial_loss = 0
             dataloader = DataLoader(datasets[p], batch_size=batch_size, shuffle=True, num_workers=4)
 
@@ -56,7 +57,6 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
             labels = []
 
             nb_patch = len(datasets[p]) * ((256//patch_size)**2)
-            nb_discriminator_sample = nb_patch * 2
 
             for i_batch, sample in enumerate(tqdm(dataloader)):
 
@@ -93,12 +93,15 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
                 z_fake = encoder(inputs)
                 logits_real = discriminator(z_real)[0]
                 logits_fake = discriminator(z_fake)[0]
-                labels = Variable(torch.cat((torch.zeros((logits_real.size(0), 1)), torch.ones((logits_fake.size(0), 1))), 0).float().cuda())
-                loss = adversarial_loss_function(torch.cat((logits_real, logits_fake), 0), labels)
+                labels_real = Variable(torch.zeros((logits_real.size(0), 1)).float().cuda())
+                labels_fake = Variable(torch.ones((logits_fake.size(0), 1)).float().cuda())
+                loss_real = adversarial_loss_function(logits_real, labels_real)
+                loss_fake = adversarial_loss_function(logits_fake, labels_fake)
                 if p == 'train':
                     loss.backward()
                     discriminator_optimizer.step()
-                running_discriminator_loss += loss.data[0]
+                running_discriminator_loss_real += loss_real.data[0]
+                running_discriminator_loss_fake += loss_fake.data[0]
 
                 #Adversarial
                 discriminator.eval()
@@ -135,13 +138,15 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
 
             #Computes epoch average losses
             epoch_reconstruction_loss = running_reconstruction_loss / nb_patch
-            epoch_discriminator_loss = running_discriminator_loss / nb_discriminator_sample
+            epoch_discriminator_loss = running_discriminator_loss_real / nb_patch
+            epoch_discriminator_loss = running_discriminator_loss_fake / nb_patch
             epoch_adversarial_loss = running_adversarial_loss / nb_patch
             writer.add_scalar('{}/learning_curve/reconstruction_loss'.format(p), epoch_reconstruction_loss, e)
-            writer.add_scalar('{}/learning_curve/discriminator_loss'.format(p), epoch_discriminator_loss, e)
+            writer.add_scalar('{}/learning_curve/discriminator_loss_real'.format(p), epoch_discriminator_loss_real, e)
+            writer.add_scalar('{}/learning_curve/discriminator_loss_fake'.format(p), epoch_discriminator_loss_fake, e)
             writer.add_scalar('{}/learning_curve/adversarial_loss/'.format(p), epoch_adversarial_loss, e)
             writer.add_scalar('{}/auc'.format(p), auc, e)
-            print('{} -- Reconstruction loss: {}, Discriminator loss: {}, Adversarial loss: {}, AUC: {}'.format(p, epoch_reconstruction_loss, epoch_discriminator_loss, epoch_adversarial_loss, auc))
+            print('{} -- Reconstruction loss: {}, Discriminator loss real: {}, Discriminator loss fake: {} Adversarial loss: {}, AUC: {}'.format(p, epoch_reconstruction_loss, epoch_discriminator_loss_real, epoch_discriminator_loss_fake, epoch_adversarial_loss, auc))
 
             if p == 'test':
                 if auc > best_auc:
@@ -221,7 +226,9 @@ def main(args):
 
     #Train the model and save it
     encoder, decoder, discriminator = train(networks, loss_functions, optimizers, trainset, testset, args.epoch, args.batch_size, args.latent_size, args.patch, args.directory)
-    #torch.save(best_model.state_dict(), os.path.join(args.directory, 'serial', 'best_model'))
+    torch.save(encoder.state_dict(), os.path.join(args.directory, 'serial', 'best_encoder'))
+    torch.save(decoder.state_dict(), os.path.join(args.directory, 'serial', 'best_decoder'))
+    torch.save(discriminator.state_dict(), os.path.join(args.directory, 'serial', 'best_discriminator'))
 
     return 0
 
