@@ -47,22 +47,12 @@ def test(networks, testset, batch_size, patch_size, directory):
         discriminator_outputs += d.data.cpu().numpy().tolist()
         groundtruth += sample['lbl'].cpu().numpy().tolist()
 
-    # #Get histograms of reconstruction error for normal and abnormal patterns
-    # normal_distribution = np.array(errors['normal'])
-    # abnormal_distribution = np.array(errors['abnormal'])
-    # print("Normal: mean={}, var={}, std={}".format(normal_distribution.mean(), normal_distribution.var(), normal_distribution.std()))
-    # print("Anomaly: mean={}, var={}, std={}".format(abnormal_distribution.mean(), abnormal_distribution.var(), abnormal_distribution.std()))
-    # hist_n, _ = np.histogram(normal_distribution, bins=50, range=[normal_distribution.min(), abnormal_distribution.max()])
-    # hist_a, _ = np.histogram(abnormal_distribution, bins=50, range=[normal_distribution.min(), abnormal_distribution.max()])
-    # minima = np.minimum(hist_n, hist_a)
-    # intersection = np.true_divide(np.sum(minima), np.sum(hist_a))
-    # utils.plot.plot_reconstruction_hist(normal_distribution, abnormal_distribution, os.path.join(directory, 'plots', 'reconstruction_hist.svg'))
-    # print('Intersection: {}'.format(intersection))
-
     #Compute AUC
     alphas = np.arange(0.0, 1.5, 0.05)
-    reconstruction_errors = torch.from_numpy(np.array(reconstruction_errors)).float().cuda()
-    discriminator_ouputs = torch.from_numpy(np.array(discriminator_ouputs)).float().cuda()
+    reconstruction_errors = np.array(reconstruction_errors)
+    discriminator_ouputs = np.array(discriminator_ouputs)
+    reconstruction_errors = torch.from_numpy(reconstruction_errors).float().cuda()
+    discriminator_ouputs = torch.from_numpy(discriminator_ouputs).float().cuda()
     for a in range(len(alphas)):
         image_abnormal_score = utils.metrics.mean_image_abnormal_score(reconstruction_errors, discriminator_ouputs, alphas[a], patch_size)
         image_abnormal_score = image_abnormal_score.cpu().numpy().tolist()
