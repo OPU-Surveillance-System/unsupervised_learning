@@ -96,6 +96,9 @@ def main(args):
         encoder = models.patch_adversarial_autoencoder.Encoder(int(hp['nb_f']), int(hp['nb_l']), int(hp['nb_b']), int(hp['latent_size']), int(hp['patch']))
         decoder = models.patch_adversarial_autoencoder.Decoder(encoder.last_map_dim, int(hp['nb_l']), int(hp['nb_b']), int(hp['latent_size']))
         discriminator = models.patch_adversarial_autoencoder.Discriminator(int(hp['latent_size']), hp['denses'])
+        encoder = encoder.cuda()
+        decoder = decoder.cuda()
+        discriminator = discriminator.cuda()
     # #Use hyper-parameters passed as arguments
     # else:
     #     ae = models.patch_autoencoder.Autoencoder(args.nb_f, args.nb_l, args.nb_b, args.dense, args.ips, args.patch)
