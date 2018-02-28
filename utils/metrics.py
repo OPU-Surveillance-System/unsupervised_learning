@@ -53,7 +53,7 @@ def mean_image_abnormal_score(r, d, alpha, patch_size):
     """
 
     patch_abnormal_score = abnormal_score(r, d, alpha)
-    reshape = score.view(-1, (256 // patch_size)**2)
+    reshape = patch_abnormal_score.view(-1, (256 // patch_size)**2)
     mean_image_score = torch.mean(reshape, 1)
 
     return mean_image_score
