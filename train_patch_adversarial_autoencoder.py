@@ -37,6 +37,10 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
     phase = ('train', 'test')
     datasets = {'train': trainset, 'test': testset}
     dist = torch.nn.PairwiseDistance(p=2, eps=1e-06)
+    best_auc = 0
+    best_encoder = copy.deepcopy(encoder)
+    best_decoder = copy.deepcopy(decoder)
+    best_discriminator = copy.deepcopy(discriminator)
     writer = SummaryWriter(os.path.join(directory, 'logs'))
 
     for e in range(epoch):
@@ -46,6 +50,10 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
             running_discriminator_loss = 0
             running_adversarial_loss = 0
             dataloader = DataLoader(datasets[p], batch_size=batch_size, shuffle=True, num_workers=4)
+
+            reconstruction_errors = []
+            discriminator_ouput = []
+            labels = []
 
             nb_patch = len(datasets[p]) * ((256//patch_size)**2)
             nb_discriminator_sample = nb_patch * 2
@@ -69,6 +77,9 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
                     loss.backward()
                     decoder_optimizer.step()
                     encoder_optimizer.step()
+                else:
+                    r_ = utils.metrics.per_image_error(dist, reconstruction, inputs.view(-1, 3, patch_size, patch_size))
+                    reconstruction_errors += r_.data.cpu().numpy().tolist()
                 running_reconstruction_loss += loss.data[0]
 
                 #Discriminator
@@ -103,18 +114,41 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
                 if p == 'train':
                     loss.backward()
                     adversarial_encoder_optimizer.step()
+                else:
+                    d_ = torch.nn.functional.tanh(logits_real)
+                    discriminator_ouput += d_.data.cpu().numpy().tolist()
                 running_adversarial_loss += loss.data[0]
+
+                #Store labels
+                if p == 'test':
+                    labels += sample['lbl'].numpy().tolist()
+
+            if p == 'test':
+                reconstruction_errors = torch.from_numpy(reconstruction_errors).float().cuda()
+                discriminator_ouput = torch.from_numpy(discriminator_ouput).float().cuda()
+                image_abnormal_score = utils.metrics.mean_image_abnormal_score(reconstruction_errors, discriminator_ouput, alpha, patch_size)
+                image_abnormal_score = image_abnormal_score.data.cpu().numpy().tolist()
+                fpr, tpr, thresholds = metrics.roc_curve(labels, image_abnormal_score)
+                auc = metrics.auc(fpr, tpr)
+            else:
+                auc = 0
 
             #Computes epoch average losses
             epoch_reconstruction_loss = running_reconstruction_loss / nb_patch
             epoch_discriminator_loss = running_discriminator_loss / nb_discriminator_sample
             epoch_adversarial_loss = running_adversarial_loss / nb_patch
-            writer.add_scalar('learning_curve/reconstruction_loss/{}'.format(p), epoch_reconstruction_loss, e)
-            writer.add_scalar('learning_curve/discriminator_loss/{}'.format(p), epoch_discriminator_loss, e)
-            writer.add_scalar('learning_curve/adversarial_loss/{}'.format(p), epoch_adversarial_loss, e)
-            print('{} -- Reconstruction loss: {}, Discriminator loss: {}, Adversarial loss: {}'.format(p, epoch_reconstruction_loss, epoch_discriminator_loss, epoch_adversarial_loss))
+            writer.add_scalar('{}/learning_curve/reconstruction_loss'.format(p), epoch_reconstruction_loss, e)
+            writer.add_scalar('{}/learning_curve/discriminator_loss'.format(p), epoch_discriminator_loss, e)
+            writer.add_scalar('{}/learning_curve/adversarial_loss/'.format(p), epoch_adversarial_loss, e)
+            writer.add_scalar('{}/auc'.format(p), auc, e)
+            print('{} -- Reconstruction loss: {}, Discriminator loss: {}, Adversarial loss: {}, AUC: {}'.format(p, epoch_reconstruction_loss, epoch_discriminator_loss, epoch_adversarial_loss, auc))
 
             if p == 'test':
+                if auc > best_auc:
+                    best_auc = auc
+                    best_encoder = copy.deepcopy(encoder)
+                    best_decoder = copy.deepcopy(decoder)
+                    best_discriminator = copy.deepcopy(discriminator)
                 if e % 10 == 0:
                     #Save model
                     torch.save(encoder.state_dict(), os.path.join(directory, 'serial', 'encoder_{}'.format(e)))
@@ -133,7 +167,7 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
     writer.export_scalars_to_json(os.path.join(directory, 'logs', 'scalars.json'))
     writer.close()
 
-    return encoder, decoder, discriminator
+    return best_encoder, best_decoder, best_discriminator
 
 def main(args):
     """
