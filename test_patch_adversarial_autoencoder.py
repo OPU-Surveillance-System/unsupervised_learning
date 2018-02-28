@@ -119,7 +119,7 @@ def main(args):
     testset = dataset.VideoDataset(args.testset, args.root_dir)
 
     #Evaluate the model
-    test(networks, testset, args.batch_size, args.directory)
+    test(networks, testset, args.batch_size, args.patch, args.directory)
 
     return 0
 
