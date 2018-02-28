@@ -37,6 +37,7 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
     phase = ('train', 'test')
     datasets = {'train': trainset, 'test': testset}
     dist = torch.nn.PairwiseDistance(p=2, eps=1e-06)
+    alpha = 0.5
     best_auc = 0
     best_encoder = copy.deepcopy(encoder)
     best_decoder = copy.deepcopy(decoder)
@@ -128,8 +129,8 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
                     label += sample['lbl'].numpy().tolist()
 
             if p == 'test':
-                reconstruction_errors = torch.from_numpy(reconstruction_errors).float().cuda()
-                discriminator_ouput = torch.from_numpy(discriminator_ouput).float().cuda()
+                reconstruction_errors = torch.from_numpy(np.array(reconstruction_errors)).float().cuda()
+                discriminator_ouput = torch.from_numpy(np.array(discriminator_ouput)).float().cuda()
                 image_abnormal_score = utils.metrics.mean_image_abnormal_score(reconstruction_errors, discriminator_ouput, alpha, patch_size)
                 image_abnormal_score = image_abnormal_score.data.cpu().numpy().tolist()
                 fpr, tpr, thresholds = metrics.roc_curve(label, image_abnormal_score)
