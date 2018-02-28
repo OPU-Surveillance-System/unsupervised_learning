@@ -139,8 +139,8 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
 
             #Computes epoch average losses
             epoch_reconstruction_loss = running_reconstruction_loss / nb_patch
-            epoch_discriminator_loss = running_discriminator_loss_real / nb_patch
-            epoch_discriminator_loss = running_discriminator_loss_fake / nb_patch
+            epoch_discriminator_loss_real = running_discriminator_loss_real / nb_patch
+            epoch_discriminator_loss_fake = running_discriminator_loss_fake / nb_patch
             epoch_adversarial_loss = running_adversarial_loss / nb_patch
             writer.add_scalar('{}/learning_curve/reconstruction_loss'.format(p), epoch_reconstruction_loss, e)
             writer.add_scalar('{}/learning_curve/discriminator_loss_real'.format(p), epoch_discriminator_loss_real, e)
