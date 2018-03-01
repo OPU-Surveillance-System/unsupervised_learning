@@ -133,12 +133,22 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
             if p == 'test':
                 reconstruction_errors = torch.from_numpy(np.array(reconstruction_errors)).float().cuda()
                 discriminator_ouput = torch.from_numpy(np.array(discriminator_ouput)).float().cuda()
-                image_abnormal_score = utils.metrics.mean_image_abnormal_score(reconstruction_errors, discriminator_ouput, alpha, patch_size)
-                image_abnormal_score = image_abnormal_score.cpu().numpy().tolist()
-                fpr, tpr, thresholds = metrics.roc_curve(label, image_abnormal_score)
-                auc = metrics.auc(fpr, tpr)
+                image_abnormal_score_alpha_0 = utils.metrics.mean_image_abnormal_score(reconstruction_errors, discriminator_ouput, 0, patch_size)
+                image_abnormal_score_alpha_0 = image_abnormal_score_alpha_0.cpu().numpy().tolist()
+                fpr, tpr, thresholds = metrics.roc_curve(label, image_abnormal_score_alpha_0)
+                auc_alpha_0 = metrics.auc(fpr, tpr)
+                image_abnormal_score_alpha_05 = utils.metrics.mean_image_abnormal_score(reconstruction_errors, discriminator_ouput, 0.5, patch_size)
+                image_abnormal_score_alpha_05 = image_abnormal_score_alpha_05.cpu().numpy().tolist()
+                fpr, tpr, thresholds = metrics.roc_curve(label, image_abnormal_score_alpha_05)
+                auc_alpha_05 = metrics.auc(fpr, tpr)
+                image_abnormal_score_alpha_1 = utils.metrics.mean_image_abnormal_score(reconstruction_errors, discriminator_ouput, 1, patch_size)
+                image_abnormal_score_alpha_1 = image_abnormal_score_alpha_1.cpu().numpy().tolist()
+                fpr, tpr, thresholds = metrics.roc_curve(label, image_abnormal_score_alpha_1)
+                auc_alpha_1 = metrics.auc(fpr, tpr)
             else:
-                auc = 0
+                auc_alpha_0 = 0
+                auc_alpha_05 = 0
+                auc_alpha_1 = 0
 
             #Computes epoch average losses
             epoch_reconstruction_loss = running_reconstruction_loss / nb_patch
@@ -151,7 +161,9 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
             writer.add_scalar('{}/learning_curve/discriminator_loss_real'.format(p), epoch_discriminator_loss_real, e)
             writer.add_scalar('{}/learning_curve/discriminator_loss_fake'.format(p), epoch_discriminator_loss_fake, e)
             writer.add_scalar('{}/learning_curve/adversarial_loss/'.format(p), epoch_adversarial_loss, e)
-            writer.add_scalar('{}/auc'.format(p), auc, e)
+            writer.add_scalar('{}/auc/0'.format(p), auc_alpha_0, e)
+            writer.add_scalar('{}/auc/05'.format(p), auc_alpha_05, e)
+            writer.add_scalar('{}/auc/1'.format(p), auc_alpha_1, e)
             print('{} -- Reconstruction loss: {}, Discriminator loss real: {}, Discriminator loss fake: {} Adversarial loss: {}, AUC: {}'.format(p, epoch_reconstruction_loss, epoch_discriminator_loss_real, epoch_discriminator_loss_fake, epoch_adversarial_loss, auc))
 
             if p == 'test':
