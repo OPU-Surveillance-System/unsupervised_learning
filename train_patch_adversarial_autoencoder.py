@@ -167,8 +167,8 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
             print('{} -- Reconstruction loss: {}, Discriminator loss real: {}, Discriminator loss fake: {} Adversarial loss: {}, AUC: {}'.format(p, epoch_reconstruction_loss, epoch_discriminator_loss_real, epoch_discriminator_loss_fake, epoch_adversarial_loss, auc_alpha_05))
 
             if p == 'test':
-                if auc > best_auc:
-                    best_auc = auc
+                if auc_alpha_05 > best_auc:
+                    best_auc = auc_alpha_05
                     best_encoder = copy.deepcopy(encoder)
                     best_decoder = copy.deepcopy(decoder)
                     best_discriminator = copy.deepcopy(discriminator)
