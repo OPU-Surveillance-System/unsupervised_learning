@@ -52,6 +52,7 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
             running_reconstruction_loss = 0
             running_discriminator_loss_real = 0
             running_discriminator_loss_fake = 0
+            running_discriminator_loss = 0
             running_adversarial_loss = 0
             dataloader = DataLoader(datasets[p], batch_size=batch_size, shuffle=True, num_workers=4)
 
@@ -106,6 +107,7 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
                     discriminator_optimizer.step()
                 running_discriminator_loss_real += loss_real.data[0]
                 running_discriminator_loss_fake += loss_fake.data[0]
+                running_discriminator_loss += loss.data[0]
 
                 #Adversarial
                 discriminator.eval()
@@ -154,10 +156,12 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
             epoch_reconstruction_loss = running_reconstruction_loss / nb_patch
             epoch_discriminator_loss_real = running_discriminator_loss_real / nb_patch
             epoch_discriminator_loss_fake = running_discriminator_loss_fake / nb_patch
+            epoch_discriminator_loss = running_discriminator_loss / (nb_patch * 2)
             epoch_adversarial_loss = running_adversarial_loss / nb_patch
             writer.add_scalar('{}/learning_curve/reconstruction_loss'.format(p), epoch_reconstruction_loss, e)
             writer.add_scalar('{}/learning_curve/discriminator_loss_real'.format(p), epoch_discriminator_loss_real, e)
             writer.add_scalar('{}/learning_curve/discriminator_loss_fake'.format(p), epoch_discriminator_loss_fake, e)
+            writer.add_scalar('{}/learning_curve/discriminator_loss'.format(p), epoch_discriminator_loss, e)
             writer.add_scalar('{}/learning_curve/adversarial_loss/'.format(p), epoch_adversarial_loss, e)
             writer.add_scalar('{}/auc/0'.format(p), auc_alpha_0, e)
             writer.add_scalar('{}/auc/05'.format(p), auc_alpha_05, e)
