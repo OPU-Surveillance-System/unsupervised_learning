@@ -48,7 +48,6 @@ def test(networks, testset, batch_size, patch_size, directory):
         groundtruth += sample['lbl'].cpu().numpy().tolist()
 
     #Compute AUC
-    print(set(np.array(groundtruth).flatten()))
     alphas = np.arange(0.0, 1.05, 0.05)
     reconstruction_errors = np.array(reconstruction_errors)
     discriminator_outputs = np.array(discriminator_outputs)
@@ -57,6 +56,7 @@ def test(networks, testset, batch_size, patch_size, directory):
     for a in range(len(alphas)):
         image_abnormal_score = utils.metrics.mean_image_abnormal_score(reconstruction_errors, discriminator_ouputs, alphas[a], patch_size)
         image_abnormal_score = image_abnormal_score.cpu().numpy().tolist()
+        print(set(np.array(image_abnormal_score).flatten()))
         fpr, tpr, thresholds = metrics.roc_curve(groundtruth, image_abnormal_score)
         auc = metrics.auc(fpr, tpr)
         utils.plot.plot_auc(fpr, tpr, auc, os.path.join(directory, 'plots', 'auc_{}.svg.'.format(alphas[a])))
