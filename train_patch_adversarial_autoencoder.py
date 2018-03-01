@@ -93,7 +93,7 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
                     discriminator.zero_grad()
                 else:
                     discriminator.eval()
-                z_real = Variable(torch.randn(inputs.size(0) * ((256//patch_size)**2), latent_size).cuda()) #Sample from N(0, 1)
+                z_real = Variable(torch.randn(inputs.size(0) * ((256//patch_size)**2) * 5, latent_size).cuda()) #Sample from N(0, 1)
                 z_fake = encoder(inputs)
                 logits_real = discriminator(z_real)[0]
                 logits_fake = discriminator(z_fake)[0]
