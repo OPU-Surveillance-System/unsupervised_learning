@@ -164,7 +164,7 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
             writer.add_scalar('{}/auc/0'.format(p), auc_alpha_0, e)
             writer.add_scalar('{}/auc/05'.format(p), auc_alpha_05, e)
             writer.add_scalar('{}/auc/1'.format(p), auc_alpha_1, e)
-            print('{} -- Reconstruction loss: {}, Discriminator loss real: {}, Discriminator loss fake: {} Adversarial loss: {}, AUC: {}'.format(p, epoch_reconstruction_loss, epoch_discriminator_loss_real, epoch_discriminator_loss_fake, epoch_adversarial_loss, auc))
+            print('{} -- Reconstruction loss: {}, Discriminator loss real: {}, Discriminator loss fake: {} Adversarial loss: {}, AUC: {}'.format(p, epoch_reconstruction_loss, epoch_discriminator_loss_real, epoch_discriminator_loss_fake, epoch_adversarial_loss, auc_alpha_05))
 
             if p == 'test':
                 if auc > best_auc:
