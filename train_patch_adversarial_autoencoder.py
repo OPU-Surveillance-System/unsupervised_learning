@@ -42,6 +42,8 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
     best_encoder = copy.deepcopy(encoder)
     best_decoder = copy.deepcopy(decoder)
     best_discriminator = copy.deepcopy(discriminator)
+    real = []
+    fake = []
     writer = SummaryWriter(os.path.join(directory, 'logs'))
 
     for e in range(epoch):
@@ -142,6 +144,8 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
             epoch_reconstruction_loss = running_reconstruction_loss / nb_patch
             epoch_discriminator_loss_real = running_discriminator_loss_real / nb_patch
             epoch_discriminator_loss_fake = running_discriminator_loss_fake / nb_patch
+            real.append(epoch_discriminator_loss_real)
+            fake.append(epoch_discriminator_loss_fake)
             epoch_adversarial_loss = running_adversarial_loss / nb_patch
             writer.add_scalar('{}/learning_curve/reconstruction_loss'.format(p), epoch_reconstruction_loss, e)
             writer.add_scalar('{}/learning_curve/discriminator_loss_real'.format(p), epoch_discriminator_loss_real, e)
@@ -171,6 +175,7 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
                     inputs = inputs.data.cpu().numpy()
                     inputs = np.rollaxis(inputs, 1, 4)
                     utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(directory, 'example_reconstruction', 'epoch_{}.svg'.format(e)))
+                    utils.plot.plot_real_vs_fake_loss(real, fake, os.path.join(directory, 'plots/real_vs_fake_loss.svg'))
     writer.export_scalars_to_json(os.path.join(directory, 'logs', 'scalars.json'))
     writer.close()
 
@@ -190,6 +195,8 @@ def main(args):
         os.makedirs(os.path.join(args.directory, 'example_reconstruction'))
     if not os.path.exists(os.path.join(args.directory, 'logs')):
         os.makedirs(os.path.join(args.directory, 'logs'))
+    if not os.path.exists(os.path.join(args.directory, 'plots')):
+        os.makedirs(os.path.join(args.directory, 'plots'))
 
     #Write arguments in a file
     d = vars(args)

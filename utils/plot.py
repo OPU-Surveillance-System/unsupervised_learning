@@ -72,3 +72,23 @@ def plot_reconstruction_images(inputs, pred, name):
         plt.savefig(name, format='svg', bbox_inches='tight')
     else:
         plt.show()
+
+def plot_real_vs_fake_loss(real, fake, name):
+    """
+    Plot discriminator loss for real vs fake samples
+    Args:
+        real (list): Floats' list of length equal to the number of training epochs
+        fake (list): Floats' list of length equal to the number of training epochs
+        name (str): name to save the figure (if None: show the figure)
+    """
+
+    plt.clf()
+    x = list(range(len(real)))
+    plt.plot(x, real, c='red', label='real')
+    plt.plot(x, fake, c='blue', label='fake')
+    plt.legend()
+
+    if name != None:
+        plt.savefig(name, format='svg', bbox_inches='tight')
+    else:
+        plt.show()
