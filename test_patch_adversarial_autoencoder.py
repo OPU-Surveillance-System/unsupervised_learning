@@ -56,7 +56,8 @@ def test(networks, testset, batch_size, patch_size, directory):
     for a in range(len(alphas)):
         image_abnormal_score = utils.metrics.mean_image_abnormal_score(reconstruction_errors, discriminator_ouputs, alphas[a], patch_size)
         image_abnormal_score = image_abnormal_score.cpu().numpy().tolist()
-        print(set(np.array(image_abnormal_score).flatten()))
+        test = set(np.array(image_abnormal_score).flatten())
+        print(min(test), max(test))
         fpr, tpr, thresholds = metrics.roc_curve(groundtruth, image_abnormal_score)
         auc = metrics.auc(fpr, tpr)
         utils.plot.plot_auc(fpr, tpr, auc, os.path.join(directory, 'plots', 'auc_{}.svg.'.format(alphas[a])))
