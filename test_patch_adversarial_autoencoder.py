@@ -48,6 +48,7 @@ def test(networks, testset, batch_size, patch_size, directory):
         groundtruth += sample['lbl'].cpu().numpy().tolist()
 
     #Compute AUC
+    print(sum(groundtruth))
     alphas = np.arange(0.0, 1.05, 0.05)
     reconstruction_errors = np.array(reconstruction_errors)
     discriminator_outputs = np.array(discriminator_outputs)
