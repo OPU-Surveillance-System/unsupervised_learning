@@ -122,7 +122,7 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
                     loss.backward()
                     adversarial_encoder_optimizer.step()
                 else:
-                    d_ = torch.nn.functional.tanh(logits_real)
+                    d_ = torch.nn.functional.sigmoid(logits_real)
                     discriminator_ouput += d_.data.cpu().numpy().tolist()
                 running_adversarial_loss += loss.data[0]
 
