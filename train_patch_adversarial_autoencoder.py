@@ -154,8 +154,6 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
             epoch_reconstruction_loss = running_reconstruction_loss / nb_patch
             epoch_discriminator_loss_real = running_discriminator_loss_real / nb_patch
             epoch_discriminator_loss_fake = running_discriminator_loss_fake / nb_patch
-            real.append(epoch_discriminator_loss_real)
-            fake.append(epoch_discriminator_loss_fake)
             epoch_adversarial_loss = running_adversarial_loss / nb_patch
             writer.add_scalar('{}/learning_curve/reconstruction_loss'.format(p), epoch_reconstruction_loss, e)
             writer.add_scalar('{}/learning_curve/discriminator_loss_real'.format(p), epoch_discriminator_loss_real, e)
@@ -167,6 +165,8 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
             print('{} -- Reconstruction loss: {}, Discriminator loss real: {}, Discriminator loss fake: {} Adversarial loss: {}, AUC: {}'.format(p, epoch_reconstruction_loss, epoch_discriminator_loss_real, epoch_discriminator_loss_fake, epoch_adversarial_loss, auc_alpha_05))
 
             if p == 'test':
+                real.append(epoch_discriminator_loss_real)
+                fake.append(epoch_discriminator_loss_fake)
                 if auc_alpha_05 > best_auc:
                     best_auc = auc_alpha_05
                     best_encoder = copy.deepcopy(encoder)
