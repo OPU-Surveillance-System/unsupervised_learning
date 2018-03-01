@@ -59,7 +59,7 @@ def test(networks, testset, batch_size, patch_size, directory):
         fpr, tpr, thresholds = metrics.roc_curve(groundtruth, image_abnormal_score)
         auc = metrics.auc(fpr, tpr)
         utils.plot.plot_auc(fpr, tpr, auc, os.path.join(directory, 'plots', 'auc_{}.svg.'.format(alphas[a])))
-        utils.plot.plot_abnormal_score_vs_label(image_abnormal_score, groundtruth, os.path.join(directory, 'plots', 'abnormal_score_vs_labels_{}'.format(a)))
+        utils.plot.plot_abnormal_score_vs_label(image_abnormal_score, groundtruth, os.path.join(directory, 'plots', 'abnormal_score_vs_labels_{}'.format(alphas[a])))
         print('Alpha = {} AUC: {}'.format(alphas[a], auc))
 
     # with open(os.path.join(directory, 'results'), 'w') as f:
