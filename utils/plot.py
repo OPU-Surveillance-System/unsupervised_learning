@@ -73,6 +73,26 @@ def plot_reconstruction_images(inputs, pred, name):
     else:
         plt.show()
 
+def plot_generated_images(inputs, name):
+    """
+    Plot example of reconstruction images
+    Args:
+
+    """
+
+    plt.clf()
+    nb_plots = min(inputs.shape[0], 4)
+    #inputs
+    for i in range(nb_plots):
+        ax = plt.subplot2grid((1, nb_plots), (0, i), rowspan=1, colspan=1)
+        ax.imshow(inputs[i])
+        ax.axis('off')
+
+    if name != None:
+        plt.savefig(name, format='svg', bbox_inches='tight')
+    else:
+        plt.show()
+
 def plot_real_vs_fake_loss(real, fake, name):
     """
     Plot discriminator loss for real vs fake samples
