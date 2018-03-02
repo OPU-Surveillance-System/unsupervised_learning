@@ -15,7 +15,7 @@ import utils.metrics
 import utils.plot
 import utils.process
 
-def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_size, latent_size, patch_size, standard_deviation, directory):
+def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_size, latent_size, patch_size, standard_deviation, nb_adversarial, directory):
     """
     Train an adversarial autoencoder and log the process
     Args:
@@ -116,16 +116,17 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
                     encoder.zero_grad()
                 else:
                     encoder.eval()
-                z_real = encoder(inputs)
-                logits_real = discriminator(z_real)[0]
-                labels = Variable(torch.zeros((logits_real.size(0), 1)).float().cuda())
-                loss = adversarial_loss_function(logits_real, labels)
-                if p == 'train':
-                    loss.backward()
-                    adversarial_encoder_optimizer.step()
-                else:
-                    d_ = torch.nn.functional.sigmoid(logits_real)
-                    discriminator_ouput += d_.data.cpu().numpy().tolist()
+                for i in range(nb_adversarial):
+                    z_real = encoder(inputs)
+                    logits_real = discriminator(z_real)[0]
+                    labels = Variable(torch.zeros((logits_real.size(0), 1)).float().cuda())
+                    loss = adversarial_loss_function(logits_real, labels)
+                    if p == 'train':
+                        loss.backward()
+                        adversarial_encoder_optimizer.step()
+                    else:
+                        d_ = torch.nn.functional.sigmoid(logits_real)
+                        discriminator_ouput += d_.data.cpu().numpy().tolist()
                 running_adversarial_loss += loss.data[0]
 
                 #Store labels
@@ -268,6 +269,7 @@ if __name__ == '__main__':
     parser.add_argument('--lra', dest='learning_rate_adversarial', type=float, default=0.0005, help='Adversarial learning rate')
     parser.add_argument('--ep', dest='epoch', type=int, default=100, help='Number of training epochs')
     parser.add_argument('--std', dest='standard_deviation', type=int, default=5, help='Gaussian standard deviation')
+    parser.add_argument('--nba', dest='nb_adversarial', type=int, default=2, help='')
     parser.add_argument('--dir', dest='directory', type=str, default='train_autoencoder', help='Directory to store results')
     #Model arguments
     parser.add_argument('-f', dest='nb_f', type=int, default=16, help='Number of filters in the first downsampling block')
