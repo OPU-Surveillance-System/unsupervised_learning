@@ -14,7 +14,8 @@ class Encoder(torch.nn.Module):
             layers = []
             for n in range(nb_l):
                 layers.append(torch.nn.Conv2d(in_dim, nb_f, (3, 3), padding=1))
-                layers.append(torch.nn.SELU())
+                #layers.append(torch.nn.SELU())
+                layers.append(torch.nn.ReLU())
                 in_dim = nb_f
             layers.append(torch.nn.MaxPool2d((2, 2), (2, 2)))
 
@@ -68,7 +69,7 @@ class Decoder(torch.nn.Module):
             layers = [torch.nn.Upsample(scale_factor=2, mode='bilinear')]
             for n in range(nb_l):
                 layers.append(torch.nn.Conv2d(in_dim, nb_f, (3, 3), padding=1))
-                layers.append(torch.nn.SELU())
+                layers.append(torch.nn.ReLU())
                 in_dim = nb_f
 
             return layers
@@ -118,7 +119,7 @@ class Discriminator(torch.nn.Module):
         in_dim = self.latent_size
         for l in range(len(self.layers)):
             layers.append(torch.nn.Linear(in_dim, self.layers[l]))
-            layers.append(torch.nn.SELU())
+            layers.append(torch.nn.ReLU())
             in_dim = self.layers[l]
         layers.append(torch.nn.Linear(in_dim, 1))
         self.net = torch.nn.Sequential(*layers)
