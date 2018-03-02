@@ -65,15 +65,15 @@ class Autoencoder(torch.nn.Module):
         self.decoder = torch.nn.Sequential(*layers)
 
         #Weights initialization
-        for m in self.modules():
-            if isinstance(m, torch.nn.Conv2d) or isinstance(m, torch.nn.ConvTranspose2d):
-                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-                m.weight.data.normal_(0, math.sqrt(2.)*math.sqrt(2. / n))
-                if m.bias is not None:
-                    m.bias.data.zero_()
-            elif isinstance(m, torch.nn.Linear):
-                m.weight.data.normal_(0, math.sqrt(2. / m.in_features))
-                m.bias.data.zero_()
+        # for m in self.modules():
+        #     if isinstance(m, torch.nn.Conv2d) or isinstance(m, torch.nn.ConvTranspose2d):
+        #         n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+        #         m.weight.data.normal_(0, math.sqrt(2.)*math.sqrt(2. / n))
+        #         if m.bias is not None:
+        #             m.bias.data.zero_()
+        #     elif isinstance(m, torch.nn.Linear):
+        #         m.weight.data.normal_(0, math.sqrt(2. / m.in_features))
+        #         m.bias.data.zero_()
 
     def forward(self, x):
         x = x.view(-1, 3, self.patch, self.patch)
