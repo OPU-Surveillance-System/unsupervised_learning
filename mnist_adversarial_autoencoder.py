@@ -68,7 +68,7 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
             else:
                 nb_patch = mnist.test.num_examples
 
-            for i_batch in range(num_examples//batch_size):
+            for i_batch in range(nb_patch//batch_size):
 
                 #Reconstruction
                 if p == 'train':
