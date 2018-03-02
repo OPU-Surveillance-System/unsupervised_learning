@@ -197,7 +197,7 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
                     #Plot example of reconstructed images
                     reconstruction = reconstruction.view(-1, 28, 28)
                     #pred = utils.process.deprocess(reconstruction)
-                    prev = (reconstruction + 1) * 0.5
+                    pred = (reconstruction + 1) * 0.5
                     pred = pred.data.cpu().numpy()
                     #pred = np.rollaxis(pred, 1, 4)
                     #inputs = utils.process.deprocess(inputs)
