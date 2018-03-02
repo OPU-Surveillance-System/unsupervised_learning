@@ -14,7 +14,7 @@ class Encoder(torch.nn.Module):
             layers = []
             for n in range(nb_l):
                 layers.append(torch.nn.Conv2d(in_dim, nb_f, (3, 3), padding=1))
-                #layers.append(torch.nn.SELU())
+                layers.append(torch.nn.Dropout2d(p=0.25))
                 layers.append(torch.nn.ReLU())
                 in_dim = nb_f
             layers.append(torch.nn.MaxPool2d((2, 2), (2, 2)))
@@ -36,16 +36,16 @@ class Encoder(torch.nn.Module):
         flatten = ((self.patch//(2**self.nb_b))**2)*(prev_f//2) #last_feature_map.h * last_feature_map.w * last_feature_map.c
         self.bottleneck = torch.nn.Linear(flatten, self.latent_size)
 
-        #Weights initialization
-        for m in self.modules():
-            if isinstance(m, torch.nn.Conv2d):
-                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-                m.weight.data.normal_(0, math.sqrt(2.)*math.sqrt(2. / n))
-                if m.bias is not None:
-                    m.bias.data.zero_()
-            elif isinstance(m, torch.nn.Linear):
-                m.weight.data.normal_(0, math.sqrt(2. / m.in_features))
-                m.bias.data.zero_()
+        # #Weights initialization
+        # for m in self.modules():
+        #     if isinstance(m, torch.nn.Conv2d):
+        #         n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+        #         m.weight.data.normal_(0, math.sqrt(2.)*math.sqrt(2. / n))
+        #         if m.bias is not None:
+        #             m.bias.data.zero_()
+        #     elif isinstance(m, torch.nn.Linear):
+        #         m.weight.data.normal_(0, math.sqrt(2. / m.in_features))
+        #         m.bias.data.zero_()
 
     def forward(self, x):
         x = x.view(-1, 3, self.patch, self.patch)
@@ -69,6 +69,7 @@ class Decoder(torch.nn.Module):
             layers = [torch.nn.Upsample(scale_factor=2, mode='bilinear')]
             for n in range(nb_l):
                 layers.append(torch.nn.Conv2d(in_dim, nb_f, (3, 3), padding=1))
+                layers.append(torch.nn.Dropout2d(p=0.25))
                 layers.append(torch.nn.ReLU())
                 in_dim = nb_f
 
@@ -89,16 +90,16 @@ class Decoder(torch.nn.Module):
         layers.append(torch.nn.Conv2d(prev_f, 3, (3, 3), padding=1))
         self.conv = torch.nn.Sequential(*layers)
 
-        #Weights initialization
-        for m in self.modules():
-            if isinstance(m, torch.nn.Conv2d):
-                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-                m.weight.data.normal_(0, math.sqrt(2.)*math.sqrt(2. / n))
-                if m.bias is not None:
-                    m.bias.data.zero_()
-            elif isinstance(m, torch.nn.Linear):
-                m.weight.data.normal_(0, math.sqrt(2. / m.in_features))
-                m.bias.data.zero_()
+        # #Weights initialization
+        # for m in self.modules():
+        #     if isinstance(m, torch.nn.Conv2d):
+        #         n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+        #         m.weight.data.normal_(0, math.sqrt(2.)*math.sqrt(2. / n))
+        #         if m.bias is not None:
+        #             m.bias.data.zero_()
+        #     elif isinstance(m, torch.nn.Linear):
+        #         m.weight.data.normal_(0, math.sqrt(2. / m.in_features))
+        #         m.bias.data.zero_()
 
     def forward(self, x):
         x = self.bottleneck(x)
@@ -119,6 +120,7 @@ class Discriminator(torch.nn.Module):
         in_dim = self.latent_size
         for l in range(len(self.layers)):
             layers.append(torch.nn.Linear(in_dim, self.layers[l]))
+            layers.append(torch.nn.Dropout2d(p=0.25))
             layers.append(torch.nn.ReLU())
             in_dim = self.layers[l]
         layers.append(torch.nn.Linear(in_dim, 1))
@@ -126,11 +128,11 @@ class Discriminator(torch.nn.Module):
 
         self.activation = torch.nn.Sigmoid()
 
-        #Weights initialization
-        for m in self.modules():
-            if isinstance(m, torch.nn.Linear):
-                m.weight.data.normal_(0, math.sqrt(2. / m.in_features))
-                m.bias.data.zero_()
+        # #Weights initialization
+        # for m in self.modules():
+        #     if isinstance(m, torch.nn.Linear):
+        #         m.weight.data.normal_(0, math.sqrt(2. / m.in_features))
+        #         m.bias.data.zero_()
 
     def forward(self, x):
         logits = self.net(x)
