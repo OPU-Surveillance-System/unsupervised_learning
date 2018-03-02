@@ -125,10 +125,10 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
                     if p == 'train':
                         loss.backward()
                         adversarial_encoder_optimizer.step()
+                    running_adversarial_loss += loss.data[0]
                 if p == 'test':
                     d_ = torch.nn.functional.sigmoid(logits_real)
                     discriminator_ouput += d_.data.cpu().numpy().tolist()
-                running_adversarial_loss += loss.data[0]
 
                 #Store labels
                 if p == 'test':
@@ -159,7 +159,7 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
             epoch_discriminator_loss_real = running_discriminator_loss_real / nb_patch
             epoch_discriminator_loss_fake = running_discriminator_loss_fake / nb_patch
             epoch_discriminator_loss = running_discriminator_loss / (nb_patch * 2)
-            epoch_adversarial_loss = running_adversarial_loss / nb_patch
+            epoch_adversarial_loss = running_adversarial_loss / (nb_patch * nb_adversarial)
             writer.add_scalar('{}/learning_curve/reconstruction_loss'.format(p), epoch_reconstruction_loss, e)
             writer.add_scalar('{}/learning_curve/discriminator_loss_real'.format(p), epoch_discriminator_loss_real, e)
             writer.add_scalar('{}/learning_curve/discriminator_loss_fake'.format(p), epoch_discriminator_loss_fake, e)
