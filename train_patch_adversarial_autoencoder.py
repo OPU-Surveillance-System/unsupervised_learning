@@ -252,7 +252,7 @@ def main(args):
     testset = dataset.VideoDataset(args.testset, args.root_dir)
 
     #Train the model and save it
-    encoder, decoder, discriminator = train(networks, loss_functions, optimizers, trainset, testset, args.epoch, args.batch_size, args.latent_size, args.patch, args.standard_deviation, args.directory)
+    encoder, decoder, discriminator = train(networks, loss_functions, optimizers, trainset, testset, args.epoch, args.batch_size, args.latent_size, args.patch, args.standard_deviation, args.nb_adversarial, args.directory)
     torch.save(encoder.state_dict(), os.path.join(args.directory, 'serial', 'best_encoder'))
     torch.save(decoder.state_dict(), os.path.join(args.directory, 'serial', 'best_decoder'))
     torch.save(discriminator.state_dict(), os.path.join(args.directory, 'serial', 'best_discriminator'))
