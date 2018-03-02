@@ -11,7 +11,7 @@ from tensorboardX import SummaryWriter
 import tensorflow as tf
 
 import dataset
-import models.patch_adversarial_autoencoder
+import models.mnist_adversarial_autoencoder
 import utils.metrics
 import utils.plot
 import utils.process
@@ -246,9 +246,9 @@ def main(args):
             f.write('{}:{}\n'.format(k, d[k]))
 
     #Networks
-    encoder = models.patch_adversarial_autoencoder.Encoder(args.nb_f, args.nb_l, args.nb_b, args.latent_size, args.patch)
-    decoder = models.patch_adversarial_autoencoder.Decoder(encoder.last_map_dim, args.nb_l, args.nb_b, args.latent_size)
-    discriminator = models.patch_adversarial_autoencoder.Discriminator(args.latent_size, args.denses)
+    encoder = models.mnist_adversarial_autoencoder.Encoder(args.nb_f, args.nb_l, args.nb_b, args.latent_size, args.patch)
+    decoder = models.mnist_adversarial_autoencoder.Decoder(encoder.last_map_dim, args.nb_l, args.nb_b, args.latent_size)
+    discriminator = models.mnist_adversarial_autoencoder.Discriminator(args.latent_size, args.denses)
     encoder = encoder.cuda()
     decoder = decoder.cuda()
     discriminator = discriminator.cuda()
