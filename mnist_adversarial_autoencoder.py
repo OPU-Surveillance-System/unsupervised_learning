@@ -82,7 +82,7 @@ def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_
                 #inputs = Variable(sample['img'].float().cuda())
                 img = mnist.train.next_batch(batch_size)[0]
                 img = np.reshape(img, (-1, 1, 28, 28))
-                inputs = Variable(torch.from_numpy(img))
+                inputs = Variable(torch.from_numpy(img).cuda())
                 inputs = (inputs - 0.5) / 0.5
                 latent = encoder(inputs)
                 reconstruction = decoder(latent)
