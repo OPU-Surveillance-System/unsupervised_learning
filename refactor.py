@@ -20,7 +20,7 @@ import utils.metrics
 import models.patch_adversarial_autoencoder
 
 # Train procedure
-def train(models, optimizers, datasets, epochs, patch_size, directory):
+def train(models, optimizers, datasets, epochs, batch_size, patch_size, directory):
     """
     """
 
@@ -260,7 +260,7 @@ if __name__ == '__main__':
     regularization_optimizer = optim.Adam(encoder.parameters(), lr=args.lra)
     optimizers = [encoder_optimizer, decoder_optimizer, discriminator_optimizer, regularization_optimizer]
 
-    encoder, decoder, discriminator = train(models, optimizers, datasets, args.e, args.p, args.dir)
+    encoder, decoder, discriminator = train(models, optimizers, datasets, args.e, args.bs, args.p, args.dir)
 
     torch.save(encoder.state_dict(), os.path.join(args.directory, 'serial', 'best_encoder'))
     torch.save(decoder.state_dict(), os.path.join(args.directory, 'serial', 'best_decoder'))
