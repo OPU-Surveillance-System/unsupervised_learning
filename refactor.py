@@ -100,8 +100,8 @@ def train(models, optimizers, datasets, epochs, batch_size, patch_size, z_dim, d
 
                 z_real = Variable(torch.randn(batch_size, z_dim) * 5.).cuda()
                 z_fake = encoder(inputs)
-                discriminator_real = discriminator(z_real)
-                discriminator_fake = discriminator(z_fake)
+                discriminator_real = discriminator(z_real)[1]
+                discriminator_fake = discriminator(z_fake)[1]
                 discriminator_loss = -torch.mean(torch.log(discriminator_real + tiny) + torch.log(1 - discriminator_fake + tiny))
                 running_discriminator_loss += discriminator_loss.data[0]
 
@@ -124,7 +124,7 @@ def train(models, optimizers, datasets, epochs, batch_size, patch_size, z_dim, d
                     discriminator.eval()
 
                 z_fake = encoder(inputs)
-                discriminator_fake = discriminator(z_fake)
+                discriminator_fake = discriminator(z_fake)[1]
                 regularization_loss = -torch.mean(torch.log(discriminator_fake + tiny))
                 running_regularization_loss += regularization_loss.data[0]
 
