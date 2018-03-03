@@ -24,9 +24,11 @@ parser.add_argument('--lra', type=float, default=0.0005, metavar='N',
                     help='adversarial learning rate')
 parser.add_argument('-f', type=int, default=8, metavar='N',
                     help='number of convolutional filters')
+parser.add_argument('-z', type=int, default=2, metavar='N',
+                    help='latent size')
 args = parser.parse_args()
 
-z_dim = 2
+z_dim = args.z
 # X_dim = 784
 f_dim = args.f
 y_dim = 10
