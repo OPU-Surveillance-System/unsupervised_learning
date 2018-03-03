@@ -168,7 +168,7 @@ def train(models, optimizers, datasets, epochs, batch_size, patch_size, z_dim, d
 
             print('Reconstruction loss = {}, Discriminator loss = {}, Regularization loss {}, AUC = {}'.format(running_reconstruction_loss, running_discriminator_loss, running_regularization_loss, auc_alpha_05))
 
-            writer.add_scalar('{}/learning_curve/reconstruction_loss'.format(p), ruuning_reconstruction_loss, e)
+            writer.add_scalar('{}/learning_curve/reconstruction_loss'.format(p), running_reconstruction_loss, e)
             writer.add_scalar('{}/learning_curve/discriminator_loss'.format(p), running_discriminator_loss_real, e)
             writer.add_scalar('{}/learning_curve/regularization_loss'.format(p), running_regularization_loss_fake, e)
             writer.add_scalar('{}/accuracy/discriminator_accuracy'.format(p), discriminator_accuracy, e)
