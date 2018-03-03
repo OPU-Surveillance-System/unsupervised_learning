@@ -149,17 +149,17 @@ def train(models, optimizers, datasets, epochs, batch_size, patch_size, z_dim, d
 
                 image_abnormal_score_alpha_0 = utils.metrics.mean_image_abnormal_score(reconstruction_errors, discriminator_score, 0, patch_size)
                 image_abnormal_score_alpha_0 = image_abnormal_score_alpha_0.cpu().numpy().tolist()
-                fpr, tpr, thresholds = metrics.roc_curve(label, image_abnormal_score_alpha_0)
+                fpr, tpr, thresholds = metrics.roc_curve(labels, image_abnormal_score_alpha_0)
                 auc_alpha_0 = metrics.auc(fpr, tpr)
 
                 image_abnormal_score_alpha_05 = utils.metrics.mean_image_abnormal_score(reconstruction_errors, discriminator_score, 0.5, patch_size)
                 image_abnormal_score_alpha_05 = image_abnormal_score_alpha_05.cpu().numpy().tolist()
-                fpr, tpr, thresholds = metrics.roc_curve(label, image_abnormal_score_alpha_05)
+                fpr, tpr, thresholds = metrics.roc_curve(labels, image_abnormal_score_alpha_05)
                 auc_alpha_05 = metrics.auc(fpr, tpr)
 
                 image_abnormal_score_alpha_1 = utils.metrics.mean_image_abnormal_score(reconstruction_errors, discriminator_score, 1, patch_size)
                 image_abnormal_score_alpha_1 = image_abnormal_score_alpha_1.cpu().numpy().tolist()
-                fpr, tpr, thresholds = metrics.roc_curve(label, image_abnormal_score_alpha_1)
+                fpr, tpr, thresholds = metrics.roc_curve(labels, image_abnormal_score_alpha_1)
                 auc_alpha_1 = metrics.auc(fpr, tpr)
             else:
                 auc_alpha_0 = 0
