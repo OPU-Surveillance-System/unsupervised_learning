@@ -198,7 +198,6 @@ def train(models, optimizers, datasets, epochs, batch_size, patch_size, z_dim, d
                     inputs = inputs.data.cpu().numpy()
                     inputs = np.rollaxis(inputs, 1, 4)
                     utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(directory, 'example_reconstruction', 'epoch_{}.svg'.format(epoch)))
-                    utils.plot.plot_real_vs_fake_loss(real, fake, os.path.join(directory, 'plots/real_vs_fake_loss.svg'))
 
     writer.export_scalars_to_json(os.path.join(directory, 'logs', 'scalars.json'))
     writer.close()
