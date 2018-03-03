@@ -33,34 +33,57 @@ mnist = tf.contrib.learn.datasets.load_dataset("mnist")
 class Encoder(nn.Module):
     def __init__(self):
         super(Encoder, self).__init__()
-        self.lin1 = nn.Linear(X_dim, N)
-        self.lin2 = nn.Linear(N, N)
-        self.lin3gauss = nn.Linear(N, z_dim)
+        # self.lin1 = nn.Linear(X_dim, N)
+        # self.lin2 = nn.Linear(N, N)
+        # self.lin3gauss = nn.Linear(N, z_dim)
+        layers = []
+        layers += nn.Conv2d(1, 8, (3, 3), (1, 1), padding=1)
+        layers += nn.Dropout2d(p=0.2)
+        layers += nn.ReLU()
+        self.conv = nn.Sequential(*layers)
+        self.latent = nn.Linear(8*((28//2)**2), z_dim)
 
     def forward(self, x):
-        x = F.dropout(self.lin1(x), p=0.2, training=self.training)
-        x = F.relu(x)
-        x = F.dropout(self.lin2(x), p=0.2, training=self.training)
-        x = F.relu(x)
-        xgauss = self.lin3gauss(x)
+        # x = F.dropout(self.lin1(x), p=0.2, training=self.training)
+        # x = F.relu(x)
+        # x = F.dropout(self.lin2(x), p=0.2, training=self.training)
+        # x = F.relu(x)
+        # xgauss = self.lin3gauss(x)
+        #
+        # return xgauss
 
-        return xgauss
+        x = self.conv(x)
+        x = self.latent(x)
+
+        return x
 
 # Decoder
 class Decoder(nn.Module):
     def __init__(self):
         super(Decoder, self).__init__()
-        self.lin1 = nn.Linear(z_dim, N)
-        self.lin2 = nn.Linear(N, N)
-        self.lin3 = nn.Linear(N, X_dim)
+        # self.lin1 = nn.Linear(z_dim, N)
+        # self.lin2 = nn.Linear(N, N)
+        # self.lin3 = nn.Linear(N, X_dim)
+        self.latent = nn.Linear(z_dim, 8*((28//2)**2))
+        layers = []
+        layers += nn.Upsample(scale_factor=2, mode='bilinear')
+        layers += nn.Conv2d(8, 1, (3, 3), (1, 1), padding=1)
+        layers += nn.Dropout2d(p=0.2)
+        layers += nn.ReLU()
+        self.conv = nn.Sequential(*layers)
 
     def forward(self, x):
-        x = self.lin1(x)
-        x = F.dropout(x, p=0.2, training=self.training)
-        x = F.relu(x)
-        x = self.lin2(x)
-        x = F.dropout(x, p=0.2, training=self.training)
-        x = self.lin3(x)
+        # x = self.lin1(x)
+        # x = F.dropout(x, p=0.2, training=self.training)
+        # x = F.relu(x)
+        # x = self.lin2(x)
+        # x = F.dropout(x, p=0.2, training=self.training)
+        # x = self.lin3(x)
+        #
+        # return x
+
+        x = self.latent(x)
+        x = self.conv(x)
 
         return x
 
@@ -106,7 +129,7 @@ def train(encoder, decoder, discriminator, encoder_optimizer, decoder_optimizer,
         # Load batch and normalize samples to be in [-1, 1]
         img = mnist.train.next_batch(batch_size)[0]
         img = (img - 0.5) / 0.5
-        img.reshape((batch_size, X_dim))
+        img.reshape((batch_size, 1, 28, 28))
         img = Variable(torch.from_numpy(img)).cuda()
 
         # Init gradients
