@@ -177,6 +177,7 @@ def generate_model():
             output = decoder(z)
             output = (output + 1) * 0.5
             output = output.data.cpu().numpy()
+            output = np.reshape((4, 28, 28))
             utils.plot.plot_generated_images(output, os.path.join('mnist', 'generated_{}'.format(epoch)))
 
 
