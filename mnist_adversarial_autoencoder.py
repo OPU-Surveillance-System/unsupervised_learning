@@ -106,7 +106,7 @@ def train(encoder, decoder, discriminator, encoder_optimizer, decoder_optimizer,
         # Load batch and normalize samples to be in [-1, 1]
         img = mnist.train.next_batch(batch_size)[0]
         img = (img - 0.5) / 0.5
-        img.resize_(batch_size, X_dim)
+        img.reshape((batch_size, X_dim))
         img = Variable(img).cuda
 
         # Init gradients
