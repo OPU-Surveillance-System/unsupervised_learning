@@ -107,8 +107,8 @@ def train(models, optimizers, datasets, epochs, batch_size, patch_size, z_dim, d
                 discriminator_loss = -torch.mean(torch.log(discriminator_real + tiny) + torch.log(1 - discriminator_fake + tiny))
                 running_discriminator_loss += discriminator_loss.data[0]
 
-                ones = torch.ones(batch_size * patch_size, 1).float()
-                zeros = torch.zeros(batch_size * patch_size, 1).float()
+                ones = torch.ones(batch_size * ((256 // patch_size)**2), 1).float()
+                zeros = torch.zeros(batch_size * ((256 // patch_size)**2), 1).float()
                 groundtruth = Variable(torch.cat((ones, zeros), 0)).cuda()
                 discriminator_out = torch.cat((discriminator_real, discriminator_fake), 0)
                 discriminator_out = (discriminator_out > 0.5)
