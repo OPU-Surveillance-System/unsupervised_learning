@@ -140,7 +140,7 @@ def train(encoder, decoder, discriminator, encoder_optimizer, decoder_optimizer,
         encoder.train()
         discriminator.eval()
 
-        z_fake = encoder(X)
+        z_fake = encoder(img)
         discriminator_fake = discriminator(z_fake)
         generator_loss = -torch.mean(torch.log(discriminator_fake + TINY))
 
