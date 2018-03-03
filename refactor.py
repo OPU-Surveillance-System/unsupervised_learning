@@ -183,7 +183,7 @@ def train(models, optimizers, datasets, epochs, batch_size, patch_size, z_dim, d
                     best_encoder = copy.deepcopy(encoder)
                     best_decoder = copy.deepcopy(decoder)
                     best_discriminator = copy.deepcopy(discriminator)
-                if e % 10 == 0:
+                if epoch % 10 == 0:
                     #Save model
                     torch.save(encoder.state_dict(), os.path.join(directory, 'serial', 'encoder_{}'.format(epoch)))
                     torch.save(decoder.state_dict(), os.path.join(directory, 'serial', 'decoder_{}'.format(epoch)))
