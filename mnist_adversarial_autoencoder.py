@@ -107,7 +107,7 @@ def train(encoder, decoder, discriminator, encoder_optimizer, decoder_optimizer,
         img = mnist.train.next_batch(batch_size)[0]
         img = (img - 0.5) / 0.5
         img.reshape((batch_size, X_dim))
-        img = Variable(img).cuda
+        img = Variable(torch.from_numpy(img)).cuda()
 
         # Init gradients
         encoder.zero_grad()
