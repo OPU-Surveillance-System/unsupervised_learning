@@ -79,7 +79,6 @@ class Decoder(nn.Module):
         layers.append(nn.Upsample(scale_factor=2, mode='bilinear'))
         layers.append(nn.Conv2d(f_dim, 1, (3, 3), (1, 1), padding=1))
         layers.append(nn.Dropout2d(p=0.2))
-        layers.append(nn.ReLU())
         self.conv = nn.Sequential(*layers)
 
     def forward(self, x):
