@@ -168,14 +168,14 @@ def train(models, optimizers, datasets, epochs, batch_size, patch_size, z_dim, d
 
             print('Reconstruction loss = {}, Discriminator loss = {}, Regularization loss {}, AUC = {}'.format(running_reconstruction_loss, running_discriminator_loss, running_regularization_loss, auc_alpha_05))
 
-            writer.add_scalar('{}/learning_curve/reconstruction_loss'.format(p), running_reconstruction_loss, e)
-            writer.add_scalar('{}/learning_curve/discriminator_loss'.format(p), running_discriminator_loss_real, e)
-            writer.add_scalar('{}/learning_curve/regularization_loss'.format(p), running_regularization_loss_fake, e)
-            writer.add_scalar('{}/accuracy/discriminator_accuracy'.format(p), discriminator_accuracy, e)
-            writer.add_scalar('{}/accuracy/regularization_accuracy'.format(p), regularization_accuracy, e)
-            writer.add_scalar('{}/auc/0'.format(p), auc_alpha_0, e)
-            writer.add_scalar('{}/auc/05'.format(p), auc_alpha_05, e)
-            writer.add_scalar('{}/auc/1'.format(p), auc_alpha_1, e)
+            writer.add_scalar('{}/learning_curve/reconstruction_loss'.format(p), running_reconstruction_loss, epoch)
+            writer.add_scalar('{}/learning_curve/discriminator_loss'.format(p), running_discriminator_loss_real, epoch)
+            writer.add_scalar('{}/learning_curve/regularization_loss'.format(p), running_regularization_loss_fake, epoch)
+            writer.add_scalar('{}/accuracy/discriminator_accuracy'.format(p), discriminator_accuracy, epoch)
+            writer.add_scalar('{}/accuracy/regularization_accuracy'.format(p), regularization_accuracy, epoch)
+            writer.add_scalar('{}/auc/0'.format(p), auc_alpha_0, epoch)
+            writer.add_scalar('{}/auc/05'.format(p), auc_alpha_05, epoch)
+            writer.add_scalar('{}/auc/1'.format(p), auc_alpha_1, epoch)
 
             if p == 'test':
                 if auc_alpha_05 > best_auc:
@@ -185,9 +185,9 @@ def train(models, optimizers, datasets, epochs, batch_size, patch_size, z_dim, d
                     best_discriminator = copy.deepcopy(discriminator)
                 if e % 10 == 0:
                     #Save model
-                    torch.save(encoder.state_dict(), os.path.join(directory, 'serial', 'encoder_{}'.format(e)))
-                    torch.save(decoder.state_dict(), os.path.join(directory, 'serial', 'decoder_{}'.format(e)))
-                    torch.save(discriminator.state_dict(), os.path.join(directory, 'serial', 'discriminator_{}'.format(e)))
+                    torch.save(encoder.state_dict(), os.path.join(directory, 'serial', 'encoder_{}'.format(epoch)))
+                    torch.save(decoder.state_dict(), os.path.join(directory, 'serial', 'decoder_{}'.format(epoch)))
+                    torch.save(discriminator.state_dict(), os.path.join(directory, 'serial', 'discriminator_{}'.format(epoch)))
 
                     #Plot example of reconstructed images
                     reconstruction = reconstruction.view(-1, 3, 256, 256)
@@ -197,7 +197,7 @@ def train(models, optimizers, datasets, epochs, batch_size, patch_size, z_dim, d
                     inputs = utils.process.deprocess(inputs)
                     inputs = inputs.data.cpu().numpy()
                     inputs = np.rollaxis(inputs, 1, 4)
-                    utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(directory, 'example_reconstruction', 'epoch_{}.svg'.format(e)))
+                    utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(directory, 'example_reconstruction', 'epoch_{}.svg'.format(epoch)))
                     utils.plot.plot_real_vs_fake_loss(real, fake, os.path.join(directory, 'plots/real_vs_fake_loss.svg'))
 
     writer.export_scalars_to_json(os.path.join(directory, 'logs', 'scalars.json'))
