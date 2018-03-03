@@ -18,7 +18,10 @@ parser.add_argument('--batch_size', type=int, default=100, metavar='N',
                     help='input batch size for training (default: 100)')
 parser.add_argument('--epochs', type=int, default=500, metavar='N',
                     help='number of epochs to train (default: 10)')
-
+parser.add_argument('--lrr', type=float, default=0.001, metavar='N',
+                    help='reconstruction learning rate')
+parser.add_argument('--lra', type=float, default=0.0005, metavar='N',
+                    help='adversarial learning rate')
 args = parser.parse_args()
 
 z_dim = 2
@@ -186,8 +189,8 @@ def generate_model():
     discriminator = Discriminator().cuda()
 
     #learning rates
-    reconstruction_learning_rate = 0.0001
-    regularization_learning_rate = 0.00005
+    reconstruction_learning_rate = args.lrr
+    regularization_learning_rate = args.lra
 
     # Set optimizators
     encoder_optimizer = optim.Adam(encoder.parameters(), lr=reconstruction_learning_rate)
