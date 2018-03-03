@@ -40,6 +40,7 @@ class Encoder(nn.Module):
         layers.append(nn.Conv2d(1, 8, (3, 3), (1, 1), padding=1))
         layers.append(nn.Dropout2d(p=0.2))
         layers.append(nn.ReLU())
+        layers.append(nn.MaxPool2d())
         self.conv = nn.Sequential(*layers)
         self.latent = nn.Linear(8*((28//2)**2), z_dim)
 
@@ -53,9 +54,7 @@ class Encoder(nn.Module):
         # return xgauss
 
         x = self.conv(x)
-        print(x.shape)
         x = x.view((batch_size, -1))
-        print(x.shape)
         x = self.latent(x)
 
         return x
