@@ -214,7 +214,7 @@ if __name__ == '__main__':
     parser.add_argument('-p', type=int, default=32, help='Patch size')
     parser.add_argument('--trs', type=str, default='data/umn_normal_trainset', help='Path to the trainset summary')
     parser.add_argument('--tes', type=str, default='data/umn_testset', help='Path to the testset summary')
-    parser.add_argument('--rd', dest='root_dir', type=str, default='home/scom/data/umn', help='Path to the images')
+    parser.add_argument('--rd', type=str, default='home/scom/data/umn', help='Path to the images')
 
     parser.add_argument('-f', type=int, default=8, help='Number of convolutional filters')
     parser.add_argument('-b', type=int, default=1, help='Number of convolutional blocks')
