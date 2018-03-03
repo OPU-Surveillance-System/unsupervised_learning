@@ -138,6 +138,7 @@ def train(encoder, decoder, discriminator, encoder_optimizer, decoder_optimizer,
         discriminator.zero_grad()
 
         # Reconstruction phase
+        print(img.shape)
         z_sample = encoder(img)
         reconstruction = decoder(z_sample)
         reconstruction_loss = F.mse_loss(reconstruction, img)
