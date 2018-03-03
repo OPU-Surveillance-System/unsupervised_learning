@@ -139,9 +139,9 @@ def train(models, optimizers, datasets, epochs, batch_size, patch_size, z_dim, d
                 else:
                     discriminator_score += discriminator_fake.data.cpu().numpy().tolist()
 
-            running_reconstruction_loss /= i_batch
-            running_discriminator_loss /= i_batch
-            running_regularization_loss /= i_batch
+            running_reconstruction_loss /= (i_batch + 1)
+            running_discriminator_loss /= (i_batch * 2 + 1)
+            running_regularization_loss /= (i_batch)
 
             if p == 'test':
                 reconstruction_errors = torch.from_numpy(np.array(reconstruction_errors)).float().cuda()
