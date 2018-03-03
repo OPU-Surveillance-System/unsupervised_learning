@@ -37,9 +37,9 @@ class Encoder(nn.Module):
         # self.lin2 = nn.Linear(N, N)
         # self.lin3gauss = nn.Linear(N, z_dim)
         layers = []
-        layers += nn.Conv2d(1, 8, (3, 3), (1, 1), padding=1)
-        layers += nn.Dropout2d(p=0.2)
-        layers += nn.ReLU()
+        layers.append(nn.Conv2d(1, 8, (3, 3), (1, 1), padding=1))
+        layers.append(nn.Dropout2d(p=0.2))
+        layers.append(nn.ReLU())
         self.conv = nn.Sequential(*layers)
         self.latent = nn.Linear(8*((28//2)**2), z_dim)
 
@@ -66,10 +66,10 @@ class Decoder(nn.Module):
         # self.lin3 = nn.Linear(N, X_dim)
         self.latent = nn.Linear(z_dim, 8*((28//2)**2))
         layers = []
-        layers += nn.Upsample(scale_factor=2, mode='bilinear')
-        layers += nn.Conv2d(8, 1, (3, 3), (1, 1), padding=1)
-        layers += nn.Dropout2d(p=0.2)
-        layers += nn.ReLU()
+        layers.append(nn.Upsample(scale_factor=2, mode='bilinear'))
+        layers.append(nn.Conv2d(8, 1, (3, 3), (1, 1), padding=1))
+        layers.append(nn.Dropout2d(p=0.2))
+        layers.append(nn.ReLU())
         self.conv = nn.Sequential(*layers)
 
     def forward(self, x):
