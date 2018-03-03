@@ -40,7 +40,7 @@ class Encoder(nn.Module):
         layers.append(nn.Conv2d(1, 8, (3, 3), (1, 1), padding=1))
         layers.append(nn.Dropout2d(p=0.2))
         layers.append(nn.ReLU())
-        layers.append(nn.MaxPool2d())
+        layers.append(nn.MaxPool2d((2, 2), (2, 2)))
         self.conv = nn.Sequential(*layers)
         self.latent = nn.Linear(8*((28//2)**2), z_dim)
 
