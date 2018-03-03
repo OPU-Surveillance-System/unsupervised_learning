@@ -8,6 +8,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 import tensorflow as tf
 from torch.autograd import Variable
+from torch.utils.data import DataLoader
 from tqdm import tqdm
 from sklearn import metrics
 from tensorboardX import SummaryWriter
@@ -247,6 +248,9 @@ if __name__ == '__main__':
     decoder = decoder.cuda()
     discriminator = models.patch_adversarial_autoencoder.Discriminator(args.z, args.d)
     discriminator = discriminator.cuda()
+    print(encoder)
+    print(decoder)
+    print(discriminator)
     models = [encoder, decoder, discriminator]
 
     #Optimizers
