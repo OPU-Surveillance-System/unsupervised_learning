@@ -8,6 +8,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 import tensorflow as tf
 import os
+import tqdm as tqdm
 
 import utils.plot
 
@@ -134,7 +135,7 @@ def train(encoder, decoder, discriminator, encoder_optimizer, decoder_optimizer,
     decoder.train()
     discriminator.train()
 
-    for i in range(mnist.train.num_examples//batch_size):
+    for i in tqdm(range(mnist.train.num_examples//batch_size)):
 
         # Load batch and normalize samples to be in [-1, 1]
         img = mnist.train.next_batch(batch_size)[0]
