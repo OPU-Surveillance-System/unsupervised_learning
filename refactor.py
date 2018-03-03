@@ -98,7 +98,7 @@ def train(models, optimizers, datasets, epochs, batch_size, patch_size, z_dim, d
                     encoder.eval()
                     discriminator.zero_grad()
 
-                z_real = Variable(torch.randn(batch_size, z_dim) * 5.).cuda()
+                z_real = Variable(torch.randn(batch_size * ((256 // patch_size)**2), z_dim) * 5.).cuda()
                 z_fake = encoder(inputs)
                 discriminator_real = discriminator(z_real)[1]
                 discriminator_fake = discriminator(z_fake)[1]
