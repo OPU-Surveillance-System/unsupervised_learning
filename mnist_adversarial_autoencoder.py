@@ -27,6 +27,7 @@ y_dim = 10
 batch_size = args.batch_size
 N = 1000
 epochs = args.epochs
+mnist = tf.contrib.learn.datasets.load_dataset("mnist")
 
 # Encoder
 class Encoder(nn.Module):
@@ -94,7 +95,6 @@ def train(encoder, decoder, discriminator, encoder_optimizer, decoder_optimizer,
     Train procedure for one epoch.
     '''
 
-    mnist = tf.contrib.learn.datasets.load_dataset("mnist")
     TINY = 1e-15
     # Set the networks in train mode (apply dropout when needed)
     encoder.train()
