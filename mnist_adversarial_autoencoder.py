@@ -1,306 +1,177 @@
 import argparse
-import os
 import torch
-import copy
+import pickle
 import numpy as np
-from torch.utils.data import DataLoader
 from torch.autograd import Variable
-from tqdm import tqdm
-from sklearn import metrics
-from tensorboardX import SummaryWriter
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
 import tensorflow as tf
 
-import dataset
-import models.mnist_adversarial_autoencoder
-import utils.metrics
-import utils.plot
-import utils.process
+# Training settings
+parser = argparse.ArgumentParser(description='PyTorch semi-supervised MNIST')
 
-def train(networks, loss_functions, optimizers, trainset, testset, epoch, batch_size, latent_size, patch_size, directory):
-    """
-    Train an adversarial autoencoder and log the process
-    Args:
-        networks (list of torch.nn.Module): List of models to train (encoder, decoder, discriminator)
-        loss_functions (list of torch.optim.Module): Loss functions (reconstruction, adversarial)
-        optimizers (list of torch.optim.Optimizer): Optimizers (encoder, decoder, discriminator, adversarial encoder)
-        trainset (torch.utils.data.Dataset): Training set
-        testset (torch.utils.data.Dataset): Test set
-        epoch (int): Number of training epochs
-        batch_size (int): Mini batch size
-        latent_size (int):
-        patch_size (int):
-        directory (str): Directory to store the logs
-    """
+parser.add_argument('--batch_size', type=int, default=100, metavar='N',
+                    help='input batch size for training (default: 100)')
+parser.add_argument('--epochs', type=int, default=500, metavar='N',
+                    help='number of epochs to train (default: 10)')
 
-    encoder, decoder, discriminator = networks
-    reconstruction_loss_function, adversarial_loss_function = loss_functions
-    encoder_optimizer, decoder_optimizer, discriminator_optimizer, adversarial_encoder_optimizer = optimizers
-    phase = ('train', 'test')
-    datasets = {'train': trainset, 'test': testset}
-    dist = torch.nn.PairwiseDistance(p=2, eps=1e-06)
-    alpha = 0.5
-    best_auc = 0
-    best_encoder = copy.deepcopy(encoder)
-    best_decoder = copy.deepcopy(decoder)
-    best_discriminator = copy.deepcopy(discriminator)
-    real = []
-    fake = []
-    writer = SummaryWriter(os.path.join(directory, 'logs'))
+args = parser.parse_args()
+
+z_dim = 2
+X_dim = 784
+y_dim = 10
+batch_size = args.batch_size
+N = 1000
+epochs = args.epochs
+
+# Encoder
+class Encoder(nn.Module):
+    def __init__(self):
+        super(Encoder, self).__init__()
+        self.lin1 = nn.Linear(X_dim, N)
+        self.lin2 = nn.Linear(N, N)
+        self.lin3gauss = nn.Linear(N, z_dim)
+
+    def forward(self, x):
+        x = F.dropout(self.lin1(x), p=0.2, training=self.training)
+        x = F.relu(x)
+        x = F.dropout(self.lin2(x), p=0.2, training=self.training)
+        x = F.relu(x)
+        xgauss = self.lin3gauss(x)
+
+        return xgauss
+
+# Decoder
+class Decoder(nn.Module):
+    def __init__(self):
+        super(Decoder, self).__init__()
+        self.lin1 = nn.Linear(z_dim, N)
+        self.lin2 = nn.Linear(N, N)
+        self.lin3 = nn.Linear(N, X_dim)
+
+    def forward(self, x):
+        x = self.lin1(x)
+        x = F.dropout(x, p=0.2, training=self.training)
+        x = F.relu(x)
+        x = self.lin2(x)
+        x = F.dropout(x, p=0.2, training=self.training)
+        x = self.lin3(x)
+
+        return x
+
+#Discriminator
+class Discriminator(nn.Module):
+    def __init__(self):
+        super(Discriminator, self).__init__()
+        self.lin1 = nn.Linear(z_dim, N)
+        self.lin2 = nn.Linear(N, N)
+        self.lin3 = nn.Linear(N, 1)
+
+    def forward(self, x):
+        x = F.dropout(self.lin1(x), p=0.2, training=self.training)
+        x = F.relu(x)
+        x = F.dropout(self.lin2(x), p=0.2, training=self.training)
+        x = F.relu(x)
+
+        return F.sigmoid(self.lin3(x))
+
+# Utility functions
+def report_loss(epoch, reconstruction_loss, discriminator_loss, generator_loss):
+    '''
+    Print loss
+    '''
+    print('Epoch {}: discriminator loss={:.4}, generator loss={:.4}, reconstruction loss={:.4}'.format(epoch, discriminator_loss.data[0],
+                                                                                   generator_loss.data[0],
+                                                                                   reconstruction_loss.data[0]))
+
+# Train procedure
+def train(encoder, decoder, discriminator, encoder_optimizer, decoder_optimizer, discriminator_optimizer, generator_optimizer):
+    '''
+    Train procedure for one epoch.
+    '''
+
     mnist = tf.contrib.learn.datasets.load_dataset("mnist")
+    TINY = 1e-15
+    # Set the networks in train mode (apply dropout when needed)
+    encoder.train()
+    decoder.train()
+    discriminator.train()
 
-    for e in range(epoch):
-        print('Epoch {}'.format(e))
-        for p in phase:
-            running_reconstruction_loss = 0
-            running_discriminator_loss_real = 0
-            running_discriminator_loss_fake = 0
-            running_discriminator_loss = 0
-            running_adversarial_loss = 0
-            dataloader = DataLoader(datasets[p], batch_size=batch_size, shuffle=True, num_workers=4)
+    for i in range(mnist.train.num_examples//batch_size):
 
-            reconstruction_errors = []
-            discriminator_ouput = []
-            label = []
+        # Load batch and normalize samples to be in [-1, 1]
+        img = mnist.train.next_batch(batch_size)[0]
+        img = (img - 0.5) / 0.5
+        img.resize_(train_batch_size, X_dim)
+        img = Variable(img).cuda
 
+        # Init gradients
+        encoder.zero_grad()
+        decoder.zero_grad()
+        discriminator.zero_grad()
 
-            if p == 'train':
-                nb_patch = mnist.train.num_examples
-            else:
-                nb_patch = mnist.test.num_examples
+        # Reconstruction phase
+        z_sample = encoder(img)
+        reconstruction = decoder(z_sample)
+        reconstruction_loss = F.mse_loss(reconstruction, img)
 
-            for i_batch in tqdm(range(nb_patch//batch_size)):
+        reconstruction_loss.backward()
+        decoder_optimizer.step()
+        encoder_optimizer.step()
 
-                #Reconstruction
-                if p == 'train':
-                    encoder.train()
-                    decoder.train()
-                    encoder.zero_grad()
-                    decoder.zero_grad()
-                else:
-                    encoder.eval()
-                    decoder.eval()
-                #inputs = Variable(sample['img'].float().cuda())
-                img = mnist.train.next_batch(batch_size)[0]
-                img = np.reshape(img, (-1, 1, 28, 28))
-                inputs = Variable(torch.from_numpy(img).cuda())
-                inputs = (inputs - 0.5) / 0.5
-                latent = encoder(inputs)
-                reconstruction = decoder(latent)
-                loss = reconstruction_loss_function(reconstruction, inputs.view(-1, 1, patch_size, patch_size))
-                if p == 'train':
-                    loss.backward()
-                    decoder_optimizer.step()
-                    encoder_optimizer.step()
-                else:
-                    r_ = utils.metrics.per_image_error(dist, reconstruction, inputs.view(-1, 1, patch_size, patch_size))
-                    reconstruction_errors += r_.data.cpu().numpy().tolist()
-                running_reconstruction_loss += loss.data[0]
+        # Discriminator phase
+        encoder.eval()
 
-                #Discriminator
-                encoder.eval()
-                if p == 'train':
-                    discriminator.train()
-                    discriminator.zero_grad()
-                else:
-                    discriminator.eval()
-                #z_real = Variable(torch.randn(inputs.size(0) * ((256//patch_size)**2) * 5, latent_size).cuda()) #Sample from N(0, 1)
-                z_real = Variable(torch.randn(inputs.size(0), latent_size).cuda()) #Sample from N(0, 1)
-                z_fake = encoder(inputs)
-                logits_real = discriminator(z_real)[0]
-                logits_fake = discriminator(z_fake)[0]
-                labels_real = Variable(torch.zeros((logits_real.size(0), 1)).float().cuda())
-                labels_fake = Variable(torch.ones((logits_fake.size(0), 1)).float().cuda())
-                loss_real = adversarial_loss_function(logits_real, labels_real)
-                loss_fake = adversarial_loss_function(logits_fake, labels_fake)
-                loss = loss_real + loss_fake
-                if p == 'train':
-                    loss.backward()
-                    discriminator_optimizer.step()
-                running_discriminator_loss_real += loss_real.data[0]
-                running_discriminator_loss_fake += loss_fake.data[0]
-                running_discriminator_loss += loss.data[0]
+        z_real = Variable(torch.randn(train_batch_size, z_dim) * 5.).cuda()
+        z_fake = encoder(img)
+        discriminator_real = discriminator(z_real)
+        discriminator_fake = discriminator(z_fake)
+        discriminator_loss = -torch.mean(torch.log(discriminator_real + TINY) + torch.log(1 - discriminator_fake + TINY))
 
-                #Adversarial
-                discriminator.eval()
-                if p == 'train':
-                    encoder.train()
-                    encoder.zero_grad()
-                else:
-                    encoder.eval()
-                z_real = encoder(inputs)
-                logits_real = discriminator(z_real)[0]
-                labels = Variable(torch.zeros((logits_real.size(0), 1)).float().cuda())
-                loss = adversarial_loss_function(logits_real, labels)
-                if p == 'train':
-                    loss.backward()
-                    adversarial_encoder_optimizer.step()
-                else:
-                    d_ = torch.nn.functional.sigmoid(logits_real)
-                    discriminator_ouput += d_.data.cpu().numpy().tolist()
-                running_adversarial_loss += loss.data[0]
+        discriminator_loss.backward()
+        discriminator_optimizer.step()
 
-                # #Store labels
-                # if p == 'test':
-                #     label += sample['lbl'].numpy().tolist()
+        # Generator
+        encoder.zero_grad()
+        encoder.train()
+        discriminator.eval()
 
-            # if p == 'test':
-            #     reconstruction_errors = torch.from_numpy(np.array(reconstruction_errors)).float().cuda()
-            #     discriminator_ouput = torch.from_numpy(np.array(discriminator_ouput)).float().cuda()
-            #     image_abnormal_score_alpha_0 = utils.metrics.mean_image_abnormal_score(reconstruction_errors, discriminator_ouput, 0, patch_size)
-            #     image_abnormal_score_alpha_0 = image_abnormal_score_alpha_0.cpu().numpy().tolist()
-            #     fpr, tpr, thresholds = metrics.roc_curve(label, image_abnormal_score_alpha_0)
-            #     auc_alpha_0 = metrics.auc(fpr, tpr)
-            #     image_abnormal_score_alpha_05 = utils.metrics.mean_image_abnormal_score(reconstruction_errors, discriminator_ouput, 0.5, patch_size)
-            #     image_abnormal_score_alpha_05 = image_abnormal_score_alpha_05.cpu().numpy().tolist()
-            #     fpr, tpr, thresholds = metrics.roc_curve(label, image_abnormal_score_alpha_05)
-            #     auc_alpha_05 = metrics.auc(fpr, tpr)
-            #     image_abnormal_score_alpha_1 = utils.metrics.mean_image_abnormal_score(reconstruction_errors, discriminator_ouput, 1, patch_size)
-            #     image_abnormal_score_alpha_1 = image_abnormal_score_alpha_1.cpu().numpy().tolist()
-            #     fpr, tpr, thresholds = metrics.roc_curve(label, image_abnormal_score_alpha_1)
-            #     auc_alpha_1 = metrics.auc(fpr, tpr)
-            # else:
-            #     auc_alpha_0 = 0
-            #     auc_alpha_05 = 0
-            #     auc_alpha_1 = 0
+        z_fake = encoder(X)
+        discriminator_fake = discriminator(z_fake)
+        generator_loss = -torch.mean(torch.log(discriminator_fake + TINY))
 
-            #Computes epoch average losses
-            epoch_reconstruction_loss = running_reconstruction_loss / nb_patch
-            epoch_discriminator_loss_real = running_discriminator_loss_real / nb_patch
-            epoch_discriminator_loss_fake = running_discriminator_loss_fake / nb_patch
-            epoch_discriminator_loss = running_discriminator_loss / (nb_patch * 2)
-            epoch_adversarial_loss = running_adversarial_loss / nb_patch
-            writer.add_scalar('{}/learning_curve/reconstruction_loss'.format(p), epoch_reconstruction_loss, e)
-            writer.add_scalar('{}/learning_curve/discriminator_loss_real'.format(p), epoch_discriminator_loss_real, e)
-            writer.add_scalar('{}/learning_curve/discriminator_loss_fake'.format(p), epoch_discriminator_loss_fake, e)
-            writer.add_scalar('{}/learning_curve/discriminator_loss'.format(p), epoch_discriminator_loss, e)
-            writer.add_scalar('{}/learning_curve/adversarial_loss/'.format(p), epoch_adversarial_loss, e)
-            # writer.add_scalar('{}/auc/0'.format(p), auc_alpha_0, e)
-            # writer.add_scalar('{}/auc/05'.format(p), auc_alpha_05, e)
-            # writer.add_scalar('{}/auc/1'.format(p), auc_alpha_1, e)
-            # print('{} -- Reconstruction loss: {}, Discriminator loss real: {}, Discriminator loss fake: {} Adversarial loss: {}, AUC: {}'.format(p, epoch_reconstruction_loss, epoch_discriminator_loss_real, epoch_discriminator_loss_fake, epoch_adversarial_loss, auc_alpha_05))
-            print('{} -- Reconstruction loss: {}, Discriminator loss real: {}, Discriminator loss fake: {}, Adversarial loss: {}'.format(p, epoch_reconstruction_loss, epoch_discriminator_loss_real, epoch_discriminator_loss_fake, epoch_adversarial_loss))
+        generator_loss.backward()
+        generator_optimizer.step()
 
-            if p == 'test':
-                real.append(epoch_discriminator_loss_real)
-                fake.append(epoch_discriminator_loss_fake)
-                # if auc_alpha_05 > best_auc:
-                #     best_auc = auc_alpha_05
-                #     best_encoder = copy.deepcopy(encoder)
-                #     best_decoder = copy.deepcopy(decoder)
-                #     best_discriminator = copy.deepcopy(discriminator)
-                if e % 10 == 0:
-                    #Save model
-                    # torch.save(encoder.state_dict(), os.path.join(directory, 'serial', 'encoder_{}'.format(e)))
-                    # torch.save(decoder.state_dict(), os.path.join(directory, 'serial', 'decoder_{}'.format(e)))
-                    # torch.save(discriminator.state_dict(), os.path.join(directory, 'serial', 'discriminator_{}'.format(e)))
+        encoder.zero_grad()
+        decoder.zero_grad()
+        discriminator.zero_grad()
 
-                    #Plot example of reconstructed images
-                    reconstruction = reconstruction.view(-1, 28, 28)
-                    #pred = utils.process.deprocess(reconstruction)
-                    pred = (reconstruction + 1) * 0.5
-                    pred = pred.data.cpu().numpy()
-                    #pred = np.rollaxis(pred, 1, 4)
-                    #inputs = utils.process.deprocess(inputs)
-                    inputs = inputs.view(-1, 28, 28)
-                    inputs = (inputs + 1) * 0.5
-                    inputs = inputs.data.cpu().numpy()
-                    #inputs = np.rollaxis(inputs, 1, 4)
-                    utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(directory, 'example_reconstruction', 'epoch_{}.svg'.format(e)))
+    return reconstruction_loss, discriminator_loss, generator_loss
 
-                    z = Variable(torch.randn(4, latent_size).cuda()) #Sample from N(0, 1)
-                    generated = decoder(z)
-                    generated = generated.view(-1, 28, 28)
-                    generated = (generated + 1) * 0.5
-                    generated = generated.data.cpu().numpy()
-                    utils.plot.plot_generated_images(generated, os.path.join(directory, 'example_generation', 'epoch_{}.svg'.format(e)))
+def generate_model():
+    #Models
+    encoder = Encoder().cuda()
+    decoder = Decoder().cuda()
+    discriminator = Discriminator().cuda()
 
-                    utils.plot.plot_real_vs_fake_loss(real, fake, os.path.join(directory, 'plots/real_vs_fake_loss.svg'))
-    writer.export_scalars_to_json(os.path.join(directory, 'logs', 'scalars.json'))
-    writer.close()
+    #learning rates
+    reconstruction_learning_rate = 0.0001
+    regularization_learning_rate = 0.00005
 
-    return best_encoder, best_decoder, best_discriminator
+    # Set optimizators
+    encoder_optimizer = optim.Adam(encoder.parameters(), lr=reconstruction_learning_rate)
+    decoder_optimizer = optim.Adam(decoder.parameters(), lr=reconstruction_learning_rate)
+    discriminator_optimizer = optim.Adam(discriminator.parameters(), lr=regularization_learning_rate)
+    generator_optimizer = optim.Adam(encoder.parameters(), lr=regularization_learning_rate)
 
-def main(args):
-    """
-    Train an autoencoder and save it
-    """
+    for epoch in range(epochs):
+        reconstruction_loss, discriminator_loss, generator_loss = train(encoder, decoder, discriminator, encoder_optimizer, decoder_optimizer, discriminator_optimizer, generator_optimizer)
+        if epoch % 10 == 0:
+            report_loss(epoch, reconstruction_loss, discriminator_loss, generator_loss)
 
-    #Create directories if it don't exists
-    if not os.path.exists(args.directory):
-        os.makedirs(args.directory)
-    if not os.path.exists(os.path.join(args.directory, 'serial')):
-        os.makedirs(os.path.join(args.directory, 'serial'))
-    if not os.path.exists(os.path.join(args.directory, 'example_reconstruction')):
-        os.makedirs(os.path.join(args.directory, 'example_reconstruction'))
-    if not os.path.exists(os.path.join(args.directory, 'example_generation')):
-        os.makedirs(os.path.join(args.directory, 'example_generation'))
-    if not os.path.exists(os.path.join(args.directory, 'logs')):
-        os.makedirs(os.path.join(args.directory, 'logs'))
-    if not os.path.exists(os.path.join(args.directory, 'plots')):
-        os.makedirs(os.path.join(args.directory, 'plots'))
-
-    #Write arguments in a file
-    d = vars(args)
-    with open(os.path.join(args.directory, 'hyper-parameters'), 'w') as f:
-        for k in d.keys():
-            f.write('{}:{}\n'.format(k, d[k]))
-
-    #Networks
-    encoder = models.mnist_adversarial_autoencoder.Encoder(args.nb_f, args.nb_l, args.nb_b, args.latent_size, args.patch)
-    decoder = models.mnist_adversarial_autoencoder.Decoder(encoder.last_map_dim, args.nb_l, args.nb_b, args.latent_size)
-    discriminator = models.mnist_adversarial_autoencoder.Discriminator(args.latent_size, args.denses)
-    encoder = encoder.cuda()
-    decoder = decoder.cuda()
-    discriminator = discriminator.cuda()
-    print(encoder)
-    print(decoder)
-    print(discriminator)
-    networks = [encoder, decoder, discriminator]
-
-    #Loss functions
-    reconstruction_loss_function = torch.nn.MSELoss()
-    adversarial_loss_function = torch.nn.BCEWithLogitsLoss()
-    loss_functions = [reconstruction_loss_function, adversarial_loss_function]
-
-    #Optimizers
-    encoder_optimizer = torch.optim.Adam(encoder.parameters(), args.learning_rate_reconstruction)
-    decoder_optimizer = torch.optim.Adam(decoder.parameters(), args.learning_rate_reconstruction)
-    discriminator_optimizer = torch.optim.Adam(discriminator.parameters(), args.learning_rate_adversarial)
-    adversarial_encoder_optimizer = torch.optim.Adam(encoder.parameters(), args.learning_rate_adversarial)
-    optimizers = [encoder_optimizer, decoder_optimizer, discriminator_optimizer, adversarial_encoder_optimizer]
-
-
-    #Datasets
-    trainset = dataset.VideoDataset(args.trainset, args.root_dir)
-    testset = dataset.VideoDataset(args.testset, args.root_dir)
-
-    #Train the model and save it
-    encoder, decoder, discriminator = train(networks, loss_functions, optimizers, trainset, testset, args.epoch, args.batch_size, args.latent_size, args.patch, args.directory)
-    torch.save(encoder.state_dict(), os.path.join(args.directory, 'serial', 'best_encoder'))
-    torch.save(decoder.state_dict(), os.path.join(args.directory, 'serial', 'best_decoder'))
-    torch.save(discriminator.state_dict(), os.path.join(args.directory, 'serial', 'best_discriminator'))
-
-    return 0
+    return encoder, decoder, discriminator
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='')
-    #Training arguments
-    parser.add_argument('--trs', dest='trainset', type=str, default='data/umn_normal_trainset', help='Path to the trainset summary')
-    parser.add_argument('--tes', dest='testset', type=str, default='data/umn_testset', help='Path to the testset summary')
-    parser.add_argument('--rd', dest='root_dir', type=str, default='/datasets', help='Path to the images')
-    parser.add_argument('--bs', dest='batch_size', type=int, default=16, help='Mini batch size')
-    parser.add_argument('--lrr', dest='learning_rate_reconstruction', type=float, default=0.0001, help='Reconstruction learning rate')
-    parser.add_argument('--lra', dest='learning_rate_adversarial', type=float, default=0.00005, help='Adversarial learning rate')
-    parser.add_argument('--ep', dest='epoch', type=int, default=100, help='Number of training epochs')
-    parser.add_argument('--dir', dest='directory', type=str, default='train_autoencoder', help='Directory to store results')
-    #Model arguments
-    parser.add_argument('-f', dest='nb_f', type=int, default=16, help='Number of filters in the first downsampling block')
-    parser.add_argument('-l', dest='nb_l', type=int, default=1, help='Number of convolutinal layers per block')
-    parser.add_argument('-b', dest='nb_b', type=int, default=1, help='Number of upsampling blocks')
-    parser.add_argument('--ls', dest='latent_size', type=int, default=2, help='Latent size')
-    parser.add_argument('-d', dest='denses', type=str, default='1024, 1024', help='Discriminator hidden layers')
-    parser.add_argument('-i', dest='ips', type=int, default=28, help='Image height (assume width = height)')
-    parser.add_argument('-p', dest='patch', type=int, default=28, help='Image patch size')
-    args = parser.parse_args()
-
-    main(args)
+    encoder, decoder, discriminator = generate_model()
