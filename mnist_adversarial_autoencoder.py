@@ -7,6 +7,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import tensorflow as tf
+import os
+
+import utils.plot
 
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch semi-supervised MNIST')
@@ -103,7 +106,7 @@ def train(encoder, decoder, discriminator, encoder_optimizer, decoder_optimizer,
         # Load batch and normalize samples to be in [-1, 1]
         img = mnist.train.next_batch(batch_size)[0]
         img = (img - 0.5) / 0.5
-        img.resize_(train_batch_size, X_dim)
+        img.resize_(batch_size, X_dim)
         img = Variable(img).cuda
 
         # Init gradients
@@ -123,7 +126,7 @@ def train(encoder, decoder, discriminator, encoder_optimizer, decoder_optimizer,
         # Discriminator phase
         encoder.eval()
 
-        z_real = Variable(torch.randn(train_batch_size, z_dim) * 5.).cuda()
+        z_real = Variable(torch.randn(batch_size, z_dim) * 5.).cuda()
         z_fake = encoder(img)
         discriminator_real = discriminator(z_real)
         discriminator_fake = discriminator(z_fake)
@@ -170,8 +173,16 @@ def generate_model():
         reconstruction_loss, discriminator_loss, generator_loss = train(encoder, decoder, discriminator, encoder_optimizer, decoder_optimizer, discriminator_optimizer, generator_optimizer)
         if epoch % 10 == 0:
             report_loss(epoch, reconstruction_loss, discriminator_loss, generator_loss)
+            z = Variable(torch.randn(4, z_dim) * 5.).cuda()
+            output = decoder(z)
+            output = (output + 1) * 0.5
+            output = output.data.cpu().numpy()
+            utils.plot.plot_generated_images(output, os.path.join('mnist', 'generated_{}'.format(epoch)))
+
 
     return encoder, decoder, discriminator
 
 if __name__ == '__main__':
+    if not os.path.exists('mnist'):
+        os.makedirs('mnist')
     encoder, decoder, discriminator = generate_model()
