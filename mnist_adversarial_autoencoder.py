@@ -22,10 +22,13 @@ parser.add_argument('--lrr', type=float, default=0.001, metavar='N',
                     help='reconstruction learning rate')
 parser.add_argument('--lra', type=float, default=0.0005, metavar='N',
                     help='adversarial learning rate')
+parser.add_argument('-f', type=float, default=8, metavar='N',
+                    help='number of convolutional filters')
 args = parser.parse_args()
 
 z_dim = 2
-X_dim = 784
+# X_dim = 784
+f_dim = args.f
 y_dim = 10
 batch_size = args.batch_size
 N = 1000
@@ -40,12 +43,12 @@ class Encoder(nn.Module):
         # self.lin2 = nn.Linear(N, N)
         # self.lin3gauss = nn.Linear(N, z_dim)
         layers = []
-        layers.append(nn.Conv2d(1, 8, (3, 3), (1, 1), padding=1))
+        layers.append(nn.Conv2d(1, f_dim, (3, 3), (1, 1), padding=1))
         layers.append(nn.Dropout2d(p=0.2))
         layers.append(nn.ReLU())
         layers.append(nn.MaxPool2d((2, 2), (2, 2)))
         self.conv = nn.Sequential(*layers)
-        self.latent = nn.Linear(8*((28//2)**2), z_dim)
+        self.latent = nn.Linear(f_dim*((28//2)**2), z_dim)
 
     def forward(self, x):
         # x = F.dropout(self.lin1(x), p=0.2, training=self.training)
@@ -69,10 +72,10 @@ class Decoder(nn.Module):
         # self.lin1 = nn.Linear(z_dim, N)
         # self.lin2 = nn.Linear(N, N)
         # self.lin3 = nn.Linear(N, X_dim)
-        self.latent = nn.Linear(z_dim, 8*((28//2)**2))
+        self.latent = nn.Linear(z_dim, f_dim*((28//2)**2))
         layers = []
         layers.append(nn.Upsample(scale_factor=2, mode='bilinear'))
-        layers.append(nn.Conv2d(8, 1, (3, 3), (1, 1), padding=1))
+        layers.append(nn.Conv2d(f_dim, 1, (3, 3), (1, 1), padding=1))
         layers.append(nn.Dropout2d(p=0.2))
         layers.append(nn.ReLU())
         self.conv = nn.Sequential(*layers)
@@ -88,7 +91,7 @@ class Decoder(nn.Module):
         # return x
 
         x = self.latent(x)
-        x = x.view((-1, 8, 14, 14))
+        x = x.view((-1, f_dim, 14, 14))
         x = self.conv(x)
 
         return x
