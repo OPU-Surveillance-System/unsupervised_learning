@@ -22,7 +22,7 @@ parser.add_argument('--lrr', type=float, default=0.001, metavar='N',
                     help='reconstruction learning rate')
 parser.add_argument('--lra', type=float, default=0.0005, metavar='N',
                     help='adversarial learning rate')
-parser.add_argument('-f', type=float, default=8, metavar='N',
+parser.add_argument('-f', type=int, default=8, metavar='N',
                     help='number of convolutional filters')
 args = parser.parse_args()
 
