@@ -53,6 +53,7 @@ class Encoder(nn.Module):
         # return xgauss
 
         x = self.conv(x)
+        x = x.view((-1, 1))
         x = self.latent(x)
 
         return x
@@ -83,6 +84,7 @@ class Decoder(nn.Module):
         # return x
 
         x = self.latent(x)
+        x = x.view((-1, 8, 14, 14))
         x = self.conv(x)
 
         return x
@@ -138,7 +140,6 @@ def train(encoder, decoder, discriminator, encoder_optimizer, decoder_optimizer,
         discriminator.zero_grad()
 
         # Reconstruction phase
-        print(img.shape)
         z_sample = encoder(img)
         reconstruction = decoder(z_sample)
         reconstruction_loss = F.mse_loss(reconstruction, img)
