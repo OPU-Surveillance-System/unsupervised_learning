@@ -53,7 +53,7 @@ class Encoder(nn.Module):
         # return xgauss
 
         x = self.conv(x)
-        x = x.view((-1, 1))
+        x = x.view((batch_size, -1))
         x = self.latent(x)
 
         return x
