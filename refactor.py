@@ -98,22 +98,19 @@ def train(models, optimizers, datasets, epochs, batch_size, patch_size, z_dim, d
                     encoder.eval()
                     discriminator.zero_grad()
 
-                z_real = Variable(torch.randn(batch_size * ((256 // patch_size)**2), z_dim) * 5.).cuda()
-                print(z_real.shape)
+                z_real = Variable(torch.randn(inputs.size(0) * ((256 // patch_size)**2), z_dim) * 5.).cuda()
                 z_fake = encoder(inputs)
-                print(z_fake.shape)
                 discriminator_real = discriminator(z_real)[1]
                 discriminator_fake = discriminator(z_fake)[1]
                 discriminator_loss = -torch.mean(torch.log(discriminator_real + tiny) + torch.log(1 - discriminator_fake + tiny))
                 running_discriminator_loss += discriminator_loss.data[0]
 
-                ones = torch.ones(batch_size * ((256 // patch_size)**2), 1).float()
-                zeros = torch.zeros(batch_size * ((256 // patch_size)**2), 1).float()
+                ones = torch.ones(inputs.size(0) * ((256 // patch_size)**2), 1).float()
+                zeros = torch.zeros(inputs.size(0) * ((256 // patch_size)**2), 1).float()
                 groundtruth = Variable(torch.cat((ones, zeros), 0)).cuda()
                 discriminator_out = torch.cat((discriminator_real, discriminator_fake), 0)
                 discriminator_out = (discriminator_out > 0.5)
-                print(discriminator_out.shape)
-                equality = (discriminator_out.float() == groundtruth)
+                equality = (discriminator_out.float() == groundtruth).float()
                 discriminator_accuracy = equality.mean().data[0]
 
                 if p == 'train':
@@ -131,9 +128,9 @@ def train(models, optimizers, datasets, epochs, batch_size, patch_size, z_dim, d
                 regularization_loss = -torch.mean(torch.log(discriminator_fake + tiny))
                 running_regularization_loss += regularization_loss.data[0]
 
-                ones = Variable(torch.ones(batch_size * patch_size, 1).float()).cuda()
+                ones = Variable(torch.ones(inputs.size(0) * ((256 // patch_size)**2), 1).float()).cuda()
                 discriminator_out = (discriminator_fake > 0.5)
-                equality = (discriminator_fake.float() == ones)
+                equality = (discriminator_fake.float() == ones).float()
                 regularization_accuracy += equality.mean().data[0]
 
                 if p == 'train':
