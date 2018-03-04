@@ -261,6 +261,6 @@ if __name__ == '__main__':
 
     encoder, decoder, discriminator = train(models, optimizers, datasets, args.e, args.bs, args.p, args.z, args.dir)
 
-    torch.save(encoder.state_dict(), os.path.join(args.directory, 'serial', 'best_encoder'))
-    torch.save(decoder.state_dict(), os.path.join(args.directory, 'serial', 'best_decoder'))
-    torch.save(discriminator.state_dict(), os.path.join(args.directory, 'serial', 'best_discriminator'))
+    torch.save(encoder.state_dict(), os.path.join(args.dir, 'serial', 'best_encoder'))
+    torch.save(decoder.state_dict(), os.path.join(args.dir, 'serial', 'best_decoder'))
+    torch.save(discriminator.state_dict(), os.path.join(args.dir, 'serial', 'best_discriminator'))
