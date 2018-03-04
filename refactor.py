@@ -130,7 +130,7 @@ def train(models, optimizers, datasets, epochs, batch_size, patch_size, z_dim, d
 
                 ones = Variable(torch.ones(inputs.size(0) * ((256 // patch_size)**2), 1).float()).cuda()
                 discriminator_out = (discriminator_fake > 0.5)
-                equality = (discriminator_fake.float() == ones).float()
+                equality = (discriminator_out.float() == ones).float()
                 regularization_accuracy += equality.mean().data[0]
 
                 if p == 'train':
