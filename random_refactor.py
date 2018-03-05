@@ -21,7 +21,7 @@ import models.patch_random_adversarial_autoencoder
 
 def sample_z(mu, log_var, batch_size, z_dim):
     # Using reparameterization trick to sample from a gaussian
-    eps = Variable(torch.randn(batch_size, z_dim) * 5.0)
+    eps = Variable(torch.randn(batch_size, z_dim) * 5.0).cuda()
 
     return mu + torch.exp(log_var / 2) * eps
 
