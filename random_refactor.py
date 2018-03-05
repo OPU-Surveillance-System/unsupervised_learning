@@ -19,9 +19,9 @@ import utils.process
 import utils.metrics
 import models.patch_random_adversarial_autoencoder
 
-def sample_z(mu, log_var):
+def sample_z(mu, log_var, batch_size, z_dim):
     # Using reparameterization trick to sample from a gaussian
-    eps = Variable(torch.randn(mb_size, Z_dim) * 5.0)
+    eps = Variable(torch.randn(batch_size, z_dim) * 5.0)
 
     return mu + torch.exp(log_var / 2) * eps
 
@@ -87,7 +87,7 @@ def train(models, optimizers, datasets, epochs, batch_size, patch_size, z_dim, d
                     decoder.zero_grad()
 
                 mu, var = encoder(inputs)
-                z = sample_z(mu, var)
+                z = sample_z(mu, var, batch_size, latent_size)
                 reconstruction = decoder(z)
                 reconstruction_loss = F.mse_loss(reconstruction, inputs)
                 running_reconstruction_loss += reconstruction_loss.data[0]
@@ -107,7 +107,7 @@ def train(models, optimizers, datasets, epochs, batch_size, patch_size, z_dim, d
 
                 z_real = Variable(torch.randn(inputs.size(0) * ((256 // patch_size)**2), z_dim) * 5.).cuda()
                 mu, var = encoder(inputs)
-                z_fake = sample_z(mu, var)
+                z_fake = sample_z(mu, var, batch_size, latent_size)
                 discriminator_real = discriminator(z_real)[1]
                 discriminator_fake = discriminator(z_fake)[1]
                 discriminator_loss = -torch.mean(torch.log(discriminator_real + tiny) + torch.log(1 - discriminator_fake + tiny))
@@ -132,7 +132,7 @@ def train(models, optimizers, datasets, epochs, batch_size, patch_size, z_dim, d
                     discriminator.eval()
 
                 mu, var = encoder(inputs)
-                z_fake = sample_z(mu, var)
+                z_fake = sample_z(mu, var, batch_size, latent_size)
                 discriminator_fake = discriminator(z_fake)[1]
                 regularization_loss = -torch.mean(torch.log(discriminator_fake + tiny))
                 running_regularization_loss += regularization_loss.data[0]
