@@ -1,5 +1,6 @@
 import torch
 import math
+from torch.autograd import Variable
 
 class VariationalAutoencoder(torch.nn.Module):
     def __init__(self, nb_f, nb_l, nb_b, fc=None, input_size=256, patch=32):
