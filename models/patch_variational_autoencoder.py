@@ -81,7 +81,7 @@ class VariationalAutoencoder(torch.nn.Module):
         z = mu + torch.exp(sigma / 2) * epsilon
         print('z: ', z.shape)
         #Decode
-        z = z.view(z.size(0), -1, self.reshape, self.reshape)
+        z = z.view(x.size(0), -1, self.reshape, self.reshape)
         print('After reshape: ', z.shape)
         logits = self.decoder(z)
         print('Logits: ', logits.shape)
