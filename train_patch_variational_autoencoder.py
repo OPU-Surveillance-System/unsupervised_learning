@@ -15,12 +15,11 @@ import utils.metrics
 import utils.plot
 import utils.process
 
-def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size, reg, directory):
+def train(model, optimizer, trainset, testset, epoch, batch_size, patch_size, directory):
     """
     Train a model and log the process
     Args:
         model (torch.nn.Module): Model to train (autoencoder)
-        loss_function (torch.optim.Module): Loss function
         optimizer (torch.optim.Optimizer): Optimizer
         trainset (torch.utils.data.Dataset): Training set
         testset (torch.utils.data.Dataset): Test set
@@ -45,19 +44,24 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
                 labels = []
                 errors = []
                 model.eval()
-            running_loss = 0
+            running_reconstruction_loss = 0
+            running_regularization_loss = 0
+            nb_patch = len(datasets[p]) * ((256 // patch_size)**2)
             dataloader = DataLoader(datasets[p], batch_size=batch_size, shuffle=True, num_workers=4)
             for i_batch, sample in enumerate(tqdm(dataloader)):
                 model.zero_grad()
                 inputs = Variable(sample['img'].float().cuda())
-                logits = model(inputs)
-                loss = loss_function(logits, inputs.view(-1, 3, args.patch, args.patch)) - reg * torch.mean(torch.norm(logits.view(-1, logits.size(1) * logits.size(2) * logits.size(3)), 2, 1))
+                logits, mu, sigma = model(inputs)
+                reconstruction_loss = torch.nn.functional.mse_loss(logits, inputs.view(-1, 3, patch_size, patch_size))
+                regularization_loss = 0.5 * torch.sum(torch.exp(sigma) + mu**2 - 1. - sigma)
+                loss = reconstruction_loss + regularization_loss
                 if p == 'train':
                     loss.backward()
                     optimizer.step()
-                running_loss += loss.data[0]
+                running_reconstruction_loss += reconstruction_loss.data[0]
+                running_regularization_loss += regularization_loss.data[0]
                 if p == 'test':
-                    logits = logits.view(-1, 3, args.ips, args.ips)
+                    logits = logits.view(-1, 3, 256, 256)
                     tmp = utils.metrics.per_image_error(dist, logits, inputs)
                     errors += tmp.data.cpu().numpy().tolist()
                     labels += sample['lbl'].numpy().tolist()
@@ -67,8 +71,10 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
                 auc = metrics.auc(fpr, tpr)
             else:
                 auc = 0
-            epoch_loss = running_loss / len(datasets[p])
-            writer.add_scalar('learning_curve/{}'.format(p), epoch_loss, e)
+            epoch_reconstruction_loss = running_reconstruction_loss / nb_patch
+            epoch_regularization_loss = running_regularization_loss / nb_patch
+            writer.add_scalar('{}/learning_curve/reconstruction_loss'.format(p), epoch_reconstruction_loss, e)
+            writer.add_scalar('{}/learning_curve/regularization_loss'.format(p), epoch_regularization_loss, e)
             print('{} -- Loss: {} AUC: {}'.format(p, epoch_loss, auc))
             if p == 'test':
                 writer.add_scalar('auc', auc, e)
@@ -124,7 +130,7 @@ def main(args):
     testset = dataset.VideoDataset(args.testset, args.root_dir)
 
     #Train the model and save it
-    best_model = train(vae, loss_function, optimizer, trainset, testset, args.epoch, args.batch_size, args.regularization, args.directory)
+    best_model = train(vae, loss_function, optimizer, trainset, testset, args.epoch, args.batch_size, args.patch, args.directory)
     torch.save(best_model.state_dict(), os.path.join(args.directory, 'serial', 'best_model'))
 
     return 0
