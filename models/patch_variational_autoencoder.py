@@ -73,7 +73,7 @@ class VariationalAutoencoder(torch.nn.Module):
         mu = self.mu(x)
         sigma = self.sigma(x)
         #Reparametrization trick
-        eps = Variable(torch.randn(mu.size(0), self.fc))
+        eps = Variable(torch.randn(mu.size(0), self.fc)).float().cuda()
         z = mu + torch.exp(sigma / 2) * eps
         #Decode
         z = z.view(z.size(0), -1, self.reshape, self.reshape)
