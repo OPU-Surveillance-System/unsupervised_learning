@@ -77,8 +77,8 @@ class VariationalAutoencoder(torch.nn.Module):
         epsilon = Variable(torch.randn(mu.size(0), self.fc)).float().cuda()
         z = mu + torch.exp(sigma / 2) * epsilon
         #Decode
-        z = self.recover(z)
-        z = z.view(x.size(0), -1, self.reshape, self.reshape) #Unflat z
-        logits = self.decoder(z)
+        latent = self.recover(z)
+        latent = latent.view(x.size(0), -1, self.reshape, self.reshape) #Unflat z
+        logits = self.decoder(latent)
 
-        return logits
+        return logits, mu, sigma
