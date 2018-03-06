@@ -69,14 +69,21 @@ class VariationalAutoencoder(torch.nn.Module):
         #Encode
         x = x.view(-1, 3, self.patch, self.patch)
         x = self.encoder(x)
+        print('After conv: ', x.shape)
         x = x.view(x.size(0), -1) #Flatten x
+        print('After flatten: ', x.shape)
         mu = self.mu(x)
         sigma = self.sigma(x)
+        print('Mu/Sigma: ', mu.shape, sigma.shape)
         #Reparametrization trick
-        eps = Variable(torch.randn(mu.size(0), self.fc)).float().cuda()
-        z = mu + torch.exp(sigma / 2) * eps
+        epsilon = Variable(torch.randn(mu.size(0), self.fc)).float().cuda()
+        print('Epsilon: ', epsilon.shape)
+        z = mu + torch.exp(sigma / 2) * epsilon
+        print('z: ', z.shape)
         #Decode
         z = z.view(z.size(0), -1, self.reshape, self.reshape)
+        print('After reshape: ', z.shape)
         logits = self.decoder(z)
+        print('Logits: ', logits.shape)
 
         return logits
