@@ -3,7 +3,7 @@ import math
 
 class VariationalAutoencoder(torch.nn.Module):
     def __init__(self, nb_f, nb_l, nb_b, fc=None, input_size=256, patch=32):
-        super(Autoencoder, self).__init__()
+        super(VariationalAutoencoder, self).__init__()
         self.in_dim = 3
         self.nb_f = nb_f
         self.nb_l = nb_l
