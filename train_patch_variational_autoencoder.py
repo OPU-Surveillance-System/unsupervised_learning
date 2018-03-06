@@ -17,7 +17,7 @@ import utils.process
 
 def sample_z(mu, sigma):
     # Using reparameterization trick to sample from a gaussian
-    eps = Variable(torch.randn(mu.size(0), mu.size(1)))
+    eps = Variable(torch.randn(mu.size(0), mu.size(1))).float().cuda()
     z = mu + torch.exp(sigma / 2) * eps
 
     return z
