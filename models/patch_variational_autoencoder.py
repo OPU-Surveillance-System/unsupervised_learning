@@ -41,7 +41,7 @@ class Encoder(torch.nn.Module):
     def forward(self, x):
         #Encode
         x = x.view(-1, 3, self.patch, self.patch)
-        x = self.encoder(x)
+        x = self.conv(x)
         x = x.view(x.size(0), -1) #Flatten x
         mu = self.mu(x)
         sigma = self.sigma(x)
