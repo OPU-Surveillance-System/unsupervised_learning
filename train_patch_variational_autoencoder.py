@@ -15,7 +15,14 @@ import utils.metrics
 import utils.plot
 import utils.process
 
-def train(model, optimizer, trainset, testset, epoch, batch_size, patch_size, directory):
+def sample_z(mu, sigma):
+    # Using reparameterization trick to sample from a gaussian
+    eps = Variable(torch.randn(mu.size(0), mu.size(1)))
+    z = mu + torch.exp(sigma / 2) * eps
+    
+    return z
+
+def train(models, optimizers, trainset, testset, epoch, batch_size, patch_size, directory):
     """
     Train a model and log the process
     Args:
@@ -28,11 +35,14 @@ def train(model, optimizer, trainset, testset, epoch, batch_size, patch_size, di
         directory (str): Directory to store the logs
     """
 
+    encoder, decoder = models
+    en_optimizer, de_optimizer = optimizers
+
     phase = ('train', 'test')
     datasets = {'train': trainset, 'test': testset}
     dist = torch.nn.PairwiseDistance(p=2, eps=1e-06)
     best_auc = 0
-    best_model = copy.deepcopy(model)
+    best_encoder = copy.deepcopy(model)
     writer = SummaryWriter(os.path.join(directory, 'logs'))
 
     for e in range(epoch):
@@ -51,13 +61,16 @@ def train(model, optimizer, trainset, testset, epoch, batch_size, patch_size, di
             for i_batch, sample in enumerate(tqdm(dataloader)):
                 model.zero_grad()
                 inputs = Variable(sample['img'].float().cuda())
-                logits, mu, sigma = model(inputs)
+                mu, sigma = encoder(inputs)
+                z = sample_z(mu, sigma)
+                logits = decoder(z)
                 reconstruction_loss = torch.nn.functional.mse_loss(logits, inputs.view(-1, 3, patch_size, patch_size))
                 regularization_loss = 0.5 * torch.sum(torch.exp(sigma) + mu**2 - 1. - sigma)
                 loss = reconstruction_loss + regularization_loss
                 if p == 'train':
                     loss.backward()
-                    optimizer.step()
+                    en_optimizer.step()
+                    de_optimizer.step()
                 running_reconstruction_loss += reconstruction_loss.data[0]
                 running_regularization_loss += regularization_loss.data[0]
                 if p == 'test':
@@ -80,10 +93,12 @@ def train(model, optimizer, trainset, testset, epoch, batch_size, patch_size, di
                 writer.add_scalar('auc', auc, e)
                 if auc > best_auc:
                     best_auc = auc
-                    best_model = copy.deepcopy(model)
+                    best_encoder = copy.deepcopy(encoder)
+                    best_decoder = copy.deepcopy(decoder)
                 if e % 10 == 0:
                     #Save model
-                    torch.save(model.state_dict(), os.path.join(directory, 'serial', 'model_{}'.format(e)))
+                    torch.save(encoder.state_dict(), os.path.join(directory, 'serial', 'encoder_{}'.format(e)))
+                    torch.save(decoder.state_dict(), os.path.join(directory, 'serial', 'decoder_{}'.format(e)))
 
                     #Plot example of reconstructed images
                     pred = utils.process.deprocess(logits)
@@ -96,7 +111,7 @@ def train(model, optimizer, trainset, testset, epoch, batch_size, patch_size, di
     writer.export_scalars_to_json(os.path.join(directory, 'logs', 'scalars.json'))
     writer.close()
 
-    return best_model
+    return best_encoder, best_decoder
 
 def main(args):
     """
@@ -120,17 +135,25 @@ def main(args):
             f.write('{}:{}\n'.format(k, d[k]))
 
     #Variables
-    vae = models.patch_variational_autoencoder.VariationalAutoencoder(args.nb_f, args.nb_l, args.nb_b, args.latent_size, args.ips, args.patch)
-    vae = vae.cuda()
-    print(vae)
-    optimizer = torch.optim.Adam(vae.parameters(), args.learning_rate)
+    encoder = models.patch_variational_autoencoder.Encoder(args.nb_f, args.nb_l, args.nb_b, args.latent_size, args.ips, args.patch)
+    decoder = models.patch_variational_autoencoder.Decoder(encoder.last_feature_map, args.nb_l, args.nb_b, args.latent_size)
+    encoder = encoder.cuda()
+    decoder = decoder.cuda()
+    models = (encoder, decoder)
+    print(encoder)
+    print(decoder)
+
+    en_optimizer = torch.optim.Adam(encoder.parameters(), args.learning_rate)
+    de_optimizer = torch.optim.Adam(decoder.parameters(), args.learning_rate)
+    optimizers = (en_optimizer, de_optimizer)
 
     trainset = dataset.VideoDataset(args.trainset, args.root_dir)
     testset = dataset.VideoDataset(args.testset, args.root_dir)
 
     #Train the model and save it
-    best_model = train(vae, optimizer, trainset, testset, args.epoch, args.batch_size, args.patch, args.directory)
-    torch.save(best_model.state_dict(), os.path.join(args.directory, 'serial', 'best_model'))
+    best_encoder, best_decoder = train(models, optimizers, trainset, testset, args.epoch, args.batch_size, args.patch, args.directory)
+    torch.save(best_encoder.state_dict(), os.path.join(args.directory, 'serial', 'best_encoder'))
+    torch.save(best_decoder.state_dict(), os.path.join(args.directory, 'serial', 'best_decoder'))
 
     return 0
 
