@@ -136,7 +136,7 @@ def main(args):
 
     #Variables
     encoder = models.patch_variational_autoencoder.Encoder(args.nb_f, args.nb_l, args.nb_b, args.latent_size, args.patch)
-    decoder = models.patch_variational_autoencoder.Decoder(encoder.last_feature_map, args.nb_l, args.nb_b, args.latent_size)
+    decoder = models.patch_variational_autoencoder.Decoder(encoder.last_map_dim, args.nb_l, args.nb_b, args.latent_size)
     encoder = encoder.cuda()
     decoder = decoder.cuda()
     model = (encoder, decoder)
