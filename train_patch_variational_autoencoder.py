@@ -42,7 +42,8 @@ def train(models, optimizers, trainset, testset, epoch, batch_size, patch_size, 
     datasets = {'train': trainset, 'test': testset}
     dist = torch.nn.PairwiseDistance(p=2, eps=1e-06)
     best_auc = 0
-    best_encoder = copy.deepcopy(model)
+    best_encoder = copy.deepcopy(encoder)
+    best_decoder = copy.deepcopy(decoder)
     writer = SummaryWriter(os.path.join(directory, 'logs'))
 
     for e in range(epoch):
