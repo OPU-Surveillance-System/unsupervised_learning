@@ -75,7 +75,7 @@ def train(model, optimizer, trainset, testset, epoch, batch_size, patch_size, di
             epoch_regularization_loss = running_regularization_loss / nb_patch
             writer.add_scalar('{}/learning_curve/reconstruction_loss'.format(p), epoch_reconstruction_loss, e)
             writer.add_scalar('{}/learning_curve/regularization_loss'.format(p), epoch_regularization_loss, e)
-            print('{} -- Loss: {} AUC: {}'.format(p, epoch_loss, auc))
+            print('{} -- Reconstruction loss: {}, Regularization loss: {}, AUC: {}'.format(p, epoch_reconstruction_loss, epoch_regularization_loss, auc))
             if p == 'test':
                 writer.add_scalar('auc', auc, e)
                 if auc > best_auc:
