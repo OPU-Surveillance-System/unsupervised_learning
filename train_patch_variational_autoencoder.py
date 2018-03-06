@@ -22,7 +22,7 @@ def sample_z(mu, sigma):
 
     return z
 
-def train(models, optimizers, trainset, testset, epoch, batch_size, patch_size, directory):
+def train(models, optimizers, trainset, testset, epoch, batch_size, patch_size, reg, directory):
     """
     Train a model and log the process
     Args:
@@ -70,7 +70,7 @@ def train(models, optimizers, trainset, testset, epoch, batch_size, patch_size, 
                 logits = decoder(z)
                 reconstruction_loss = torch.nn.functional.mse_loss(logits, inputs.view(-1, 3, patch_size, patch_size))
                 regularization_loss = 0.5 * torch.sum(torch.exp(sigma) + mu**2 - 1. - sigma)
-                loss = reconstruction_loss + regularization_loss
+                loss = reconstruction_loss + reg * regularization_loss
                 if p == 'train':
                     loss.backward()
                     en_optimizer.step()
@@ -155,7 +155,7 @@ def main(args):
     testset = dataset.VideoDataset(args.testset, args.root_dir)
 
     #Train the model and save it
-    best_encoder, best_decoder = train(model, optimizers, trainset, testset, args.epoch, args.batch_size, args.patch, args.directory)
+    best_encoder, best_decoder = train(model, optimizers, trainset, testset, args.epoch, args.batch_size, args.patch, args.regularization, args.directory)
     torch.save(best_encoder.state_dict(), os.path.join(args.directory, 'serial', 'best_encoder'))
     torch.save(best_decoder.state_dict(), os.path.join(args.directory, 'serial', 'best_decoder'))
 
