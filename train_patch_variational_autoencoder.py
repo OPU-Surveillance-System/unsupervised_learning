@@ -123,14 +123,13 @@ def main(args):
     vae = models.patch_variational_autoencoder.VariationalAutoencoder(args.nb_f, args.nb_l, args.nb_b, args.latent_size, args.ips, args.patch)
     vae = vae.cuda()
     print(vae)
-    loss_function = torch.nn.MSELoss()
     optimizer = torch.optim.Adam(vae.parameters(), args.learning_rate)
 
     trainset = dataset.VideoDataset(args.trainset, args.root_dir)
     testset = dataset.VideoDataset(args.testset, args.root_dir)
 
     #Train the model and save it
-    best_model = train(vae, loss_function, optimizer, trainset, testset, args.epoch, args.batch_size, args.patch, args.directory)
+    best_model = train(vae, optimizer, trainset, testset, args.epoch, args.batch_size, args.patch, args.directory)
     torch.save(best_model.state_dict(), os.path.join(args.directory, 'serial', 'best_model'))
 
     return 0
