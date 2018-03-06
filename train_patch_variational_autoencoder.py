@@ -50,17 +50,20 @@ def train(models, optimizers, trainset, testset, epoch, batch_size, patch_size, 
         print('Epoch {}'.format(e))
         for p in phase:
             if p == 'train':
-                model.train()
+                encoder.train()
+                decoder.train()
             else:
                 labels = []
                 errors = []
-                model.eval()
+                encoder.eval()
+                decoder.eval()
             running_reconstruction_loss = 0
             running_regularization_loss = 0
             nb_patch = len(datasets[p]) * ((256 // patch_size)**2)
             dataloader = DataLoader(datasets[p], batch_size=batch_size, shuffle=True, num_workers=4)
             for i_batch, sample in enumerate(tqdm(dataloader)):
-                model.zero_grad()
+                encoder.zero_grad()
+                decoder.zero_grad()
                 inputs = Variable(sample['img'].float().cuda())
                 mu, sigma = encoder(inputs)
                 z = sample_z(mu, sigma)
