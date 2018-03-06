@@ -19,7 +19,7 @@ def sample_z(mu, sigma):
     # Using reparameterization trick to sample from a gaussian
     eps = Variable(torch.randn(mu.size(0), mu.size(1)))
     z = mu + torch.exp(sigma / 2) * eps
-    
+
     return z
 
 def train(models, optimizers, trainset, testset, epoch, batch_size, patch_size, directory):
@@ -139,7 +139,7 @@ def main(args):
     decoder = models.patch_variational_autoencoder.Decoder(encoder.last_feature_map, args.nb_l, args.nb_b, args.latent_size)
     encoder = encoder.cuda()
     decoder = decoder.cuda()
-    models = (encoder, decoder)
+    model = (encoder, decoder)
     print(encoder)
     print(decoder)
 
@@ -151,7 +151,7 @@ def main(args):
     testset = dataset.VideoDataset(args.testset, args.root_dir)
 
     #Train the model and save it
-    best_encoder, best_decoder = train(models, optimizers, trainset, testset, args.epoch, args.batch_size, args.patch, args.directory)
+    best_encoder, best_decoder = train(model, optimizers, trainset, testset, args.epoch, args.batch_size, args.patch, args.directory)
     torch.save(best_encoder.state_dict(), os.path.join(args.directory, 'serial', 'best_encoder'))
     torch.save(best_decoder.state_dict(), os.path.join(args.directory, 'serial', 'best_decoder'))
 
