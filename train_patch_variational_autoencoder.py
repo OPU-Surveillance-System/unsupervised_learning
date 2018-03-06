@@ -84,6 +84,9 @@ def train(models, optimizers, trainset, testset, epoch, batch_size, patch_size, 
                     labels += sample['lbl'].numpy().tolist()
 
             if p == 'test':
+                errors = torch.from_numpy(np.array(errors)).cuda()
+                metrics.normalize_reconstruction_errors(errors)
+                errors = errors.cpu().numpy()
                 fpr, tpr, thresholds = metrics.roc_curve(labels, errors)
                 auc = metrics.auc(fpr, tpr)
             else:
