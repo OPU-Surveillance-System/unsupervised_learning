@@ -51,8 +51,8 @@ class VariationalAutoencoder(torch.nn.Module):
         self.sigma = torch.nn.Linear(in_dim, self.fc)
 
         #Decoder
+        self.recover = torch.nn.Linear(self.fc, in_dim)
         layers = []
-        layers.append(torch.nn.Linear(self.fc, in_dim))
         for n in range(self.nb_b):
             prev_f //= 2
             next_f = prev_f // 2
@@ -82,6 +82,8 @@ class VariationalAutoencoder(torch.nn.Module):
         z = mu + torch.exp(sigma / 2) * epsilon
         print('z: ', z.shape)
         #Decode
+        z = self.recover(z)
+        print('After recover: ', z.shape)
         z = z.view(x.size(0), -1, self.reshape, self.reshape) #Unflat z
         print('After reshape: ', z.shape)
         logits = self.decoder(z)
