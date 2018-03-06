@@ -58,19 +58,23 @@ class VariationalAutoencoder(torch.nn.Module):
         layers.append(torch.nn.Conv2d(next_f, self.in_dim, (3, 3), padding=1))
         self.decoder = torch.nn.Sequential(*layers)
 
-    def sample_z(mu, sigma):
-        eps = Variable(torch.randn(mu.size(0), self.fc))
-        z = self.mu + torch.exp(self.sigma / 2) * eps
+    def sample_z(self, mu, sigma):
+
+
 
         return z
 
     def forward(self, x):
+        #Encode
         x = x.view(-1, 3, self.patch, self.patch)
         x = self.encoder(x)
         x = x.view(x.size(0), -1) #Flatten x
         mu = self.mu(x)
         sigma = self.sigma(x)
-        z = sample_z(mu, sigma)
+        #Reparametrization trick
+        eps = Variable(torch.randn(mu.size(0), self.fc))
+        z = mu + torch.exp(sigma / 2) * eps
+        #Decode
         z = z.view(z.size(0), -1, self.reshape, self.reshape)
         logits = self.decoder(z)
 
