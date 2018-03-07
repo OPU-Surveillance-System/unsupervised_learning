@@ -38,6 +38,11 @@ class Encoder(torch.nn.Module):
         self.mu = torch.nn.Linear(flatten, self.latent_size)
         self.sigma = torch.nn.Linear(flatten, self.latent_size)
 
+        #Weights initialization
+        for m in self.modules():
+            if isinstance(m, torch.nn.Conv2d) or isinstance(m, torch.nn.Linear):
+                torch.nn.init.kaiming_normal(m.weight)
+
     def forward(self, x):
         #Encode
         x = x.view(-1, 3, self.patch, self.patch)
@@ -82,6 +87,11 @@ class Decoder(torch.nn.Module):
             next_f //= 2
         layers.append(torch.nn.Conv2d(prev_f, 3, (3, 3), padding=1))
         self.conv = torch.nn.Sequential(*layers)
+
+        #Weights initialization
+        for m in self.modules():
+            if isinstance(m, torch.nn.Conv2d) or isinstance(m, torch.nn.Linear):
+                torch.nn.init.kaiming_normal(m.weight)
 
     def forward(self, z):
         x = self.bottleneck(z)
