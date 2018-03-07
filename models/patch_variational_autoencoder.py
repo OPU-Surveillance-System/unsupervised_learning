@@ -38,6 +38,17 @@ class Encoder(torch.nn.Module):
         self.mu = torch.nn.Linear(flatten, self.latent_size)
         self.sigma = torch.nn.Linear(flatten, self.latent_size)
 
+        #Weights initialization
+        for m in self.modules():
+            if isinstance(m, torch.nn.Conv2d):
+                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+                m.weight.data.normal_(0, math.sqrt(2.)*math.sqrt(2. / n))
+                if m.bias is not None:
+                    m.bias.data.zero_()
+            elif isinstance(m, torch.nn.Linear):
+                m.weight.data.normal_(0, math.sqrt(2. / m.in_features))
+                m.bias.data.zero_()
+
     def forward(self, x):
         #Encode
         x = x.view(-1, 3, self.patch, self.patch)
@@ -82,6 +93,17 @@ class Decoder(torch.nn.Module):
             next_f //= 2
         layers.append(torch.nn.Conv2d(prev_f, 3, (3, 3), padding=1))
         self.conv = torch.nn.Sequential(*layers)
+
+        #Weights initialization
+        for m in self.modules():
+            if isinstance(m, torch.nn.Conv2d):
+                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+                m.weight.data.normal_(0, math.sqrt(2.)*math.sqrt(2. / n))
+                if m.bias is not None:
+                    m.bias.data.zero_()
+            elif isinstance(m, torch.nn.Linear):
+                m.weight.data.normal_(0, math.sqrt(2. / m.in_features))
+                m.bias.data.zero_()
 
     def forward(self, z):
         x = self.bottleneck(z)
