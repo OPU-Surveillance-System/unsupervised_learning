@@ -68,8 +68,8 @@ def train(models, optimizers, trainset, testset, epoch, batch_size, patch_size, 
                 mu, sigma = encoder(inputs)
                 z = sample_z(mu, sigma)
                 logits = decoder(z)
-                #reconstruction_loss = torch.nn.functional.mse_loss(logits, inputs.view(-1, 3, patch_size, patch_size))
-                reconstruction_loss = torch.nn.functional.binary_cross_entropy_with_logits(logits, inputs.view(-1, 3, patch_size, patch_size))
+                reconstruction_loss = torch.nn.functional.mse_loss(logits, inputs.view(-1, 3, patch_size, patch_size))
+                #reconstruction_loss = torch.nn.functional.binary_cross_entropy_with_logits(logits, inputs.view(-1, 3, patch_size, patch_size))
                 regularization_loss = 0.5 * torch.sum(torch.exp(sigma) + mu**2 - 1. - sigma)
                 loss = reconstruction_loss + reg * regularization_loss
                 if p == 'train':
@@ -80,7 +80,8 @@ def train(models, optimizers, trainset, testset, epoch, batch_size, patch_size, 
                 running_regularization_loss += regularization_loss.data[0]
                 if p == 'test':
                     logits = logits.view(-1, 3, 256, 256)
-                    tmp = utils.metrics.per_image_error(dist, torch.nn.functional.sigmoid(logits), inputs)
+                    tmp = utils.metrics.per_image_error(dist, logits, inputs)
+                    #tmp = utils.metrics.per_image_error(dist, torch.nn.functional.sigmoid(logits), inputs)
                     errors += tmp.data.cpu().numpy().tolist()
                     labels += sample['lbl'].numpy().tolist()
 
@@ -109,11 +110,11 @@ def train(models, optimizers, trainset, testset, epoch, batch_size, patch_size, 
                     torch.save(decoder.state_dict(), os.path.join(directory, 'serial', 'decoder_{}'.format(e)))
 
                     #Plot example of reconstructed images
-                    #pred = utils.process.deprocess(torch.nn.functional.sigmoid(logits))
-                    pred = torch.nn.functional.sigmoid(logits)
+                    pred = utils.process.deprocess(logits)
+                    #pred = torch.nn.functional.sigmoid(logits)
                     pred = pred.data.cpu().numpy()
                     pred = np.rollaxis(pred, 1, 4)
-                    #inputs = utils.process.deprocess(inputs)
+                    inputs = utils.process.deprocess(inputs)
                     inputs = inputs.data.cpu().numpy()
                     inputs = np.rollaxis(inputs, 1, 4)
                     utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(directory, 'example_reconstruction', 'epoch_{}.svg'.format(e)))
