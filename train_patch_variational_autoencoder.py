@@ -109,10 +109,11 @@ def train(models, optimizers, trainset, testset, epoch, batch_size, patch_size, 
                     torch.save(decoder.state_dict(), os.path.join(directory, 'serial', 'decoder_{}'.format(e)))
 
                     #Plot example of reconstructed images
-                    pred = utils.process.deprocess(torch.nn.functional.sigmoid(logits))
+                    #pred = utils.process.deprocess(torch.nn.functional.sigmoid(logits))
+                    pred = torch.nn.functional.sigmoid(logits)
                     pred = pred.data.cpu().numpy()
                     pred = np.rollaxis(pred, 1, 4)
-                    inputs = utils.process.deprocess(inputs)
+                    #inputs = utils.process.deprocess(inputs)
                     inputs = inputs.data.cpu().numpy()
                     inputs = np.rollaxis(inputs, 1, 4)
                     utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(directory, 'example_reconstruction', 'epoch_{}.svg'.format(e)))
