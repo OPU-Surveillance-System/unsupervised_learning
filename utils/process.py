@@ -5,8 +5,8 @@ def preprocess(x):
         x (numpy.array or torch.Tensor): Image of any shape (assume pixels to range in [0, 255])
     """
 
-    #x = (x - 127.5) / 127.5
-    x = x / x.max()
+    x = (x - 127.5) / 127.5
+    #x = x / x.max()
 
     return x
 
