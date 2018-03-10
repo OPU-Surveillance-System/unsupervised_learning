@@ -51,7 +51,7 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
                 model.zero_grad()
                 inputs = Variable(sample['img'].float().cuda())
                 logits = model(inputs)
-                loss = torch.nn.functional.binary_cross_entropy_with_logits(logits, inputs.view(-1, 3, patch_size, patch_size))
+                loss = torch.nn.functional.binary_cross_entropy_with_logits(logits, inputs.view(-1, 3, args.patch, args.patch))
                 #loss = loss_function(logits, inputs.view(-1, 3, args.patch, args.patch)) - reg * torch.mean(torch.norm(logits.view(-1, logits.size(1) * logits.size(2) * logits.size(3)), 2, 1))
                 if p == 'train':
                     loss.backward()
