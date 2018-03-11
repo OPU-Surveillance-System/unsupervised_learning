@@ -86,7 +86,7 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
                     pred = torch.nn.functional.sigmoid(logits)
                     pred = pred.data.cpu().numpy()
                     pred = np.rollaxis(pred, 1, 4)
-                    inputs = utils.process.deprocess(inputs)
+                    #inputs = utils.process.deprocess(inputs)
                     inputs = inputs.data.cpu().numpy()
                     inputs = np.rollaxis(inputs, 1, 4)
                     utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(directory, 'example_reconstruction', 'epoch_{}.svg'.format(e)))
