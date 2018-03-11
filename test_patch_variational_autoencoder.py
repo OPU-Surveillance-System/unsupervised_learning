@@ -43,6 +43,7 @@ def test(model, testset, batch_size, directory):
         mu, sigma = encoder(inputs)
         z = sample_z(mu, sigma)
         logits = decoder(z).view(-1, 3, args.ips, args.ips)
+        logits = torch.nn.sigmoid(logits)
         e = utils.metrics.per_image_error(dist, logits.contiguous(), inputs.contiguous())
         e = e.cpu().data.numpy().tolist()
         answer += e
