@@ -102,8 +102,8 @@ def main(args):
     else:
         saved_enc = 'encoder_{}'.format(args.model)
         saved_dec = 'decoder_{}'.format(args.model)
-    encoder.load_state_dict(torch.load(saved_enc))
-    decoder.load_state_dict(torch.load(saved_dec))
+    encoder.load_state_dict(torch.load(os.path.join(args.directory, 'serial', saved_enc)))
+    decoder.load_state_dict(torch.load(os.path.join(args.directory, 'serial', saved_dec)))
     model = (encoder, decoder)
 
     testset = dataset.VideoDataset(args.testset, args.root_dir)
