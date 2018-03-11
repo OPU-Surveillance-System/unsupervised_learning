@@ -8,7 +8,7 @@ from tqdm import tqdm
 from sklearn import metrics
 
 import dataset
-import models.patch_autoencoder
+import models.patch_variational_autoencoder
 import utils.metrics
 import utils.plot
 import utils.process
