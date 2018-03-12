@@ -157,7 +157,7 @@ def main(args):
                                                            nb_b=args.nb_b,
                                                            latent_size=args.latent_size,
                                                            patch=args.patch)
-    decoder = models.patch_variational_autoencoder.Decoder(out_dim=in_dim,
+    decoder = models.patch_variational_autoencoder.Decoder(out_dim=input_dim,
                                                            encoder_dim=encoder.last_map_dim,
                                                            nb_l=args.nb_l,
                                                            nb_b=args.nb_b,
