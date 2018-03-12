@@ -60,12 +60,12 @@ def plot_reconstruction_images(inputs, pred, name):
     #inputs
     for i in range(nb_plots):
         ax = plt.subplot2grid((2, nb_plots), (0, i), rowspan=1, colspan=1)
-        ax.imshow(inputs[i])
+        ax.imshow(inputs[i].reshape(256, 256))
         ax.axis('off')
     #pred
     for i in range(nb_plots):
         ax = plt.subplot2grid((2, nb_plots), (1, i), rowspan=1, colspan=1)
-        ax.imshow(np.clip(pred[i], 0.0, 1.0))
+        ax.imshow(np.clip(pred[i], 0.0, 1.0).reshape(256, 256))
         ax.axis('off')
 
     if name != None:

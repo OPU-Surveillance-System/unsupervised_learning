@@ -24,7 +24,7 @@ class Encoder(torch.nn.Module):
 
         #Conv part
         layers = []
-        prev_in = 3 #RGB images
+        prev_in = 1 #RGB images
         prev_f = self.nb_f
         for n in range(self.nb_b):
             layers += downsampling_block(prev_in, prev_f, self.nb_l)
@@ -85,7 +85,7 @@ class Decoder(torch.nn.Module):
             layers += upsampling_block(prev_f, next_f, self.nb_l)
             prev_f = next_f
             next_f //= 2
-        layers.append(torch.nn.Conv2d(prev_f, 3, (3, 3), padding=1))
+        layers.append(torch.nn.Conv2d(prev_f, 1, (3, 3), padding=1))
         self.conv = torch.nn.Sequential(*layers)
 
         # #Weights initialization

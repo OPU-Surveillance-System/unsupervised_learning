@@ -38,7 +38,7 @@ class VideoDataset(Dataset):
             idx (int): item index
         """
 
-        img = misc.imread(self.frames[idx])
+        img = misc.imread(self.frames[idx], mode='L')
         img = utils.process.preprocess(img) #Normalize the image
         img = np.rollaxis(img, 2, 0)
 

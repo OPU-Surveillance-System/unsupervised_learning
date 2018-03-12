@@ -79,7 +79,7 @@ def train(models, optimizers, trainset, testset, epoch, batch_size, patch_size, 
                 running_reconstruction_loss += reconstruction_loss.data[0]
                 running_regularization_loss += regularization_loss.data[0]
                 if p == 'test':
-                    logits = logits.view(-1, 3, 256, 256)
+                    logits = logits.view(-1, 1, 256, 256)
                     #tmp = utils.metrics.per_image_error(dist, logits, inputs)
                     tmp = utils.metrics.per_image_error(dist, torch.nn.functional.sigmoid(logits), inputs)
                     errors += tmp.data.cpu().numpy().tolist()
