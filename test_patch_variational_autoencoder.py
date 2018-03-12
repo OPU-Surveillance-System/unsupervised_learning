@@ -40,10 +40,11 @@ def test(model, testset, batch_size, directory):
     #Process the testset
     for i_batch, sample in enumerate(tqdm(dataloader)):
         inputs = Variable(sample['img'].float().cuda())
+        nb_channel = inputs.size(1)
         mu, sigma = encoder(inputs)
         z = sample_z(mu, sigma)
-        logits = decoder(z).view(-1, 3, args.ips, args.ips)
-        logits = torch.nn.functional.sigmoid(logits)
+        logits = decoder(z).view(-1, nb_channel, args.ips, args.ips)
+        #logits = torch.nn.functional.sigmoid(logits)
         e = utils.metrics.per_image_error(dist, logits.contiguous(), inputs.contiguous())
         e = e.cpu().data.numpy().tolist()
         answer += e
@@ -89,8 +90,22 @@ def main(args):
     if not os.path.exists(os.path.join(args.directory, 'plots')):
         os.makedirs(os.path.join(args.directory, 'plots'))
 
-    encoder = models.patch_variational_autoencoder.Encoder(args.nb_f, args.nb_l, args.nb_b, args.latent_size, args.patch)
-    decoder = models.patch_variational_autoencoder.Decoder(encoder.last_map_dim, args.nb_l, args.nb_b, args.latent_size)
+    if args.mode == 'L':
+        input_dim = 1
+    else:
+        input_dim = 3
+
+    encoder = models.patch_variational_autoencoder.Encoder(in_dim=input_dim,
+                                                           nb_f=args.nb_f,
+                                                           nb_l=args.nb_l,
+                                                           nb_b=args.nb_b,
+                                                           latent_size=args.latent_size,
+                                                           patch=args.patch)
+    decoder = models.patch_variational_autoencoder.Decoder(out_dim=input_dim,
+                                                           encoder_dim=encoder.last_map_dim,
+                                                           nb_l=args.nb_l,
+                                                           nb_b=args.nb_b,
+                                                           latent_size=args.latent_size)
     encoder = encoder.cuda()
     decoder = decoder.cuda()
     model = (encoder, decoder)
@@ -122,6 +137,7 @@ if __name__ == '__main__':
     parser.add_argument('--rd', dest='root_dir', type=str, default='/datasets', help='Path to the images')
     parser.add_argument('--bs', dest='batch_size', type=int, default=16, help='Mini batch size')
     parser.add_argument('--dir', dest='directory', type=str, default='train_autoencoder', help='Directory to store results')
+    parser.add_argument('--im', dest='mode', type=str, default='RGB', help='Image mode (L: black and white, RGB: RGB)')
     #Model arguments
     parser.add_argument('-f', dest='nb_f', type=int, default=16, help='Number of filters in the first downsampling block')
     parser.add_argument('-l', dest='nb_l', type=int, default=1, help='Number of convolutinal layers per block')
