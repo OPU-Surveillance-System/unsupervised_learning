@@ -69,7 +69,7 @@ def train(models, optimizers, trainset, testset, epoch, batch_size, patch_size, 
                 z = sample_z(mu, sigma)
                 logits = decoder(z)
                 #reconstruction_loss = torch.nn.functional.mse_loss(logits, inputs.view(-1, 3, patch_size, patch_size))
-                reconstruction_loss = torch.nn.functional.binary_cross_entropy_with_logits(logits, inputs.view(-1, 3, patch_size, patch_size))
+                reconstruction_loss = torch.nn.functional.binary_cross_entropy_with_logits(logits, inputs.view(-1, 1, patch_size, patch_size))
                 regularization_loss = torch.mean(0.5 * torch.sum(torch.exp(sigma) + mu**2 - 1. - sigma, 1))
                 loss = reconstruction_loss + reg * regularization_loss
                 if p == 'train':
