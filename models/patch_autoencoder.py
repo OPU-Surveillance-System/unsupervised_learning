@@ -16,19 +16,17 @@ class Autoencoder(torch.nn.Module):
             layers = []
             for n in range(nb_l):
                 layers.append(torch.nn.Conv2d(in_dim, nb_f, (3, 3), padding=1))
-                layers.append(torch.nn.SELU())
+                layers.append(torch.nn.ReLU())
                 in_dim = nb_f
             layers.append(torch.nn.MaxPool2d((2, 2), (2, 2)))
 
             return layers
 
         def upsampling_block(in_dim, nb_f, nb_l):
-            #layers = [torch.nn.ConvTranspose2d(in_dim, nb_f, (2, 2), (2, 2))]
             layers = [torch.nn.Upsample(scale_factor=2, mode='bilinear')]
-            layers.append(torch.nn.SELU())
             for n in range(nb_l):
                 layers.append(torch.nn.Conv2d(in_dim, nb_f, (3, 3), padding=1))
-                layers.append(torch.nn.SELU())
+                layers.append(torch.nn.ReLU())
                 in_dim = nb_f
 
             return layers
@@ -63,17 +61,6 @@ class Autoencoder(torch.nn.Module):
             layers += upsampling_block(prev_f, next_f, self.nb_l)
         layers.append(torch.nn.Conv2d(next_f, self.in_dim, (3, 3), padding=1))
         self.decoder = torch.nn.Sequential(*layers)
-
-        #Weights initialization
-        # for m in self.modules():
-        #     if isinstance(m, torch.nn.Conv2d) or isinstance(m, torch.nn.ConvTranspose2d):
-        #         n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-        #         m.weight.data.normal_(0, math.sqrt(2.)*math.sqrt(2. / n))
-        #         if m.bias is not None:
-        #             m.bias.data.zero_()
-        #     elif isinstance(m, torch.nn.Linear):
-        #         m.weight.data.normal_(0, math.sqrt(2. / m.in_features))
-        #         m.bias.data.zero_()
 
     def forward(self, x):
         x = x.view(-1, 3, self.patch, self.patch)

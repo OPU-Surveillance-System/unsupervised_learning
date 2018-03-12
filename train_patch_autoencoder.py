@@ -51,14 +51,16 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
                 model.zero_grad()
                 inputs = Variable(sample['img'].float().cuda())
                 logits = model(inputs)
-                loss = loss_function(logits, inputs.view(-1, 3, args.patch, args.patch)) - reg * torch.mean(torch.norm(logits.view(-1, logits.size(1) * logits.size(2) * logits.size(3)), 2, 1))
+                loss = torch.nn.functional.binary_cross_entropy_with_logits(logits, inputs.view(-1, 3, args.patch, args.patch))
+                #loss = loss_function(logits, inputs.view(-1, 3, args.patch, args.patch)) - reg * torch.mean(torch.norm(logits.view(-1, logits.size(1) * logits.size(2) * logits.size(3)), 2, 1))
                 if p == 'train':
                     loss.backward()
                     optimizer.step()
                 running_loss += loss.data[0]
                 if p == 'test':
                     logits = logits.view(-1, 3, args.ips, args.ips)
-                    tmp = utils.metrics.per_image_error(dist, logits, inputs)
+                    #tmp = utils.metrics.per_image_error(dist, logits, inputs)
+                    tmp = utils.metrics.per_image_error(dist, torch.nn.functional.sigmoid(logits), inputs)
                     errors += tmp.data.cpu().numpy().tolist()
                     labels += sample['lbl'].numpy().tolist()
 
@@ -80,10 +82,11 @@ def train(model, loss_function, optimizer, trainset, testset, epoch, batch_size,
                     torch.save(model.state_dict(), os.path.join(directory, 'serial', 'model_{}'.format(e)))
 
                     #Plot example of reconstructed images
-                    pred = utils.process.deprocess(logits)
+                    #pred = utils.process.deprocess(logits)
+                    pred = torch.nn.functional.sigmoid(logits)
                     pred = pred.data.cpu().numpy()
                     pred = np.rollaxis(pred, 1, 4)
-                    inputs = utils.process.deprocess(inputs)
+                    #inputs = utils.process.deprocess(inputs)
                     inputs = inputs.data.cpu().numpy()
                     inputs = np.rollaxis(inputs, 1, 4)
                     utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(directory, 'example_reconstruction', 'epoch_{}.svg'.format(e)))
