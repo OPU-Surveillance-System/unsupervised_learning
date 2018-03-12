@@ -90,22 +90,47 @@ def main(args):
     if not os.path.exists(os.path.join(args.directory, 'plots')):
         os.makedirs(os.path.join(args.directory, 'plots'))
 
-    if args.mode == 'L':
-        input_dim = 1
-    else:
-        input_dim = 3
+    #Create a model with the hyper-parameters used during training
+    if os.path.exists(os.path.join(args.directory, 'hyper-parameters')):
+        with open(os.path.join(args.directory, 'hyper-parameters'), 'r') as f:
+            hp = f.read().split('\n')[:-1]
+        hp = {e.split(':')[0]:e.split(':')[1] for e in hp}
+        if hp['mode'] == 'L':
+            input_dim = 1
+        else:
+            input_dim = 3
+        encoder = models.patch_variational_autoencoder.Encoder(in_dim=input_dim,
+                                                               nb_f=hp['nb_f'],
+                                                               nb_l=hp['nb_l'],
+                                                               nb_b=hp['nb_b'],
+                                                               latent_size=hp['latent_size'],
+                                                               patch=hp['patch'])
+        decoder = models.patch_variational_autoencoder.Decoder(out_dim=input_dim,
+                                                               encoder_dim=encoder.last_map_dim,
+                                                               nb_l=hp['nb_l'],
+                                                               nb_b=hp['nb_b'],
+                                                               latent_size=hp['latent_size'])
 
-    encoder = models.patch_variational_autoencoder.Encoder(in_dim=input_dim,
-                                                           nb_f=args.nb_f,
-                                                           nb_l=args.nb_l,
-                                                           nb_b=args.nb_b,
-                                                           latent_size=args.latent_size,
-                                                           patch=args.patch)
-    decoder = models.patch_variational_autoencoder.Decoder(out_dim=input_dim,
-                                                           encoder_dim=encoder.last_map_dim,
-                                                           nb_l=args.nb_l,
-                                                           nb_b=args.nb_b,
-                                                           latent_size=args.latent_size)
+        testset = dataset.VideoDataset(args.testset, args.root_dir, mode=hp['mode'])
+    else:
+        if args.mode == 'L':
+            input_dim = 1
+        else:
+            input_dim = 3
+
+        encoder = models.patch_variational_autoencoder.Encoder(in_dim=input_dim,
+                                                               nb_f=args.nb_f,
+                                                               nb_l=args.nb_l,
+                                                               nb_b=args.nb_b,
+                                                               latent_size=args.latent_size,
+                                                               patch=args.patch)
+        decoder = models.patch_variational_autoencoder.Decoder(out_dim=input_dim,
+                                                               encoder_dim=encoder.last_map_dim,
+                                                               nb_l=args.nb_l,
+                                                               nb_b=args.nb_b,
+                                                               latent_size=args.latent_size)
+
+        testset = dataset.VideoDataset(args.testset, args.root_dir, mode=args.mode)
     encoder = encoder.cuda()
     decoder = decoder.cuda()
     model = (encoder, decoder)
@@ -121,8 +146,6 @@ def main(args):
     encoder.load_state_dict(torch.load(os.path.join(args.directory, 'serial', saved_enc)))
     decoder.load_state_dict(torch.load(os.path.join(args.directory, 'serial', saved_dec)))
     model = (encoder, decoder)
-
-    testset = dataset.VideoDataset(args.testset, args.root_dir)
 
     #Evaluate the model
     test(model, testset, args.batch_size, args.directory)
