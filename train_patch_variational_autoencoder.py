@@ -65,10 +65,11 @@ def train(models, optimizers, trainset, testset, epoch, batch_size, patch_size, 
                 encoder.zero_grad()
                 decoder.zero_grad()
                 inputs = Variable(sample['img'].float().cuda())
+                nb_channel = inputs.size(1)
                 mu, sigma = encoder(inputs)
                 z = sample_z(mu, sigma)
                 logits = decoder(z)
-                reconstruction_loss = torch.nn.functional.mse_loss(logits, inputs.view(-1, 1, patch_size, patch_size))
+                reconstruction_loss = torch.nn.functional.mse_loss(logits, inputs.view(-1, nb_channel, patch_size, patch_size))
                 #reconstruction_loss = torch.nn.functional.binary_cross_entropy_with_logits(logits, inputs.view(-1, 1, patch_size, patch_size))
                 regularization_loss = torch.mean(0.5 * torch.sum(torch.exp(sigma) + mu**2 - 1. - sigma, 1))
                 loss = reconstruction_loss + reg * regularization_loss
@@ -79,7 +80,7 @@ def train(models, optimizers, trainset, testset, epoch, batch_size, patch_size, 
                 running_reconstruction_loss += reconstruction_loss.data[0]
                 running_regularization_loss += regularization_loss.data[0]
                 if p == 'test':
-                    logits = logits.view(-1, 1, 256, 256)
+                    logits = logits.view(-1, nb_channel, 256, 256)
                     tmp = utils.metrics.per_image_error(dist, logits, inputs)
                     #tmp = utils.metrics.per_image_error(dist, torch.nn.functional.sigmoid(logits), inputs)
                     errors += tmp.data.cpu().numpy().tolist()
@@ -145,8 +146,22 @@ def main(args):
             f.write('{}:{}\n'.format(k, d[k]))
 
     #Variables
-    encoder = models.patch_variational_autoencoder.Encoder(args.nb_f, args.nb_l, args.nb_b, args.latent_size, args.patch)
-    decoder = models.patch_variational_autoencoder.Decoder(encoder.last_map_dim, args.nb_l, args.nb_b, args.latent_size)
+    if args.mode == 'L':
+        input_dim = 1
+    else:
+        input_dim = 3
+
+    encoder = models.patch_variational_autoencoder.Encoder(in_dim=input_dim,
+                                                           nb_f=args.nb_f,
+                                                           nb_l=args.nb_l,
+                                                           nb_b=args.nb_b,
+                                                           latent_size=args.latent_size,
+                                                           patch=args.patch)
+    decoder = models.patch_variational_autoencoder.Decoder(out_dim=in_dim,
+                                                           encoder_dim=encoder.last_map_dim,
+                                                           nb_l=args.nb_l,
+                                                           nb_b=args.nb_b,
+                                                           latent_size=args.latent_size)
     encoder = encoder.cuda()
     decoder = decoder.cuda()
     model = (encoder, decoder)
@@ -157,8 +172,8 @@ def main(args):
     de_optimizer = torch.optim.Adam(decoder.parameters(), args.learning_rate)
     optimizers = (en_optimizer, de_optimizer)
 
-    trainset = dataset.VideoDataset(args.trainset, args.root_dir)
-    testset = dataset.VideoDataset(args.testset, args.root_dir)
+    trainset = dataset.VideoDataset(args.trainset, args.root_dir, args.mode)
+    testset = dataset.VideoDataset(args.testset, args.root_dir, args.mode)
 
     #Train the model and save it
     best_encoder, best_decoder = train(model, optimizers, trainset, testset, args.epoch, args.batch_size, args.patch, args.regularization, args.directory)
@@ -178,6 +193,7 @@ if __name__ == '__main__':
     parser.add_argument('--reg', dest='regularization', type=float, default=0.0001, help='Regularization')
     parser.add_argument('--ep', dest='epoch', type=int, default=100, help='Number of training epochs')
     parser.add_argument('--dir', dest='directory', type=str, default='train_autoencoder', help='Directory to store results')
+    parser.add_argument('-m', dest='mode', type=str, default='RGB', help='Image mode (L: black and white, RGB: RGB)')
     #Model arguments
     parser.add_argument('-f', dest='nb_f', type=int, default=16, help='Number of filters in the first downsampling block')
     parser.add_argument('-l', dest='nb_l', type=int, default=1, help='Number of convolutinal layers per block')

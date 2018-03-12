@@ -10,12 +10,13 @@ class VideoDataset(Dataset):
     Create a dataset
     """
 
-    def __init__(self, summary, root_dir):
+    def __init__(self, summary, root_dir, mode='RGB'):
         """
         VideoDataset constructor
         Args:
             summary (str): Path to a dataset summary file
             root_dir (str): Path to the dataset frames
+            model (str): Image color mode (L: black and white, RGB: RGB)
         """
 
         self.root_dir = root_dir
@@ -23,6 +24,7 @@ class VideoDataset(Dataset):
             content = f.read().split('\n')[:-1]
         self.frames = [os.path.join(self.root_dir, '{}'.format(c.split('\t')[0])) for c in content]
         self.labels = [int(c.split('\t')[1]) for c in content]
+        self.mode = mode
 
     def __len__(self):
         """
@@ -38,9 +40,11 @@ class VideoDataset(Dataset):
             idx (int): item index
         """
 
-        img = misc.imread(self.frames[idx], mode='L').reshape(1, 256, 256)
+        img = misc.imread(self.frames[idx], mode=self.mode)
+        if self.mode == 'L':
+            img = img.reshape((256, 256, 1))
         img = utils.process.preprocess(img) #Normalize the image
-        #img = np.rollaxis(img, 2, 0)
+        img = np.rollaxis(img, 2, 0)
 
         lbl = self.labels[idx]
 
