@@ -22,7 +22,7 @@ class VideoDataset(Dataset):
         self.root_dir = root_dir
         with open(summary, 'r') as f:
             content = f.read().split('\n')[:-1]
-        self.frames = [os.path.join(self.root_dir, '{}'.format(c.split('\t')[0])) for c in content]
+        self.frames = [os.path.join(self.root_dir, '{}'.format(c.split('\t')[0])) for c in content[0:5]]
         self.labels = [int(c.split('\t')[1]) for c in content]
         self.mode = mode
 
@@ -31,7 +31,7 @@ class VideoDataset(Dataset):
         Return the dataset length
         """
 
-        return len(self.frames)//100
+        return len(self.frames)
 
     def __getitem__(self, idx):
         """

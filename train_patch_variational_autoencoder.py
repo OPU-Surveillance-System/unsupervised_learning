@@ -109,16 +109,16 @@ def train(models, optimizers, trainset, testset, epoch, batch_size, patch_size, 
                     #Save model
                     torch.save(encoder.state_dict(), os.path.join(directory, 'serial', 'encoder_{}'.format(e)))
                     torch.save(decoder.state_dict(), os.path.join(directory, 'serial', 'decoder_{}'.format(e)))
-
-            #Plot example of reconstructed images
-            pred = utils.process.deprocess(logits)
-            #pred = torch.nn.functional.sigmoid(logits)
-            pred = pred.data.cpu().numpy()
-            pred = np.rollaxis(pred, 1, 4)
-            inputs = utils.process.deprocess(inputs)
-            inputs = inputs.data.cpu().numpy()
-            inputs = np.rollaxis(inputs, 1, 4)
-            utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(directory, 'example_reconstruction_{}'.format(p), 'epoch_{}.svg'.format(e)))
+            if e % 10 == 0:
+                #Plot example of reconstructed images
+                pred = utils.process.deprocess(logits)
+                #pred = torch.nn.functional.sigmoid(logits)
+                pred = pred.data.cpu().numpy()
+                pred = np.rollaxis(pred, 1, 4)
+                inputs = utils.process.deprocess(inputs)
+                inputs = inputs.data.cpu().numpy()
+                inputs = np.rollaxis(inputs, 1, 4)
+                utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(directory, 'example_reconstruction_{}'.format(p), 'epoch_{}.svg'.format(e)))
     writer.export_scalars_to_json(os.path.join(directory, 'logs', 'scalars.json'))
     writer.close()
 
