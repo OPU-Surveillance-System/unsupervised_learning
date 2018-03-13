@@ -22,7 +22,7 @@ def sample_z(mu, sigma):
 
     return z
 
-def train(models, optimizers, trainset, testset, epoch, batch_size, patch_size, reg, directory):
+def train(models, optimizers, trainset, testset, epoch, batch_size, reg, directory):
     """
     Train a model and log the process
     Args:
@@ -59,7 +59,6 @@ def train(models, optimizers, trainset, testset, epoch, batch_size, patch_size, 
                 decoder.eval()
             running_reconstruction_loss = 0
             running_regularization_loss = 0
-            nb_patch = len(datasets[p]) * ((256 // patch_size)**2)
             dataloader = DataLoader(datasets[p], batch_size=batch_size, shuffle=True, num_workers=4)
             for i_batch, sample in enumerate(tqdm(dataloader)):
                 encoder.zero_grad()
@@ -91,8 +90,8 @@ def train(models, optimizers, trainset, testset, epoch, batch_size, patch_size, 
                 auc = metrics.auc(fpr, tpr)
             else:
                 auc = 0
-            epoch_reconstruction_loss = running_reconstruction_loss / nb_patch
-            epoch_regularization_loss = running_regularization_loss / nb_patch
+            epoch_reconstruction_loss = running_reconstruction_loss / len(datasets[p])
+            epoch_regularization_loss = running_regularization_loss / len(datasets[p])
             writer.add_scalar('{}/learning_curve/reconstruction_loss'.format(p), epoch_reconstruction_loss, e)
             writer.add_scalar('{}/learning_curve/regularization_loss'.format(p), epoch_regularization_loss, e)
             print('{} -- Reconstruction loss: {}, Regularization loss: {}, AUC: {}'.format(p, epoch_reconstruction_loss, epoch_regularization_loss, auc))

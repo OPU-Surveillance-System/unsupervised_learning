@@ -31,10 +31,10 @@ class Encoder(torch.nn.Module):
             prev_in = prev_f
             prev_f *= 2
         self.conv = torch.nn.Sequential(*layers)
-        self.last_map_dim = ','.join([str(prev_f//2), str(self.patch//(2**self.nb_b)), str(self.patch//(2**self.nb_b))])
+        self.last_map_dim = ','.join([str(prev_f//2), str(256//(2**self.nb_b)), str(256//(2**self.nb_b))])
 
         #Bottleneck
-        flatten = ((self.patch//(2**self.nb_b))**2)*(prev_f//2) #last_feature_map.h * last_feature_map.w * last_feature_map.c
+        flatten = ((256//(2**self.nb_b))**2)*(prev_f//2) #last_feature_map.h * last_feature_map.w * last_feature_map.c
         self.mu = torch.nn.Linear(flatten, self.latent_size)
         self.sigma = torch.nn.Linear(flatten, self.latent_size)
 
