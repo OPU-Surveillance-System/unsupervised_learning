@@ -3,14 +3,13 @@ import math
 from torch.autograd import Variable
 
 class Encoder(torch.nn.Module):
-    def __init__(self, in_dim, nb_f, nb_l, nb_b, latent_size, patch=32):
+    def __init__(self, in_dim, nb_f, nb_l, nb_b, latent_size):
         super(Encoder, self).__init__()
         self.in_dim = in_dim
         self.nb_f = nb_f
         self.nb_l = nb_l
         self.nb_b = nb_b
         self.latent_size = latent_size
-        self.patch = patch
 
         def downsampling_block(in_dim, nb_f, nb_l):
             layers = []
@@ -46,7 +45,6 @@ class Encoder(torch.nn.Module):
 
     def forward(self, x):
         #Encode
-        x = x.view(-1, self.in_dim, self.patch, self.patch)
         x = self.conv(x)
         x = x.view(x.size(0), -1) #Flatten x
         mu = self.mu(x)
