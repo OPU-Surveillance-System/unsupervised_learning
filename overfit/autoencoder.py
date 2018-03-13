@@ -25,8 +25,9 @@ class Autoencoder(torch.nn.Module):
             layers = [torch.nn.Upsample(scale_factor=2, mode='bilinear')]
             layers.append(torch.nn.ReLU())
             for n in range(nb_l):
-                layers.append(torch.nn.Conv2d(nb_f, nb_f, (3, 3), padding=1))
+                layers.append(torch.nn.Conv2d(in_dim, nb_f, (3, 3), padding=1))
                 layers.append(torch.nn.ReLU())
+                in_dim = nb_f
 
             return layers
 
@@ -56,12 +57,9 @@ class Autoencoder(torch.nn.Module):
         #Decoder
 
         layers = []
-        print('prev_f', prev_f)
         for n in range(self.nb_b):
             prev_f //= 2
-            print('prev_f', prev_f)
             next_f = prev_f // 2
-            print('next_f', next_f)
             layers += upsampling_block(prev_f, next_f, self.nb_l)
         layers.append(torch.nn.Conv2d(next_f, self.in_dim, (3, 3), padding=1))
         self.decoder = torch.nn.Sequential(*layers)
@@ -73,16 +71,12 @@ class Autoencoder(torch.nn.Module):
                 torch.nn.init.kaiming_normal(m.weight)
 
     def forward(self, x):
-        print(x.shape)
         x = self.encoder(x)
-        print(x.shape)
         if self.fc:
             x = x.view(x.size(0), -1)
-            print(x.shape)
             x = self.bottleneck(x)
             reshape = 256//(2**self.nb_b)
             x = x.view(x.size(0), -1, reshape, reshape)
-            print(x.shape)
         logits = self.decoder(x)
 
         return logits
