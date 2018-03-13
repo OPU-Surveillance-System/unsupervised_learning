@@ -116,7 +116,7 @@ def main(args):
             f.write('{}:{}\n'.format(k, d[k]))
 
     #Variables
-    ae = overfit.autoencoder.Autoencoder(args.nb_f, args.nb_l, args.nb_b, args.dense)
+    ae = overfit.autoencoder.Autoencoder(3, args.nb_f, args.nb_l, args.nb_b, args.dense)
     ae = ae.cuda()
     print(ae)
     optimizer = torch.optim.Adam(ae.parameters(), args.learning_rate)

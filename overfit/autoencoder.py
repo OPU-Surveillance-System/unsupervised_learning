@@ -9,7 +9,7 @@ class Autoencoder(torch.nn.Module):
         self.nb_l = nb_l
         self.nb_b = nb_b
         self.fc = fc
-        print('1')
+
         def downsampling_block(in_dim, nb_f, nb_l):
             layers = []
             for n in range(nb_l):
@@ -36,7 +36,7 @@ class Autoencoder(torch.nn.Module):
 
             return layers
 
-        print('2')
+
         #Encoder
         layers = []
         prev_in = self.in_dim
@@ -46,7 +46,7 @@ class Autoencoder(torch.nn.Module):
             prev_in = prev_f
             prev_f *= 2
         self.encoder = torch.nn.Sequential(*layers)
-        print('3')
+
         #Bottleneck
         if self.fc:
             in_dim = ((256//(2**self.nb_b))**2)*(prev_f//2) #last_feature_map.h * last_feature_map.w * last_feature_map.c
@@ -54,7 +54,7 @@ class Autoencoder(torch.nn.Module):
             self.bottleneck = torch.nn.Sequential(*layers)
 
         #Decoder
-        print('4')
+
         layers = []
         for n in range(self.nb_b):
             prev_f //= 2
@@ -64,9 +64,8 @@ class Autoencoder(torch.nn.Module):
         self.decoder = torch.nn.Sequential(*layers)
 
         #Weights initialization
-        print('5')
+
         for m in self.modules():
-            print(m)
             if isinstance(m, torch.nn.Conv2d) or isinstance(m, torch.nn.Linear):
                 torch.nn.init.kaiming_normal(m.weight)
 
