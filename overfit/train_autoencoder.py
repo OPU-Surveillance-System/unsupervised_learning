@@ -116,10 +116,6 @@ def main(args):
             f.write('{}:{}\n'.format(k, d[k]))
 
     #Variables
-    if args.random_projection == 0:
-        rp = False
-    else:
-        rp = True
     ae = models.autoencoder.Autoencoder(args.nb_f, args.nb_l, args.nb_b, args.dense)
     ae = ae.cuda()
     print(ae)
