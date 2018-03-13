@@ -31,7 +31,7 @@ class VideoDataset(Dataset):
         Return the dataset length
         """
 
-        return len(self.frames)
+        return len(self.frames)//100
 
     def __getitem__(self, idx):
         """

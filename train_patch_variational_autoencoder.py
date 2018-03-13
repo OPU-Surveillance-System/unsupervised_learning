@@ -110,15 +110,15 @@ def train(models, optimizers, trainset, testset, epoch, batch_size, patch_size, 
                     torch.save(encoder.state_dict(), os.path.join(directory, 'serial', 'encoder_{}'.format(e)))
                     torch.save(decoder.state_dict(), os.path.join(directory, 'serial', 'decoder_{}'.format(e)))
 
-                    #Plot example of reconstructed images
-                    pred = utils.process.deprocess(logits)
-                    #pred = torch.nn.functional.sigmoid(logits)
-                    pred = pred.data.cpu().numpy()
-                    pred = np.rollaxis(pred, 1, 4)
-                    inputs = utils.process.deprocess(inputs)
-                    inputs = inputs.data.cpu().numpy()
-                    inputs = np.rollaxis(inputs, 1, 4)
-                    utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(directory, 'example_reconstruction', 'epoch_{}.svg'.format(e)))
+            #Plot example of reconstructed images
+            pred = utils.process.deprocess(logits)
+            #pred = torch.nn.functional.sigmoid(logits)
+            pred = pred.data.cpu().numpy()
+            pred = np.rollaxis(pred, 1, 4)
+            inputs = utils.process.deprocess(inputs)
+            inputs = inputs.data.cpu().numpy()
+            inputs = np.rollaxis(inputs, 1, 4)
+            utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(directory, 'example_reconstruction_{}', 'epoch_{}.svg'.format(p, e)))
     writer.export_scalars_to_json(os.path.join(directory, 'logs', 'scalars.json'))
     writer.close()
 
@@ -134,8 +134,10 @@ def main(args):
         os.makedirs(args.directory)
     if not os.path.exists(os.path.join(args.directory, 'serial')):
         os.makedirs(os.path.join(args.directory, 'serial'))
-    if not os.path.exists(os.path.join(args.directory, 'example_reconstruction')):
-        os.makedirs(os.path.join(args.directory, 'example_reconstruction'))
+    if not os.path.exists(os.path.join(args.directory, 'example_reconstruction_train')):
+        os.makedirs(os.path.join(args.directory, 'example_reconstruction_train'))
+    if not os.path.exists(os.path.join(args.directory, 'example_reconstruction_test')):
+        os.makedirs(os.path.join(args.directory, 'example_reconstruction_test'))
     if not os.path.exists(os.path.join(args.directory, 'logs')):
         os.makedirs(os.path.join(args.directory, 'logs'))
 
