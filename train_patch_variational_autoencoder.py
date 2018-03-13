@@ -118,7 +118,7 @@ def train(models, optimizers, trainset, testset, epoch, batch_size, patch_size, 
             inputs = utils.process.deprocess(inputs)
             inputs = inputs.data.cpu().numpy()
             inputs = np.rollaxis(inputs, 1, 4)
-            utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(directory, 'example_reconstruction_{}', 'epoch_{}.svg'.format(p, e)))
+            utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(directory, 'example_reconstruction_{}'.format(p), 'epoch_{}.svg'.format(e)))
     writer.export_scalars_to_json(os.path.join(directory, 'logs', 'scalars.json'))
     writer.close()
 
