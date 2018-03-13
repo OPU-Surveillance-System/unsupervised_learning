@@ -10,7 +10,7 @@ from sklearn import metrics
 from tensorboardX import SummaryWriter
 
 import dataset
-import overfit.patch_variational_autoencoder
+import overfit.variational_autoencoder
 import utils.metrics
 import utils.plot
 import utils.process
