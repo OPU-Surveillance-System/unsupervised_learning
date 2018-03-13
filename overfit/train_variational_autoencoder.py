@@ -150,12 +150,12 @@ def main(args):
     else:
         input_dim = 3
 
-    encoder = overfit.patch_variational_autoencoder.Encoder(in_dim=input_dim,
+    encoder = overfit.variational_autoencoder.Encoder(in_dim=input_dim,
                                                            nb_f=args.nb_f,
                                                            nb_l=args.nb_l,
                                                            nb_b=args.nb_b,
                                                            latent_size=args.latent_size)
-    decoder = overfit.patch_variational_autoencoder.Decoder(out_dim=input_dim,
+    decoder = overfit.variational_autoencoder.Decoder(out_dim=input_dim,
                                                            encoder_dim=encoder.last_map_dim,
                                                            nb_l=args.nb_l,
                                                            nb_b=args.nb_b,
