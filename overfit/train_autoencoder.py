@@ -10,7 +10,7 @@ from sklearn import metrics
 from tensorboardX import SummaryWriter
 
 import dataset
-import models.autoencoder
+import overfit.autoencoder
 import utils.metrics
 import utils.plot
 import utils.process
@@ -116,7 +116,7 @@ def main(args):
             f.write('{}:{}\n'.format(k, d[k]))
 
     #Variables
-    ae = models.autoencoder.Autoencoder(args.nb_f, args.nb_l, args.nb_b, args.dense)
+    ae = overfit.autoencoder.Autoencoder(args.nb_f, args.nb_l, args.nb_b, args.dense)
     ae = ae.cuda()
     print(ae)
     optimizer = torch.optim.Adam(ae.parameters(), args.learning_rate)
