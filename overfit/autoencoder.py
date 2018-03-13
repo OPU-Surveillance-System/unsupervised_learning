@@ -63,14 +63,8 @@ class Autoencoder(torch.nn.Module):
 
         #Weights initialization
         for m in self.modules():
-            if isinstance(m, torch.nn.Conv2d) or isinstance(m, torch.nn.ConvTranspose2d):
-                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-                m.weight.data.normal_(0, math.sqrt(2.)*math.sqrt(2. / n))
-                if m.bias is not None:
-                    m.bias.data.zero_()
-            elif isinstance(m, torch.nn.Linear):
-                m.weight.data.normal_(0, math.sqrt(2. / m.in_features))
-                m.bias.data.zero_()
+            if isinstance(m, torch.nn.Conv2d) or isinstance(m, torch.nn.Linear):
+                torch.nn.init.kaiming_normal(m.weight)
 
     def forward(self, x):
         x = self.encoder(x)
