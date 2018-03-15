@@ -69,7 +69,7 @@ def train(models, optimizers, trainset, testset, epoch, batch_size, reg, directo
                 z = sample_z(mu, sigma)
                 logits = decoder(z)
                 reconstruction_loss = torch.nn.functional.mse_loss(logits, inputs, size_average=True)
-                regularization_loss = 0.5 * torch.mean((mu**2) + (sigma**2) - torch.log(sigma) - 1)
+                regularization_loss = 0.5 * torch.mean((mu**2) + (torch.exp(sigma)**2) - torch.log(torch.exp(sigma)) - 1)
                 #regularization_loss = 0.5 * torch.sum(torch.exp(sigma) + mu**2 - 1. - sigma)
                 loss = reconstruction_loss + reg * regularization_loss
                 if p == 'train':
