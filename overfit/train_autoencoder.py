@@ -116,7 +116,7 @@ def main(args):
             f.write('{}:{}\n'.format(k, d[k]))
 
     #Variables
-    ae = overfit.autoencoder.Autoencoder(3, args.nb_f, args.nb_l, args.nb_b, args.dense)
+    ae = overfit.autoencoder.Autoencoder(3, args.nb_f, args.nb_l, args.nb_b, args.dense, args.rate)
     ae = ae.cuda()
     print(ae)
     optimizer = torch.optim.Adam(ae.parameters(), args.learning_rate)
@@ -146,6 +146,7 @@ if __name__ == '__main__':
     parser.add_argument('-b', dest='nb_b', type=int, default=2, help='Number of upsampling blocks')
     parser.add_argument('-d', dest='dense', type=int, default=None, help='Number of neurons in the middle denser layer (if None: no dense layer)')
     parser.add_argument('-i', dest='ips', type=int, default=256, help='Image height (assume width = height)')
+    parser.add_argument('-r', dest='rate', type=float, default=0.5, help='Dropout rate')
     args = parser.parse_args()
 
     main(args)
