@@ -97,12 +97,12 @@ def plot_reconstruction_noiy_images(inputs, pred, noisy, name):
         ax.axis('off')
     #noisy
     for i in range(nb_plots):
-        ax = plt.subplot2grid((3, nb_plots), (0, i), rowspan=1, colspan=1)
+        ax = plt.subplot2grid((3, nb_plots), (1, i), rowspan=1, colspan=1)
         ax.imshow(noisy[i])
         ax.axis('off')
     #pred
     for i in range(nb_plots):
-        ax = plt.subplot2grid((3, nb_plots), (1, i), rowspan=1, colspan=1)
+        ax = plt.subplot2grid((3, nb_plots), (2, i), rowspan=1, colspan=1)
         ax.imshow(np.clip(pred[i], 0.0, 1.0))
         ax.axis('off')
 
