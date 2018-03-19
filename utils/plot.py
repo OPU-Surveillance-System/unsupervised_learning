@@ -76,6 +76,41 @@ def plot_reconstruction_images(inputs, pred, name):
     else:
         plt.show()
 
+def plot_reconstruction_noiy_images(inputs, pred, noisy, name):
+    """
+    Plot example of reconstruction images
+    Args:
+        inputs (numpy.array): True images
+        pred (numpy.array): Reconstructed images
+        name (str): name to save the figure (if None: show the figure)
+    """
+
+    plt.clf()
+    nb_plots = min(inputs.shape[0], 4)
+    if inputs.shape[3] == 1:
+        inputs = inputs.reshape((-1, 256, 256))
+        pred = pred.reshape((-1, 256, 256))
+    #inputs
+    for i in range(nb_plots):
+        ax = plt.subplot2grid((3, nb_plots), (0, i), rowspan=1, colspan=1)
+        ax.imshow(inputs[i])
+        ax.axis('off')
+    #noisy
+    for i in range(nb_plots):
+        ax = plt.subplot2grid((3, nb_plots), (0, i), rowspan=1, colspan=1)
+        ax.imshow(noisy[i])
+        ax.axis('off')
+    #pred
+    for i in range(nb_plots):
+        ax = plt.subplot2grid((3, nb_plots), (1, i), rowspan=1, colspan=1)
+        ax.imshow(np.clip(pred[i], 0.0, 1.0))
+        ax.axis('off')
+
+    if name != None:
+        plt.savefig(name, format='svg', bbox_inches='tight')
+    else:
+        plt.show()
+
 def plot_generated_images(inputs, name):
     """
     Plot example of reconstruction images
