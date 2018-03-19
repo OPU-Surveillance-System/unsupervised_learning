@@ -16,8 +16,8 @@ class Autoencoder(torch.nn.Module):
             for n in range(nb_l):
                 layers.append(torch.nn.Conv2d(in_dim, nb_f, (3, 3), padding=1))
                 layers.append(torch.nn.Dropout2d(p=rate))
-                #layers.append(torch.nn.ReLU())
-                layers.append(torch.nn.SELU())
+                layers.append(torch.nn.ReLU())
+                #layers.append(torch.nn.SELU())
                 in_dim = nb_f
             layers.append(torch.nn.MaxPool2d((2, 2), (2, 2)))
 
@@ -30,8 +30,8 @@ class Autoencoder(torch.nn.Module):
             for n in range(nb_l):
                 layers.append(torch.nn.Conv2d(in_dim, nb_f, (3, 3), padding=1))
                 layers.append(torch.nn.Dropout2d(p=rate))
-                #layers.append(torch.nn.ReLU())
-                layers.append(torch.nn.SELU())
+                layers.append(torch.nn.ReLU())
+                #layers.append(torch.nn.SELU())
                 in_dim = nb_f
 
             return layers
@@ -72,7 +72,8 @@ class Autoencoder(torch.nn.Module):
         #Weights initialization
         for m in self.modules():
             if isinstance(m, torch.nn.Conv2d) or isinstance(m, torch.nn.Linear):
-                torch.nn.init.kaiming_normal(m.weight)
+                #torch.nn.init.kaiming_normal(m.weight)
+                torch.nn.init.xavier_uniform(m.weight, math.sqrt(2))
 
     def forward(self, x):
         x = self.encoder(x)
