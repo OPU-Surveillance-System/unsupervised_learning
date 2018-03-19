@@ -50,7 +50,7 @@ def train(model, optimizer, trainset, testset, epoch, batch_size, noise_rate, di
             for i_batch, sample in enumerate(tqdm(dataloader)):
                 model.zero_grad()
                 inputs = Variable(sample['img'].float().cuda())
-                noise = Variable(torch.rand(batch_size, 3, 256, 256) * noise_rate)
+                noise = Variable(torch.rand(batch_size, 3, 256, 256) * noise_rate).float().cuda()
                 noise_inputs = inputs + noise
                 logits = model(inputs)
                 loss = torch.nn.functional.mse_loss(logits, inputs)
