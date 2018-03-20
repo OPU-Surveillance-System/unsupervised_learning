@@ -90,6 +90,8 @@ def plot_reconstruction_noiy_images(inputs, pred, noisy, name):
     if inputs.shape[3] == 1:
         inputs = inputs.reshape((-1, 256, 256))
         pred = pred.reshape((-1, 256, 256))
+        noisy = noisy.reshape((-1, 256, 256))
+    print(inputs.shape, pred.shape, noisy.shape)
     #inputs
     for i in range(nb_plots):
         ax = plt.subplot2grid((3, nb_plots), (0, i), rowspan=1, colspan=1)
@@ -103,7 +105,7 @@ def plot_reconstruction_noiy_images(inputs, pred, noisy, name):
     #pred
     for i in range(nb_plots):
         ax = plt.subplot2grid((3, nb_plots), (2, i), rowspan=1, colspan=1)
-        ax.imshow(np.clip(pred[i], 0.0, 1.0))
+        ax.imshow(pred[i])
         ax.axis('off')
 
     if name != None:
