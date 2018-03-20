@@ -15,7 +15,7 @@ import utils.metrics
 import utils.plot
 import utils.process
 
-def train(model, optimizer, trainset, testset, epoch, batch_size, directory):
+def train(model, optimizer, trainset, testset, epoch, batch_size, noise_ratio, directory):
     """
     Train a model and log the process
     Args:
@@ -50,6 +50,10 @@ def train(model, optimizer, trainset, testset, epoch, batch_size, directory):
             for i_batch, sample in enumerate(tqdm(dataloader)):
                 model.zero_grad()
                 inputs = Variable(sample['img'].float().cuda())
+                groundtruth = Variable(sample['img'].float().cuda())
+                if p == 'train':
+                    noise =  torch.randn(inputs.size()) * noise_ratio
+                    inputs = inputs + noise
                 logits = model(inputs)
                 loss = torch.nn.functional.mse_loss(logits, inputs)
                 if p == 'train':
@@ -86,7 +90,10 @@ def train(model, optimizer, trainset, testset, epoch, batch_size, directory):
                 inputs = utils.process.deprocess(inputs)
                 inputs = inputs.data.cpu().numpy()
                 inputs = np.rollaxis(inputs, 1, 4)
-                utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(directory, 'example_reconstruction_{}'.format(p), 'epoch_{}.svg'.format(e)))
+                groundtruth = utils.process.deprocess(groundtruth)
+                groundtruth = groundtruth.data.cpu().numpy()
+                groundtruth = np.rollaxis(groundtruth, 1, 4)
+                utils.plot.plot_reconstruction_noiy_images(groundtruth, pred, inputs, os.path.join(directory, 'example_reconstruction_{}'.format(p), 'epoch_{}.svg'.format(e)))
     writer.export_scalars_to_json(os.path.join(directory, 'logs', 'scalars.json'))
     writer.close()
 
@@ -125,7 +132,7 @@ def main(args):
     testset = dataset.VideoDataset(args.testset, args.root_dir)
 
     #Train the model and save it
-    best_model = train(ae, optimizer, trainset, testset, args.epoch, args.batch_size, args.directory)
+    best_model = train(ae, optimizer, trainset, testset, args.epoch, args.batch_size, args.noise, args.directory)
     # torch.save(best_model.state_dict(), os.path.join(args.directory, 'serial', 'best_model'))
 
     return 0
@@ -138,6 +145,7 @@ if __name__ == '__main__':
     parser.add_argument('--rd', dest='root_dir', type=str, default='/datasets', help='Path to the images')
     parser.add_argument('--bs', dest='batch_size', type=int, default=16, help='Mini batch size')
     parser.add_argument('--lr', dest='learning_rate', type=float, default=0.0001, help='Learning rate')
+    parser.add_argument('-n', dest='noise', type=float, default=0.02, help='Noise ratio')
     parser.add_argument('--ep', dest='epoch', type=int, default=100, help='Number of training epochs')
     parser.add_argument('--dir', dest='directory', type=str, default='train_autoencoder', help='Directory to store results')
     #Model arguments
