@@ -93,6 +93,10 @@ def train(model, optimizer, trainset, testset, epoch, batch_size, noise_ratio, d
                 groundtruth = utils.process.deprocess(groundtruth)
                 groundtruth = groundtruth.data.cpu().numpy()
                 groundtruth = np.rollaxis(groundtruth, 1, 4)
+                if groundtruth.shape[4] == 1:
+                    pred = pred.reshape((-1, 256, 256))
+                    inputs = inputs.reshape((-1, 256, 256))
+                    groundtruth = groundtruth.reshape((-1, 256, 256))
                 utils.plot.plot_reconstruction_noiy_images(groundtruth, pred, inputs, os.path.join(directory, 'example_reconstruction_{}'.format(p), 'epoch_{}.svg'.format(e)))
     writer.export_scalars_to_json(os.path.join(directory, 'logs', 'scalars.json'))
     writer.close()
@@ -123,13 +127,17 @@ def main(args):
             f.write('{}:{}\n'.format(k, d[k]))
 
     #Variables
-    ae = overfit.autoencoder.Autoencoder(3, args.nb_f, args.nb_l, args.nb_b, args.dense, args.rate)
+    if args.mode == 'L':
+        input_dim = 1
+    else:
+        input_dim = 3
+    ae = overfit.autoencoder.Autoencoder(input_dim, args.nb_f, args.nb_l, args.nb_b, args.dense, args.rate)
     ae = ae.cuda()
     print(ae)
     optimizer = torch.optim.Adam(ae.parameters(), args.learning_rate)
 
-    trainset = dataset.VideoDataset(args.trainset, args.root_dir)
-    testset = dataset.VideoDataset(args.testset, args.root_dir)
+    trainset = dataset.VideoDataset(args.trainset, args.root_dir, args.mode)
+    testset = dataset.VideoDataset(args.testset, args.root_dir, args.mode)
 
     #Train the model and save it
     best_model = train(ae, optimizer, trainset, testset, args.epoch, args.batch_size, args.noise, args.directory)
@@ -146,6 +154,7 @@ if __name__ == '__main__':
     parser.add_argument('--bs', dest='batch_size', type=int, default=16, help='Mini batch size')
     parser.add_argument('--lr', dest='learning_rate', type=float, default=0.0001, help='Learning rate')
     parser.add_argument('-n', dest='noise', type=float, default=0.02, help='Noise ratio')
+    parser.add_argument('-m', dest='mode', type=str, default='RGB', help='Image mode: L (greyscale) or RGB')
     parser.add_argument('--ep', dest='epoch', type=int, default=100, help='Number of training epochs')
     parser.add_argument('--dir', dest='directory', type=str, default='train_autoencoder', help='Directory to store results')
     #Model arguments
