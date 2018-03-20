@@ -93,6 +93,7 @@ def train(model, optimizer, trainset, testset, epoch, batch_size, noise_ratio, d
                 groundtruth = utils.process.deprocess(groundtruth)
                 groundtruth = groundtruth.data.cpu().numpy()
                 groundtruth = np.rollaxis(groundtruth, 1, 4)
+                print(groundtruth.shape)
                 if groundtruth.shape[4] == 1:
                     pred = pred.reshape((-1, 256, 256))
                     inputs = inputs.reshape((-1, 256, 256))
