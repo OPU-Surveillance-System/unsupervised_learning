@@ -93,11 +93,6 @@ def train(model, optimizer, trainset, testset, epoch, batch_size, noise_ratio, d
                 groundtruth = utils.process.deprocess(groundtruth)
                 groundtruth = groundtruth.data.cpu().numpy()
                 groundtruth = np.rollaxis(groundtruth, 1, 4)
-                print(groundtruth.shape, pred.shape, inputs.shape)
-                if groundtruth.shape[3] == 1:
-                    pred = pred.reshape((-1, 256, 256))
-                    inputs = inputs.reshape((-1, 256, 256))
-                    groundtruth = groundtruth.reshape((-1, 256, 256))
                 utils.plot.plot_reconstruction_noiy_images(groundtruth, pred, inputs, os.path.join(directory, 'example_reconstruction_{}'.format(p), 'epoch_{}.svg'.format(e)))
     writer.export_scalars_to_json(os.path.join(directory, 'logs', 'scalars.json'))
     writer.close()
