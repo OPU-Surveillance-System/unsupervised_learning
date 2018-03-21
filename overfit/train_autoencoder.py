@@ -52,9 +52,8 @@ def train(model, optimizer, trainset, testset, epoch, batch_size, noise_ratio, d
                 inputs = Variable(sample['img'].float().cuda())
                 groundtruth = Variable(sample['img'].float().cuda())
                 if p == 'train':
-                    # noise =  Variable(torch.randn(inputs.size()) * noise_ratio).float().cuda()
-                    # inputs = inputs + noise
-                    inputs = torch.nn.functional.dropout2d(inputs, p=noise_ratio)
+                    noise =  Variable(torch.randn(inputs.size()) * noise_ratio).float().cuda()
+                    inputs = inputs + noise
                 logits = model(inputs)
                 loss = torch.nn.functional.mse_loss(logits, inputs)
                 if p == 'train':
