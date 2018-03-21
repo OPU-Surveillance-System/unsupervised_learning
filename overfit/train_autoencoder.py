@@ -55,7 +55,7 @@ def train(model, optimizer, trainset, testset, epoch, batch_size, noise_ratio, d
                     noise =  Variable(torch.randn(inputs.size()) * noise_ratio).float().cuda()
                     inputs = inputs + noise
                 logits = model(inputs)
-                loss = torch.nn.functional.mse_loss(logits, inputs)
+                loss = torch.nn.functional.mse_loss(logits, inputs, size_average=False)
                 if p == 'train':
                     loss.backward()
                     optimizer.step()
