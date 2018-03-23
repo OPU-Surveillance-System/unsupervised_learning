@@ -77,7 +77,7 @@ def main(args):
             f.write('{}:{}\n'.format(k, d[k]))
 
     #Variables
-    pcnn = overfit.autoencoder.Autoencoder(1, args.h, args.n, args.d)
+    pcnn = overfit.autoencoder.Autoencoder(1, args.f, args.n, args.d)
     pcnn = pcnn.cuda()
     print(pcnn)
     optimizer = torch.optim.Adam(pcnn.parameters(), args.learning_rate)
@@ -99,7 +99,7 @@ if __name__ == '__main__':
     parser.add_argument('--ep', dest='epoch', type=int, default=100, help='Number of training epochs')
     parser.add_argument('--dir', dest='directory', type=str, default='train_autoencoder', help='Directory to store results')
     #Model arguments
-    parser.add_argument('-h', dest='h', type=int, default=128, help='Number of hidden features')
+    parser.add_argument('-f', dest='f', type=int, default=128, help='Number of hidden features')
     parser.add_argument('-d', dest='d', type=int, default=32, help='Number of top layer features')
     parser.add_argument('-n', dest='n', type=int, default=15, help='Number of residual blocks')
     args = parser.parse_args()
