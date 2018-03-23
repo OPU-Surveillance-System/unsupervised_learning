@@ -9,6 +9,7 @@ from torchvision import datasets, transforms, utils
 from tqdm import tqdm
 from sklearn import metrics
 from tensorboardX import SummaryWriter
+import matplotlib.pyplot as plt
 
 import dataset
 import autoregressive.pixelcnn
