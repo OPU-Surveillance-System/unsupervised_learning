@@ -16,7 +16,7 @@ import utils.metrics
 import utils.plot
 import utils.process
 
-def train(model, optimizer, trainset, testset, epoch, batch_size, directory):
+def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
     """
     """
 
