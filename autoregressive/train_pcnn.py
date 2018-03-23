@@ -35,6 +35,7 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
         dataloader = DataLoader(sets[p], batch_size=batch_size, shuffle=False, num_workers=4)
 
         for i_batch, sample in enumerate(tqdm(dataloader)):
+            print('BATCH', i_batch)
             if i_batch > 0:
                 break
             optimizer.zero_grad()
