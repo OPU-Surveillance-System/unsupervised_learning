@@ -75,7 +75,7 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
                 print('logits after permute', logits.shape)
                 probs = torch.nn.functional.softmax(logits, dim=3)
                 print('softmax', probs.shape)
-                argmax = torch.max(probs, 3)
+                argmax = torch.max(probs, 3)[1]
                 print('argmax', argmax.shape)
                 argmax = argmax.data.cpu().numpy()
                 argmax = np.reshape(argmax, (batch_size, 28, 28))[0:4]
