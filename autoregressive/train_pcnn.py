@@ -79,12 +79,12 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
                 plt.imshow(argmax)
                 plt.savefig(os.path.join(directory, 'reconstruction_train', '{}.svg'.format(e)), format='svg', bbox_inches='tight')
 
-            if e == 0:
-                img = img.data.cpu().numpy()[0]
-                img = np.reshape(img, (28, 28))
-                plt.clf()
-                plt.imshow(img)
-                plt.savefig(os.path.join(directory, 'gt.svg'.format(e)), format='svg', bbox_inches='tight')
+                if e == 0:
+                    img = img.data.cpu().numpy()[0]
+                    img = np.reshape(img, (28, 28))
+                    plt.clf()
+                    plt.imshow(img)
+                    plt.savefig(os.path.join(directory, 'gt.svg'.format(e)), format='svg', bbox_inches='tight')
 
 def main(args):
     """
