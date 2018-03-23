@@ -70,12 +70,18 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
                 plt.savefig(os.path.join(directory, 'generation', '{}.svg'.format(e)), format='svg', bbox_inches='tight')
 
             if p == 'train':
+                print('logits', logits.shape)
                 logits = logits.permute(1, -1)
+                print('logits after permute', logits.shape)
                 probs = torch.nn.functional.softmax(logits, dim=3)
+                print('softmax', probs.shape)
                 argmax = torch.max(probs, 3)
+                print('argmax', argmax.shape)
                 argmax = argmax.data.cpu().numpy()
                 argmax = np.reshape(argmax, (batch_size, 28, 28))[0:4]
+                print('first 4', argmax.shape)
                 argmax = np.reshape(argmax, (2 * 28, 2 * 28))
+                print('merge', argmax.shape)
                 plt.clf()
                 plt.imshow(argmax)
                 plt.savefig(os.path.join(directory, 'reconstruction_train', '{}.svg'.format(e)), format='svg', bbox_inches='tight')
