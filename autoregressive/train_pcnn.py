@@ -33,7 +33,7 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
 
         dataloader = DataLoader(sets[p], batch_size=batch_size, shuffle=True, num_workers=4)
 
-        for i_batch, sample in enumerate(dataloader):
+        for i_batch, sample in enumerate(tqdm(dataloader)):
           optimizer.zero_grad()
           img = Variable(sample[0], volatile=(p == 'test')).cuda()
           lbl = Variable(sample[0] * 255, volatile=(p == 'test')).long().cuda()
