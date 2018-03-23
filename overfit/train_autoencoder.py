@@ -70,7 +70,7 @@ def train(model, optimizer, trainset, testset, epoch, batch_size, noise_ratio, d
                 auc = metrics.auc(fpr, tpr)
             else:
                 auc = 0
-            epoch_loss = running_loss / len(datasets[p])
+            epoch_loss = running_loss / (i_batch + 1)
             writer.add_scalar('learning_curve/{}'.format(p), epoch_loss, e)
             print('{} -- Loss: {} AUC: {}'.format(p, epoch_loss, auc))
             if p == 'test':
