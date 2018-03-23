@@ -35,7 +35,6 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
             dataloader = DataLoader(sets[p], batch_size=batch_size, shuffle=False, num_workers=4)
 
             for i_batch, sample in enumerate(tqdm(dataloader)):
-                print('BATCH', i_batch)
                 if i_batch > 0:
                     break
                 optimizer.zero_grad()
@@ -70,18 +69,12 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
                 plt.savefig(os.path.join(directory, 'generation', '{}.svg'.format(e)), format='svg', bbox_inches='tight')
 
             if p == 'train':
-                print('logits', logits.shape)
                 logits = logits.permute(0, 2, 3, 1)
-                print('logits after permute', logits.shape)
                 probs = torch.nn.functional.softmax(logits, dim=3)
-                print('softmax', probs.shape)
                 argmax = torch.max(probs, 3)[1]
-                print('argmax', argmax.shape)
                 argmax = argmax.data.cpu().numpy()
                 argmax = np.reshape(argmax, (batch_size, 28, 28))[0:4]
-                print('first 4', argmax.shape)
                 argmax = np.reshape(argmax, (2 * 28, 2 * 28))
-                print('merge', argmax.shape)
                 plt.clf()
                 plt.imshow(argmax)
                 plt.savefig(os.path.join(directory, 'reconstruction_train', '{}.svg'.format(e)), format='svg', bbox_inches='tight')
