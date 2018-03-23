@@ -2,7 +2,7 @@ import torch
 
 class MaskedConvolution(torch.nn.Conv2d):
   def __init__(self, in_dim, out_dim, kernel_size, mask_type, padding):
-    super(MaskedConvolution, self).__init__(in_channels=in_dim, out_channels=out_dim, kernel_size=kernel_size, padding=padding)
+    super(MaskedConvolution, self).__init__(in_channels=in_dim, out_channels=out_dim, kernel_size=kernel_size, padding=padding, bias=False)
 
     self.in_dim = in_dim
     self.out_dim = out_dim
