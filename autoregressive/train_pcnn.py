@@ -77,7 +77,7 @@ def main(args):
             f.write('{}:{}\n'.format(k, d[k]))
 
     #Variables
-    pcnn = overfit.autoencoder.Autoencoder(1, args.f, args.n, args.d)
+    pcnn = autoregressive.pixelcnn.PixelCNN(1, args.f, args.n, args.d)
     pcnn = pcnn.cuda()
     print(pcnn)
     optimizer = torch.optim.Adam(pcnn.parameters(), args.learning_rate)
