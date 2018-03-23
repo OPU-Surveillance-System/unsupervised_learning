@@ -15,10 +15,10 @@ class MaskedConvolution(torch.nn.Conv2d):
     self.mask[:, :, height // 2, width // 2 + (mask_type == 'B'):] = 0
     self.mask[:, :, height // 2 + 1:] = 0
 
-    #Weights initialization
-    for m in self.modules():
-        if isinstance(m, torch.nn.Conv2d):
-            torch.nn.init.kaiming_normal(m.weight)
+    # #Weights initialization
+    # for m in self.modules():
+    #     if isinstance(m, torch.nn.Conv2d):
+    #         torch.nn.init.kaiming_normal(m.weight)
 
   def forward(self, x):
     self.weight.data *= self.mask
@@ -41,10 +41,10 @@ class ResidualBlock(torch.nn.Module):
     layers.append(torch.nn.Conv2d(self.h, 2 * self.h, (1, 1)))
     self.layers = torch.nn.Sequential(*layers)
 
-    #Weights initialization
-    for m in self.modules():
-        if isinstance(m, torch.nn.Conv2d):
-            torch.nn.init.kaiming_normal(m.weight)
+    # #Weights initialization
+    # for m in self.modules():
+    #     if isinstance(m, torch.nn.Conv2d):
+    #         torch.nn.init.kaiming_normal(m.weight)
 
   def forward(self, x):
     y = self.layers(x)
@@ -65,10 +65,10 @@ class PixelCNN(torch.nn.Module):
     self.top_layer = torch.nn.Sequential(*[torch.nn.ReLU(), torch.nn.Conv2d(2 * self.h, self.d, (1, 1)), torch.nn.ReLU()])
     self.evidence = torch.nn.Conv2d(self.d, 256, (1, 1))
 
-    #Weights initialization
-    for m in self.modules():
-        if isinstance(m, torch.nn.Conv2d):
-            torch.nn.init.kaiming_normal(m.weight)
+    # #Weights initialization
+    # for m in self.modules():
+    #     if isinstance(m, torch.nn.Conv2d):
+    #         torch.nn.init.kaiming_normal(m.weight)
 
   def forward(self, x):
     x = self.first_layer(x)
