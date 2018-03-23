@@ -71,7 +71,7 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
 
             if p == 'train':
                 print('logits', logits.shape)
-                logits = logits.permute(1, -1)
+                logits = logits.permute(0, 2, 3, 1)
                 print('logits after permute', logits.shape)
                 probs = torch.nn.functional.softmax(logits, dim=3)
                 print('softmax', probs.shape)
