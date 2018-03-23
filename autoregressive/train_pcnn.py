@@ -27,47 +27,57 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
     writer = SummaryWriter(os.path.join(directory, 'logs'))
 
     for e in range(epoch):
-      running_loss = 0
+        running_loss = 0
 
-      for p in phase:
-        pcnn.train(p == 'train')
+        for p in phase:
+            pcnn.train(p == 'train')
 
-        dataloader = DataLoader(sets[p], batch_size=batch_size, shuffle=True, num_workers=4)
+        dataloader = DataLoader(sets[p], batch_size=batch_size, shuffle=False, num_workers=4)
 
         for i_batch, sample in enumerate(tqdm(dataloader)):
-          optimizer.zero_grad()
-          img = Variable(sample[0], volatile=(p == 'test')).cuda()
-          lbl = Variable(sample[0] * 255, volatile=(p == 'test')).long().cuda()
+            if i_batch > 0:
+                break
+            optimizer.zero_grad()
+            img = Variable(sample[0], volatile=(p == 'test')).cuda()
+            lbl = Variable(sample[0] * 255, volatile=(p == 'test')).long().cuda()
 
-          logits = pcnn(img)[0]
+            logits = pcnn(img)[0]
 
-          loss = torch.nn.functional.cross_entropy(logits.view((-1, 256)), lbl.view((-1)))
-          running_loss += loss.data[0]
-
-          if p == 'train':
-            loss.backward()
-            optimizer.step()
+            loss = torch.nn.functional.cross_entropy(logits.view((-1, 256)), lbl.view((-1)))
+            running_loss += loss.data[0]
+            if p == 'train':
+                loss.backward()
+                optimizer.step()
 
         epoch_loss = running_loss / (i_batch + 1)
         writer.add_scalar('learning_curve/{}'.format(p), epoch_loss, e)
         print('Epoch {} ({}): loss = {}'.format(e, p, epoch_loss))
 
         if p == 'test':
-          synthetic = torch.zeros(16, 1, 28, 28).cuda()
+            synthetic = torch.zeros(16, 1, 28, 28).cuda()
+            for i in tqdm(range(28)):
+                for j in range(28):
+                    probs = pcnn(Variable(synthetic, volatile=True))[0]
+                    probs = torch.nn.functional.softmax(probs[:, :, i, j]).data
+                    synthetic[:, :, i, j] = torch.multinomial(probs, 1).float() / 255.
 
-          for i in tqdm(range(28)):
-            for j in range(28):
-              probs = pcnn(Variable(synthetic, volatile=True))[0]
-              probs = torch.nn.functional.softmax(probs[:, :, i, j]).data
-              synthetic[:, :, i, j] = torch.multinomial(probs, 1).float() / 255.
+            synthetic = synthetic.cpu().numpy()
+            synthetic = np.moveaxis(synthetic, 1, -1)
+            synthetic = np.reshape(synthetic, (4 * 28, 4 * 28))
+            plt.clf()
+            plt.imshow(synthetic)
+            plt.savefig(os.path.join(directory, 'generation', '{}.svg'.format(e)), format='svg', bbox_inches='tight')
 
-          synthetic = synthetic.cpu().numpy()
-          synthetic = np.moveaxis(synthetic, 1, -1)
-          synthetic = np.reshape(synthetic, (4 * 28, 4 * 28))
-
-          plt.clf()
-          plt.imshow(synthetic)
-          plt.savefig(os.path.join(directory, 'generation', '{}.svg'.format(e)), format='svg', bbox_inches='tight')
+        if p == 'train':
+            logits = logits.permute(1, -1)
+            probs = torch.nn.functional.softmax(logits, dim=3)
+            argmax = torch.max(probs, 3)
+            argmax = argmax.data.cpu().numpy()
+            argmax = np.reshape(argmax, (batch_size, 28, 28))[0:4]
+            argmax = np.reshape(argmax, (2 * 28, 2 * 28))
+            plt.clf()
+            plt.imshow(argmax)
+            plt.savefig(os.path.join(directory, 'reconstruction_train', '{}.svg'.format(e)), format='svg', bbox_inches='tight')
 
 def main(args):
     """
