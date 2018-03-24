@@ -40,9 +40,6 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
                 optimizer.zero_grad()
                 img = Variable(sample[0], volatile=(p == 'test')).cuda()
                 lbl = Variable(img.data[:, 0] * 255, volatile=(p == 'test')).long().cuda()
-                print(lbl.shape)
-                lbl = Variable(sample[0] * 255, volatile=(p == 'test')).long().cuda()
-                print(lbl.shape)
 
                 logits = pcnn(img)[0]
 
@@ -76,18 +73,11 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
                 probs = torch.nn.functional.softmax(logits, dim=3)
                 argmax = torch.max(probs, 3)[1]
                 argmax = argmax.data.cpu().numpy()
-                argmax = np.reshape(argmax, (batch_size, 28, 28))[0]
-                argmax = np.reshape(argmax, (28, 28))
+                argmax = np.reshape(argmax, (batch_size, 28, 28))[0:4]
+                argmax = np.reshape(argmax, (2 * 28, 2 * 28))
                 plt.clf()
                 plt.imshow(argmax)
                 plt.savefig(os.path.join(directory, 'reconstruction_train', '{}.svg'.format(e)), format='svg', bbox_inches='tight')
-
-                if e == 0:
-                    img = img.data.cpu().numpy()[0]
-                    img = np.reshape(img, (28, 28))
-                    plt.clf()
-                    plt.imshow(img)
-                    plt.savefig(os.path.join(directory, 'gt.svg'.format(e)), format='svg', bbox_inches='tight')
 
 def main(args):
     """
