@@ -74,6 +74,7 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
                 argmax = torch.max(probs, 3)[1]
                 argmax = argmax.data.cpu().numpy()
                 argmax = np.reshape(argmax, (batch_size, 28, 28))[0:4]
+                argmax = np.moveaxis(argmax, 0, -1)
                 argmax = np.reshape(argmax, (2 * 28, 2 * 28))
                 plt.clf()
                 plt.imshow(argmax)
