@@ -24,7 +24,7 @@ class MaskedConvolution(torch.nn.Conv2d):
         self.weight.data *= self.mask
         x = super(MaskedConvolution, self).forward(x)
 
-    return x
+        return x
 
 class ResidualBlock(torch.nn.Module):
     def __init__(self, h):
