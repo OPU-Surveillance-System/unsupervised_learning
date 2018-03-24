@@ -26,6 +26,7 @@ class VideoDataset(Dataset):
         self.labels = [int(c.split('\t')[1]) for c in content]
         self.mode = mode
         self.size = (int(s) for s in size.split(','))
+        print(self.size)
 
     def __len__(self):
         """
