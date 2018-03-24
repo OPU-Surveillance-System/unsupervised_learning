@@ -76,16 +76,11 @@ class PixelCNN(torch.nn.Module):
         #         torch.nn.init.kaiming_normal(m.weight)
 
     def forward(self, x):
-        print(x.shape)
         x = self.first_layer(x)
-        print(x.shape)
         #x = self.bn(x)
         x = self.residual_blocks(x)
-        print(x.shape)
         x = self.top_layer(x)
-        print(x.shape)
         logits = self.evidence(x)
-        print(x.shape)
         output = torch.nn.functional.softmax(logits, dim=1)
 
         return logits, output
