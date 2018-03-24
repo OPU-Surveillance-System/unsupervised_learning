@@ -79,7 +79,7 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
             argmax = np.reshape(argmax, (2 * 28, 2 * 28))
             plt.clf()
             plt.imshow(argmax)
-            plt.savefig(os.path.join(directory, 'reconstruction_train', '{}.svg'.format(e)), format='svg', bbox_inches='tight')
+            plt.savefig(os.path.join(directory, 'reconstruction_{}'.format(p), '{}.svg'.format(e)), format='svg', bbox_inches='tight')
 
 def main(args):
     """
