@@ -39,7 +39,7 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
                     break
                 optimizer.zero_grad()
                 img = Variable(sample[0], volatile=(p == 'test')).cuda()
-                lbl = Variable(sample[0].data[:, 0] * 255, volatile=(p == 'test')).long().cuda()
+                lbl = Variable(img.data[:, 0] * 255, volatile=(p == 'test')).long().cuda()
 
                 logits = pcnn(img)[0]
 
