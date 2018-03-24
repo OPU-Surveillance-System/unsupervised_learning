@@ -39,11 +39,11 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
                     break
                 optimizer.zero_grad()
                 img = Variable(sample[0], volatile=(p == 'test')).cuda()
-                lbl = Variable(sample[0] * 255, volatile=(p == 'test')).long().cuda()
+                lbl = Variable(sample[:, 0] * 255, volatile=(p == 'test')).long().cuda()
 
                 logits = pcnn(img)[0]
 
-                loss = torch.nn.functional.cross_entropy(logits.view((-1, 256)), lbl.view((-1)))
+                loss = torch.nn.functional.cross_entropy(logits, lbl)
                 running_loss += loss.data[0]
                 if p == 'train':
                     loss.backward()
