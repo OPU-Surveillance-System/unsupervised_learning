@@ -32,7 +32,7 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
         for p in phase:
             pcnn.train(p == 'train')
 
-            dataloader = DataLoader(sets[p], batch_size=batch_size, shuffle=False, num_workers=4)
+            dataloader = DataLoader(sets[p], batch_size=batch_size, shuffle=True, num_workers=4)
 
             for i_batch, sample in enumerate(tqdm(dataloader)):
                 optimizer.zero_grad()
