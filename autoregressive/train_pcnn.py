@@ -74,7 +74,7 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
             nb_img = min(argmax.shape[0], 4)
             argmax = np.reshape(argmax, (-1, 28, 28))[0:nb_img]
 
-            argmax = np.reshape(argmax, (-1, 28, 28))
+            argmax = np.reshape(argmax, (1, nb_img, 28, 28))
             argmax = np.swapaxes(argmax, 1, 2)
             argmax = np.reshape(argmax, (28, nb_img * 28))
             plt.clf()
