@@ -38,10 +38,8 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, ims, directory)
                 optimizer.zero_grad()
                 img = Variable(sample['img'], volatile=(p == 'test')).float().cuda()
                 lbl = Variable(img.data[:, 0] * 255, volatile=(p == 'test')).long().cuda()
-                print('label', lbl.shape)
 
                 logits = pcnn(img)[0]
-                print('logits', logits.shape)
 
                 loss = torch.nn.functional.cross_entropy(logits, lbl)
                 running_loss += loss.data[0]
@@ -53,21 +51,21 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, ims, directory)
             writer.add_scalar('learning_curve/{}'.format(p), epoch_loss, e)
             print('Epoch {} ({}): loss = {}'.format(e, p, epoch_loss))
 
-            if p == 'test':
-                synthetic = torch.zeros(16, 1, ims[0], ims[1]).cuda()
-                for i in tqdm(range(ims[0])):
-                    for j in range(ims[1]):
-                        probs = pcnn(Variable(synthetic, volatile=True))[0]
-                        probs = torch.nn.functional.softmax(probs[:, :, i, j]).data
-                        synthetic[:, :, i, j] = torch.multinomial(probs, 1).float() / 255.
-
-                synthetic = synthetic.cpu().numpy()
-                synthetic = np.reshape(synthetic, (4, 4, ims[0], ims[1]))
-                synthetic = np.swapaxes(synthetic, 1, 2)
-                synthetic = np.reshape(synthetic, (ims[0] * 4, ims[1] * 4))
-                plt.clf()
-                plt.imshow(synthetic)
-                plt.savefig(os.path.join(directory, 'generation', '{}.svg'.format(e)), format='svg', bbox_inches='tight')
+            # if p == 'test':
+            #     synthetic = torch.zeros(16, 1, ims[0], ims[1]).cuda()
+            #     for i in tqdm(range(ims[0])):
+            #         for j in range(ims[1]):
+            #             probs = pcnn(Variable(synthetic, volatile=True))[0]
+            #             probs = torch.nn.functional.softmax(probs[:, :, i, j]).data
+            #             synthetic[:, :, i, j] = torch.multinomial(probs, 1).float() / 255.
+            #
+            #     synthetic = synthetic.cpu().numpy()
+            #     synthetic = np.reshape(synthetic, (4, 4, ims[0], ims[1]))
+            #     synthetic = np.swapaxes(synthetic, 1, 2)
+            #     synthetic = np.reshape(synthetic, (ims[0] * 4, ims[1] * 4))
+            #     plt.clf()
+            #     plt.imshow(synthetic)
+            #     plt.savefig(os.path.join(directory, 'generation', '{}.svg'.format(e)), format='svg', bbox_inches='tight')
 
             #Plot reconstructions
             logits = logits.permute(0, 2, 3, 1)
