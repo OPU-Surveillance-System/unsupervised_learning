@@ -114,8 +114,8 @@ def main(args):
     optimizer = torch.optim.Adam(pcnn.parameters(), args.learning_rate)
     ims = [int(s) for s in args.image_size.split(',')]
 
-    trainset = dataset.VideoDataset(args.trainset, args.root_dir, 'L')
-    testset = dataset.VideoDataset(args.testset, args.root_dir, 'L')
+    trainset = dataset.VideoDataset(args.trainset, args.root_dir, 'L', ims)
+    testset = dataset.VideoDataset(args.testset, args.root_dir, 'L', ims)
     # trainset = datasets.MNIST('data', train=True, download=True, transform=transforms.ToTensor())
     # testset = datasets.MNIST('data', train=False, download=True, transform=transforms.ToTensor())
 
