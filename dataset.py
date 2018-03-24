@@ -25,8 +25,7 @@ class VideoDataset(Dataset):
         self.frames = [os.path.join(self.root_dir, '{}'.format(c.split('\t')[0])) for c in content]
         self.labels = [int(c.split('\t')[1]) for c in content]
         self.mode = mode
-        self.size = (int(s) for s in size.split(','))
-        print(self.size)
+        self.size = [int(s) for s in size.split(',')]
 
     def __len__(self):
         """
