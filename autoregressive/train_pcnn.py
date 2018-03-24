@@ -32,7 +32,7 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
         for p in phase:
             pcnn.train(p == 'train')
 
-            dataloader = DataLoader(sets[p], batch_size=batch_size, shuffle=False, num_workers=4)
+            dataloader = DataLoader(sets[p], batch_size=batch_size, shuffle=True, num_workers=4)
 
             for i_batch, sample in enumerate(tqdm(dataloader)):
                 if i_batch > 0:
@@ -68,18 +68,18 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
             #     plt.imshow(synthetic)
             #     plt.savefig(os.path.join(directory, 'generation', '{}.svg'.format(e)), format='svg', bbox_inches='tight')
 
-            if p == 'train':
-                logits = logits.permute(0, 2, 3, 1)
-                probs = torch.nn.functional.softmax(logits, dim=3)
-                argmax = torch.max(probs, 3)[1]
-                argmax = argmax.data.cpu().numpy()
-                argmax = np.reshape(argmax, (batch_size, 28, 28))[0:4]
-                argmax = np.reshape(argmax, (2, 2, 28, 28))
-                argmax = np.swapaxes(argmax, 1, 2)
-                argmax = np.reshape(argmax, (2 * 28, 2 * 28))
-                plt.clf()
-                plt.imshow(argmax)
-                plt.savefig(os.path.join(directory, 'reconstruction_train', '{}.svg'.format(e)), format='svg', bbox_inches='tight')
+            #Plot reconstructions
+            logits = logits.permute(0, 2, 3, 1)
+            probs = torch.nn.functional.softmax(logits, dim=3)
+            argmax = torch.max(probs, 3)[1]
+            argmax = argmax.data.cpu().numpy()
+            argmax = np.reshape(argmax, (batch_size, 28, 28))[0:4]
+            argmax = np.reshape(argmax, (2, 2, 28, 28))
+            argmax = np.swapaxes(argmax, 1, 2)
+            argmax = np.reshape(argmax, (2 * 28, 2 * 28))
+            plt.clf()
+            plt.imshow(argmax)
+            plt.savefig(os.path.join(directory, 'reconstruction_train', '{}.svg'.format(e)), format='svg', bbox_inches='tight')
 
 def main(args):
     """
