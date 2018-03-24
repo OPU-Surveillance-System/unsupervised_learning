@@ -67,6 +67,8 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, ims, directory)
                 plt.imshow(synthetic)
                 plt.savefig(os.path.join(directory, 'generation', '{}.svg'.format(e)), format='svg', bbox_inches='tight')
 
+                torch.save(pcnn.state_dict(), os.path.join(directory, 'serial', 'model_{}'.format(e)))
+
             #Plot reconstructions
             logits = logits.permute(0, 2, 3, 1)
             probs = torch.nn.functional.softmax(logits, dim=3)
@@ -81,6 +83,9 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, ims, directory)
             plt.clf()
             plt.imshow(argmax)
             plt.savefig(os.path.join(directory, 'reconstruction_{}'.format(p), '{}.svg'.format(e)), format='svg', bbox_inches='tight')
+
+    writer.export_scalars_to_json(os.path.join(directory, 'logs', 'scalars.json'))
+    writer.close()
 
 def main(args):
     """
