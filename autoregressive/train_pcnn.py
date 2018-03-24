@@ -51,7 +51,7 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, ims, directory)
             writer.add_scalar('learning_curve/{}'.format(p), epoch_loss, e)
             print('Epoch {} ({}): loss = {}'.format(e, p, epoch_loss))
 
-            if p == 'test':
+            if p == 'test' and e % 10 == 0:
                 synthetic = torch.zeros(16, 1, ims[0], ims[1]).cuda()
                 for i in tqdm(range(ims[0])):
                     for j in range(ims[1]):
