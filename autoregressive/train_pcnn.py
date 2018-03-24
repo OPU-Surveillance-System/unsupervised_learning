@@ -36,7 +36,7 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, ims, directory)
 
             for i_batch, sample in enumerate(tqdm(dataloader)):
                 optimizer.zero_grad()
-                img = Variable(sample['img'], volatile=(p == 'test')).cuda()
+                img = Variable(sample['img'], volatile=(p == 'test')).float().cuda()
                 lbl = Variable(img.data[:, 0] * 255, volatile=(p == 'test')).long().cuda()
 
                 logits = pcnn(img)[0]
