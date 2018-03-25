@@ -34,7 +34,7 @@ def test(pcnn, testset, batch_size, directory):
         lbl = Variable(img.data[:, 0] * 255, volatile=True).long().cuda()
         lbl = torch.unsqueeze(lbl, 1)
         output = pcnn(img)[1]
-        onehot_lbl = torch.FloatTensor(batch_size, 256, 64, 64).zero_().cuda()
+        onehot_lbl = torch.FloatTensor(img.size(0), 256, 64, 64).zero_().cuda()
         onehot_lbl = Variable(onehot_lbl.scatter_(1, lbl.data, 1))
         merge = output * onehot_lbl
         merge = torch.sum(merge, 1)
