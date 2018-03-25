@@ -43,8 +43,9 @@ def test(pcnn, testset, batch_size, directory):
         merge = output * onehot_lbl
         print('merge', merge.shape)
         merge = torch.sum(merge, 1)
+        merge = torch.unsqueeze(merge, 1)
         print('sum', merge.shape)
-        prob = torch.prod(merge)
+        prob = torch.prod(merge, 1)
         print('prod', prob.shape, prob)
     #     e = utils.metrics.per_image_error(dist, logits.contiguous(), inputs.contiguous())
     #     e = e.cpu().data.numpy().tolist()
