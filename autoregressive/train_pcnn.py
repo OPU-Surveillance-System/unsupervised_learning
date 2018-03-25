@@ -52,7 +52,7 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, ims, directory)
                     probs = torch.nn.functional.softmax(logits, dim=3)
                     argmax = torch.max(probs, 3)[1]
                     print(argmax.shape, lbl.shape)
-                    tmp = utils.metrics.per_image_error(dist, argmax, lbl)
+                    tmp = utils.metrics.per_image_error(dist, argmax.float(), lbl.float())
                     errors += tmp.data.cpu().numpy().tolist()
                     labels += sample['lbl'].numpy().tolist()
             if p == 'test':
