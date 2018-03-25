@@ -34,8 +34,8 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, ims, directory)
             pcnn.train(p == 'train')
 
             dataloader = DataLoader(sets[p], batch_size=batch_size, shuffle=True, num_workers=4)
-            error = []
-            
+            errors = []
+
             for i_batch, sample in enumerate(tqdm(dataloader)):
                 optimizer.zero_grad()
                 img = Variable(sample['img'], volatile=(p == 'test')).float().cuda()
