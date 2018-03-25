@@ -50,8 +50,8 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, ims, directory)
                     loss.backward()
                     optimizer.step()
                 if p == 'test':
-                    logits = logits.permute(0, 2, 3, 1)
-                    probs = torch.nn.functional.softmax(logits, dim=3)
+                    permuted = logits.permute(0, 2, 3, 1)
+                    probs = torch.nn.functional.softmax(permuted, dim=3)
                     argmax = torch.max(probs, 3)[1]
                     tmp = utils.metrics.per_image_error(dist, argmax.float(), lbl.float())
                     errors += tmp.data.cpu().numpy().tolist()
