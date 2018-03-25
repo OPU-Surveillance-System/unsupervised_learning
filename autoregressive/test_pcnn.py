@@ -33,11 +33,12 @@ def test(pcnn, testset, batch_size, directory):
     for i_batch, sample in enumerate(tqdm(dataloader)):
         img = Variable(sample['img'], volatile=True).float().cuda()
         lbl = Variable(img.data[:, 0] * 255, volatile=True).long().cuda()
-        lbl = lbl.view(-1, 1, 64, 64)
+        lbl = torch.unsqueeze(lbl, 3)
         print('lbl', lbl.shape)
         output = pcnn(img)[1]
         print('output', output.shape)
-        onehot_lbl = lbl.scatter_(1, lbl, 1)
+        onehot_lbl = torch.FloatTensor(batch_size, 64, 64, 256).zero_()
+        onehot_lbl = lbl.scatter_(3, lbl, 1)
         print('onehot', onehot_lbl.shape)
         merge = output * onehot_lbl
         print('merge', merge.shape)
