@@ -38,7 +38,7 @@ def test(pcnn, testset, batch_size, directory):
         onehot_lbl = Variable(onehot_lbl.scatter_(1, lbl.data, 1))
         merge = output * onehot_lbl
         merge = torch.sum(merge, 1)
-        merge = merge.view(batch_size, -1)
+        merge = merge.view(img.size(0), -1)
         merge = torch.log(merge)
         prob = torch.sum(merge, 1)
         answer += prob.data.cpu().numpy().tolist()
