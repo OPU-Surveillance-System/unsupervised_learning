@@ -34,7 +34,8 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, ims, directory)
             pcnn.train(p == 'train')
 
             dataloader = DataLoader(sets[p], batch_size=batch_size, shuffle=True, num_workers=4)
-
+            error = []
+            
             for i_batch, sample in enumerate(tqdm(dataloader)):
                 optimizer.zero_grad()
                 img = Variable(sample['img'], volatile=(p == 'test')).float().cuda()
@@ -51,7 +52,6 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, ims, directory)
                     logits = logits.permute(0, 2, 3, 1)
                     probs = torch.nn.functional.softmax(logits, dim=3)
                     argmax = torch.max(probs, 3)[1]
-                    print(argmax.shape, lbl.shape)
                     tmp = utils.metrics.per_image_error(dist, argmax.float(), lbl.float())
                     errors += tmp.data.cpu().numpy().tolist()
                     labels += sample['lbl'].numpy().tolist()
