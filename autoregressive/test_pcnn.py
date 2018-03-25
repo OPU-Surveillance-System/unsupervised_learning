@@ -45,7 +45,7 @@ def test(pcnn, testset, batch_size, directory):
         merge = torch.sum(merge, 1)
         print('sum', merge.shape)
         prob = torch.prod(merge)
-        print('prod', prod.shape, prod)
+        print('prod', prob.shape, prod)
     #     e = utils.metrics.per_image_error(dist, logits.contiguous(), inputs.contiguous())
     #     e = e.cpu().data.numpy().tolist()
     #     answer += e
