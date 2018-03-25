@@ -33,6 +33,7 @@ def test(pcnn, testset, batch_size, directory):
     for i_batch, sample in enumerate(tqdm(dataloader)):
         img = Variable(sample['img'], volatile=True).float().cuda()
         lbl = Variable(img.data[:, 0] * 255, volatile=True).long().cuda()
+        lbl = lbl.view(-1, 1, 64, 64)
         print('lbl', lbl.shape)
         output = pcnn(img)[1]
         print('output', output.shape)
