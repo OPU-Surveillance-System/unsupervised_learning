@@ -48,6 +48,7 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, ims, directory)
                     loss.backward()
                     optimizer.step()
                 if p == 'test':
+                    logits = logits.permute(0, 2, 3, 1)
                     probs = torch.nn.functional.softmax(logits, dim=3)
                     argmax = torch.max(probs, 3)[1]
                     print(argmax.shape, lbl.shape)
