@@ -43,7 +43,7 @@ def test(pcnn, testset, batch_size, directory):
         merge = output * onehot_lbl
         print('merge', merge.shape)
         merge = torch.sum(merge, 1)
-        merge = torch.view(batch_size, -1)
+        merge = merge.view(batch_size, -1)
         print(merge[0][0])
         print('sum', merge.shape)
         prob = torch.prod(merge, 1)
