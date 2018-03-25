@@ -43,7 +43,9 @@ def test(pcnn, testset, batch_size, directory):
         prob = torch.sum(merge, 1)
         answer += prob.data.cpu().numpy().tolist()
         groundtruth += sample['lbl'].numpy().tolist()
-    print(max(answer), min(answer))
+    for i in range(len(answer)):
+        if answer[i] == -float('inf'):
+            answer[i] == -20000
     fpr, tpr, thresholds = metrics.roc_curve(groundtruth, answer)
     auc = metrics.auc(fpr, tpr)
     print('AUC:', auc)
