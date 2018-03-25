@@ -37,8 +37,8 @@ def test(pcnn, testset, batch_size, directory):
         print('lbl', lbl.shape)
         output = pcnn(img)[1]
         print('output', output.shape)
-        onehot_lbl = torch.FloatTensor(batch_size, 64, 64, 256).zero_()
-        onehot_lbl = lbl.scatter_(3, lbl, 1)
+        onehot_lbl = torch.FloatTensor(batch_size, 256, 64, 64).zero_()
+        onehot_lbl = lbl.scatter_(1, lbl.data, 1)
         print('onehot', onehot_lbl.shape)
         merge = output * onehot_lbl
         print('merge', merge.shape)
