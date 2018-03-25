@@ -90,14 +90,22 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, ims, directory)
             probs = torch.nn.functional.softmax(logits, dim=3)
             argmax = torch.max(probs, 3)[1]
             argmax = argmax.data.cpu().numpy()
+            lbl = lbl.data.cpu().numpy()
             nb_img = min(argmax.shape[0], 4)
+            lbl = np.reshape(lbl, (-1, ims[0], ims[1]))[0:nb_img]
             argmax = np.reshape(argmax, (-1, ims[0], ims[1]))[0:nb_img]
 
+            plt.clf()
             argmax = np.reshape(argmax, (1, nb_img, ims[0], ims[1]))
             argmax = np.swapaxes(argmax, 1, 2)
             argmax = np.reshape(argmax, (ims[0], nb_img * ims[1]))
-            plt.clf()
-            plt.imshow(argmax)
+            ax = plt.subplot2grid((2, 1), (0, 0), rowspan=1, colspan=1)
+            ax.imshow(argmax)
+            lbl = np.reshape(lbl, (1, nb_img, ims[0], ims[1]))
+            lbl = np.swapaxes(lbl, 1, 2)
+            lbl = np.reshape(lbl, (ims[0], nb_img * ims[1]))
+            ax = plt.subplot2grid((2, 1), (1, 0), rowspan=1, colspan=1)
+            ax.imshow(lbl)
             plt.savefig(os.path.join(directory, 'reconstruction_{}'.format(p), '{}.svg'.format(e)), format='svg', bbox_inches='tight')
 
     writer.export_scalars_to_json(os.path.join(directory, 'logs', 'scalars.json'))
