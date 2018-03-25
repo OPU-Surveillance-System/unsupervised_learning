@@ -23,6 +23,7 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, ims, directory)
 
     phase = ('train', 'test')
     sets = {'train':trainset, 'test':testset}
+    dist = torch.nn.PairwiseDistance(p=2, eps=1e-06)
 
     writer = SummaryWriter(os.path.join(directory, 'logs'))
 
@@ -46,10 +47,22 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, ims, directory)
                 if p == 'train':
                     loss.backward()
                     optimizer.step()
+                if p == 'test':
+                    probs = torch.nn.functional.softmax(logits, dim=3)
+                    argmax = torch.max(probs, 3)[1]
+                    tmp = utils.metrics.per_image_error(dist, argmax, lbl)
+                    errors += tmp.data.cpu().numpy().tolist()
+                    labels += sample['lbl'].numpy().tolist()
+            if p == 'test':
+                fpr, tpr, thresholds = metrics.roc_curve(labels, errors)
+                auc = metrics.auc(fpr, tpr)
+                writer.add_scalar('ditance_auc', auc, e)
+            else:
+                auc = 0
 
             epoch_loss = running_loss / (i_batch + 1)
             writer.add_scalar('learning_curve/{}'.format(p), epoch_loss, e)
-            print('Epoch {} ({}): loss = {}'.format(e, p, epoch_loss))
+            print('Epoch {} ({}): loss = {}, distance AUC = {}'.format(e, p, epoch_loss, auc))
 
             if p == 'test' and e % 10 == 0:
                 synthetic = torch.zeros(16, 1, ims[0], ims[1]).cuda()
