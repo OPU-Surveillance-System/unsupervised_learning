@@ -50,6 +50,7 @@ def test(pcnn, testset, batch_size, directory):
         print('prob data', prob)
         print('prod', prob.shape)
         exp = torch.exp(prob)
+        print('exp', exp)
     #     e = utils.metrics.per_image_error(dist, logits.contiguous(), inputs.contiguous())
     #     e = e.cpu().data.numpy().tolist()
     #     answer += e
