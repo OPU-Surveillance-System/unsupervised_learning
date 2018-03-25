@@ -23,7 +23,6 @@ def test(pcnn, testset, batch_size, directory):
         directory (str): Directory to save results
     """
 
-    errors = {'normal':[], 'abnormal':[]}
     answer = []
     groundtruth = []
     dataloader = DataLoader(testset, batch_size=batch_size, shuffle=False, num_workers=4)
@@ -34,56 +33,19 @@ def test(pcnn, testset, batch_size, directory):
         img = Variable(sample['img'], volatile=True).float().cuda()
         lbl = Variable(img.data[:, 0] * 255, volatile=True).long().cuda()
         lbl = torch.unsqueeze(lbl, 1)
-        print('lbl', lbl.shape)
         output = pcnn(img)[1]
-        print('output', output.shape)
         onehot_lbl = torch.FloatTensor(batch_size, 256, 64, 64).zero_().cuda()
         onehot_lbl = Variable(onehot_lbl.scatter_(1, lbl.data, 1))
-        print('onehot', onehot_lbl.shape)
         merge = output * onehot_lbl
-        print('merge', merge.shape)
         merge = torch.sum(merge, 1)
         merge = merge.view(batch_size, -1)
         merge = torch.log(merge)
-        print('sum', merge.shape)
         prob = torch.sum(merge, 1)
-        print('prob data', prob)
-        print('prod', prob.shape)
-        exp = torch.exp(prob)
-        print('exp', exp)
-    #     e = utils.metrics.per_image_error(dist, logits.contiguous(), inputs.contiguous())
-    #     e = e.cpu().data.numpy().tolist()
-    #     answer += e
-    #     groundtruth += sample['lbl'].cpu().numpy().tolist()
-    #     for i in range(len(sample['lbl'])):
-    #         if sample['lbl'][i] == 0:
-    #             errors['normal'].append(e[i])
-    #         else:
-    #             errors['abnormal'].append(e[i])
-    #
-    # #Get histograms of reconstruction error for normal and abnormal patterns
-    # normal_distribution = np.array(errors['normal'])
-    # abnormal_distribution = np.array(errors['abnormal'])
-    # print("Normal: mean={}, var={}, std={}".format(normal_distribution.mean(), normal_distribution.var(), normal_distribution.std()))
-    # print("Anomaly: mean={}, var={}, std={}".format(abnormal_distribution.mean(), abnormal_distribution.var(), abnormal_distribution.std()))
-    # hist_n, _ = np.histogram(normal_distribution, bins=50, range=[normal_distribution.min(), abnormal_distribution.max()])
-    # hist_a, _ = np.histogram(abnormal_distribution, bins=50, range=[normal_distribution.min(), abnormal_distribution.max()])
-    # minima = np.minimum(hist_n, hist_a)
-    # intersection = np.true_divide(np.sum(minima), np.sum(hist_a))
-    # utils.plot.plot_reconstruction_hist(normal_distribution, abnormal_distribution, os.path.join(directory, 'plots', 'reconstruction_hist.svg'))
-    # print('Intersection: {}'.format(intersection))
-    #
-    # #Compute AUC
-    # fpr, tpr, thresholds = metrics.roc_curve(groundtruth, answer)
-    # auc = metrics.auc(fpr, tpr)
-    # utils.plot.plot_auc(fpr, tpr, auc, os.path.join(directory, 'plots', 'auc.svg'))
-    # print('AUC: {}'.format(auc))
-    #
-    # with open(os.path.join(directory, 'results'), 'w') as f:
-    #     f.write('Normal: mean={}, var={}, std={}\n'.format(normal_distribution.mean(), normal_distribution.var(), normal_distribution.std()))
-    #     f.write('Abnormal: mean={}, var={}, std={}\n'.format(abnormal_distribution.mean(), abnormal_distribution.var(), abnormal_distribution.std()))
-    #     f.write('Intersection: {}\n'.format(intersection))
-    #     f.write('AUC: {}\n'.format(auc))
+        answer += prob.data.cpu().numpy().tolist()
+        groundtruth += sample['lbl'].numpy().tolist()
+    fpr, tpr, thresholds = metrics.roc_curve(groundtruth, answer)
+    auc = metrics.auc(fpr, tpr)
+    print('AUC:', auc)
 
     return 0
 
