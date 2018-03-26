@@ -171,3 +171,16 @@ def plot_abnormal_score_vs_label(abnormal_score, label, name):
         plt.savefig(name, format='svg', bbox_inches='tight')
     else:
         plt.show()
+
+def plot_distribution(distribution, name):
+    """
+    """
+
+    plt.clf()
+    x = list(range(256))
+    plt.plot(x, distribution)
+
+    if name != None:
+        plt.savefig(name, format='svg', bbox_inches='tight')
+    else:
+        plt.show()    
