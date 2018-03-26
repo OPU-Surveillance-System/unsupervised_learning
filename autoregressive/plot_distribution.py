@@ -36,9 +36,9 @@ def test(pcnn, testset, batch_size, directory):
         output = pcnn(img)[1]
         output = output.permute(0, 2, 3, 1)
         output = output.data.cpu().numpy()
-        img_idx = random.randint(0, img.size(0))
-        row_idx = random.randint(0, img.size(2))
-        col_idx = random.randint(0, img.size(3))
+        img_idx = random.randint(0, img.size(0) - 1)
+        row_idx = random.randint(0, img.size(2) - 1)
+        col_idx = random.randint(0, img.size(3) - 1)
         utils.plot.plot_distribution(output[img_idx][row_idx][col_idx], os.path.join(directory, plots, '{}_{}_{}.svg'.format(sample['name'][img_idx], row_idx, col_idx)))
 
     return 0
