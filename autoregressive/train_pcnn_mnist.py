@@ -127,9 +127,6 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
     #Training arguments
-    parser.add_argument('--trs', dest='trainset', type=str, default='data/umn_normal_trainset', help='Path to the trainset summary')
-    parser.add_argument('--tes', dest='testset', type=str, default='data/umn_testset', help='Path to the testset summary')
-    parser.add_argument('--rd', dest='root_dir', type=str, default='/datasets/umn64', help='Path to the images')
     parser.add_argument('--bs', dest='batch_size', type=int, default=16, help='Mini batch size')
     parser.add_argument('--lr', dest='learning_rate', type=float, default=0.001, help='Learning rate')
     parser.add_argument('--ep', dest='epoch', type=int, default=100, help='Number of training epochs')
