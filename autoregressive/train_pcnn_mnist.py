@@ -12,12 +12,12 @@ from tensorboardX import SummaryWriter
 import matplotlib.pyplot as plt
 
 import dataset
-import autoregressive.pixelcnn
+import autoregressive.pixelcnn_mnist
 import utils.metrics
 import utils.plot
 import utils.process
 
-def train(pcnn, optimizer, trainset, testset, epoch, batch_size, ims, directory):
+def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
     """
     """
 
@@ -51,21 +51,23 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, ims, directory)
             writer.add_scalar('learning_curve/{}'.format(p), epoch_loss, e)
             print('Epoch {} ({}): loss = {}'.format(e, p, epoch_loss))
 
-            if p == 'test':
-                synthetic = torch.zeros(16, 1, ims[0], ims[1]).cuda()
-                for i in tqdm(range(ims[0])):
-                    for j in range(ims[1]):
+            if p == 'test' and e % 10 == 0:
+                synthetic = torch.zeros(16, 1, 28, 28).cuda()
+                for i in tqdm(range(28)):
+                    for j in range(28):
                         probs = pcnn(Variable(synthetic, volatile=True))[0]
                         probs = torch.nn.functional.softmax(probs[:, :, i, j]).data
                         synthetic[:, :, i, j] = torch.multinomial(probs, 1).float() / 255.
 
                 synthetic = synthetic.cpu().numpy()
-                synthetic = np.reshape(synthetic, (4, 4, ims[0], ims[1]))
+                synthetic = np.reshape(synthetic, (4, 4, 28, 28))
                 synthetic = np.swapaxes(synthetic, 1, 2)
-                synthetic = np.reshape(synthetic, (ims[0] * 4, ims[1] * 4))
+                synthetic = np.reshape(synthetic, (28 * 4, 28 * 4))
                 plt.clf()
                 plt.imshow(synthetic)
                 plt.savefig(os.path.join(directory, 'generation', '{}.svg'.format(e)), format='svg', bbox_inches='tight')
+
+                torch.save(pcnn.state_dict(), os.path.join(directory, 'serial', 'model_{}'.format(e)))
 
             #Plot reconstructions
             logits = logits.permute(0, 2, 3, 1)
@@ -73,11 +75,11 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, ims, directory)
             argmax = torch.max(probs, 3)[1]
             argmax = argmax.data.cpu().numpy()
             nb_img = min(argmax.shape[0], 4)
-            argmax = np.reshape(argmax, (-1, ims[0], ims[1]))[0:nb_img]
+            argmax = np.reshape(argmax, (-1, 28, 28))[0:nb_img]
 
-            argmax = np.reshape(argmax, (1, nb_img, ims[0], ims[1]))
+            argmax = np.reshape(argmax, (1, nb_img, 28, 28))
             argmax = np.swapaxes(argmax, 1, 2)
-            argmax = np.reshape(argmax, (ims[0], nb_img * ims[1]))
+            argmax = np.reshape(argmax, (28, nb_img * 28))
             plt.clf()
             plt.imshow(argmax)
             plt.savefig(os.path.join(directory, 'reconstruction_{}'.format(p), '{}.svg'.format(e)), format='svg', bbox_inches='tight')
@@ -108,19 +110,16 @@ def main(args):
             f.write('{}:{}\n'.format(k, d[k]))
 
     #Variables
-    pcnn = autoregressive.pixelcnn.PixelCNN(args.f, args.n, args.d)
+    pcnn = autoregressive.pixelcnn_mnist.PixelCNN(args.f, args.n, args.d)
     pcnn = pcnn.cuda()
     print(pcnn)
     optimizer = torch.optim.Adam(pcnn.parameters(), args.learning_rate)
-    ims = [int(s) for s in args.image_size.split(',')]
 
-    trainset = dataset.VideoDataset(args.trainset, args.root_dir, 'L', args.image_size)
-    testset = dataset.VideoDataset(args.testset, args.root_dir, 'L', args.image_size)
-    # trainset = datasets.MNIST('data', train=True, download=True, transform=transforms.ToTensor())
-    # testset = datasets.MNIST('data', train=False, download=True, transform=transforms.ToTensor())
+    trainset = datasets.MNIST('data', train=True, download=True, transform=transforms.ToTensor())
+    testset = datasets.MNIST('data', train=False, download=True, transform=transforms.ToTensor())
 
     #Train the model and save it
-    best_model = train(pcnn, optimizer, trainset, testset, args.epoch, args.batch_size, ims, args.directory)
+    best_model = train(pcnn, optimizer, trainset, testset, args.epoch, args.batch_size, args.directory)
     # torch.save(best_model.state_dict(), os.path.join(args.directory, 'serial', 'best_model'))
 
     return 0
@@ -135,7 +134,6 @@ if __name__ == '__main__':
     parser.add_argument('--lr', dest='learning_rate', type=float, default=0.001, help='Learning rate')
     parser.add_argument('--ep', dest='epoch', type=int, default=100, help='Number of training epochs')
     parser.add_argument('--dir', dest='directory', type=str, default='train_autoencoder', help='Directory to store results')
-    parser.add_argument('--ims', dest='image_size', type=str, default='64,64,1', help='Image size')
     #Model arguments
     parser.add_argument('-f', dest='f', type=int, default=128, help='Number of hidden features')
     parser.add_argument('-d', dest='d', type=int, default=32, help='Number of top layer features')

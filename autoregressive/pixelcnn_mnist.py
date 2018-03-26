@@ -15,10 +15,10 @@ class MaskedConvolution(torch.nn.Conv2d):
     self.mask[:, :, height // 2, width // 2 + (mask_type == 'B'):] = 0
     self.mask[:, :, height // 2 + 1:] = 0
 
-    # #Weights initialization
-    # for m in self.modules():
-    #     if isinstance(m, torch.nn.Conv2d):
-    #         torch.nn.init.kaiming_normal(m.weight)
+    #Weights initialization
+    for m in self.modules():
+        if isinstance(m, torch.nn.Conv2d):
+            torch.nn.init.kaiming_normal(m.weight)
 
   def forward(self, x):
     self.weight.data *= self.mask
@@ -35,19 +35,16 @@ class ResidualBlock(torch.nn.Module):
     layers = []
     layers.append(torch.nn.ReLU())
     layers.append(torch.nn.Conv2d(2 * self.h, self.h, (1, 1)))
-    #layers.append(torch.nn.BatchNorm2d(self.h))
     layers.append(torch.nn.ReLU())
     layers.append(MaskedConvolution(self.h, self.h, (3, 3), 'B', 1))
-    #layers.append(torch.nn.BatchNorm2d(self.h))
     layers.append(torch.nn.ReLU())
     layers.append(torch.nn.Conv2d(self.h, 2 * self.h, (1, 1)))
-    #layers.append(torch.nn.BatchNorm2d(2 * self.h))
     self.layers = torch.nn.Sequential(*layers)
 
-    # #Weights initialization
-    # for m in self.modules():
-    #     if isinstance(m, torch.nn.Conv2d):
-    #         torch.nn.init.kaiming_normal(m.weight)
+    #Weights initialization
+    for m in self.modules():
+        if isinstance(m, torch.nn.Conv2d):
+            torch.nn.init.kaiming_normal(m.weight)
 
   def forward(self, x):
     y = self.layers(x)
@@ -64,20 +61,17 @@ class PixelCNN(torch.nn.Module):
     self.d = d
 
     self.first_layer = MaskedConvolution(1, 2 * self.h, (7, 7), 'A', 3)
-    #self.bn = torch.nn.BatchNorm2d(2 * self.h)
     self.residual_blocks = torch.nn.Sequential(*[ResidualBlock(self.h) for n in range(self.n + 1)])
-    #self.top_layer = torch.nn.Sequential(*[torch.nn.ReLU(), torch.nn.Conv2d(2 * self.h, self.d, (1, 1)), torch.nn.BatchNorm2d(self.d), torch.nn.ReLU()])
     self.top_layer = torch.nn.Sequential(*[torch.nn.ReLU(), torch.nn.Conv2d(2 * self.h, self.d, (1, 1)), torch.nn.ReLU()])
     self.evidence = torch.nn.Conv2d(self.d, 256, (1, 1))
 
-    # #Weights initialization
-    # for m in self.modules():
-    #     if isinstance(m, torch.nn.Conv2d):
-    #         torch.nn.init.kaiming_normal(m.weight)
+    #Weights initialization
+    for m in self.modules():
+        if isinstance(m, torch.nn.Conv2d):
+            torch.nn.init.kaiming_normal(m.weight)
 
   def forward(self, x):
     x = self.first_layer(x)
-    #x = self.bn(x)
     x = self.residual_blocks(x)
     x = self.top_layer(x)
     logits = self.evidence(x)
