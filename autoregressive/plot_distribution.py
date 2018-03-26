@@ -39,7 +39,7 @@ def test(pcnn, testset, batch_size, directory):
         img_idx = random.randint(0, img.size(0))
         row_idx = random.randint(0, img.size(2))
         col_idx = random.randint(0, img.size(3))
-        utils.plot_distribution(output[img_idx][row_idx][col_idx], os.path.join(directory, plots, '{}_{}_{}.svg'.format(sample['name'][img_idx], row_idx, col_idx)))
+        utils.plot.plot_distribution(output[img_idx][row_idx][col_idx], os.path.join(directory, plots, '{}_{}_{}.svg'.format(sample['name'][img_idx], row_idx, col_idx)))
 
     return 0
 
