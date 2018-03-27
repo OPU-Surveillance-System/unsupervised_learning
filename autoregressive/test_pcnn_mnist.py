@@ -27,13 +27,13 @@ def test(pcnn, testset, batch_size, directory):
     torch.set_printoptions(threshold=5000)
     likelihood = []
     groundtruth = []
-    dataloader = DataLoader(testset, batch_size=batch_size, shuffle=False, num_workers=4)
+    dataloader = DataLoader(testset, batch_size=batch_size, shuffle=True, num_workers=4)
     dist = torch.nn.PairwiseDistance(p=2, eps=1e-06)
 
     #Process the testset
     for i_batch, sample in enumerate(tqdm(dataloader)):
-        # if i_batch > 0:
-        #     break
+        if i_batch > 50:
+            break
         img = Variable(sample[0], volatile=True).cuda()
         lbl = Variable(img.data[:, 0] * 255, volatile=True).long().cuda()
         lbl = torch.unsqueeze(lbl, 1)
