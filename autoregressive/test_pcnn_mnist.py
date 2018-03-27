@@ -52,7 +52,7 @@ def test(pcnn, testset, batch_size, directory):
                 probs = torch.sum(probs, 1)
                 likelihood.append(probs.data.cpu().numpy().tolist())
         likelihood = np.array(likelihood)
-        print(numpy.isnan(likelihood).any())
+        print(np.isnan(likelihood).any())
         likelihood = np.sum(likelihood, 0)
         print(likelihood)
         print(likelihood.shape)
