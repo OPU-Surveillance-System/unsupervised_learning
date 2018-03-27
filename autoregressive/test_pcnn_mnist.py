@@ -32,7 +32,7 @@ def test(pcnn, testset, batch_size, directory):
 
     #Process the testset
     for i_batch, sample in enumerate(tqdm(dataloader)):
-        if i_batch > 50:
+        if i_batch > 25:
             break
         img = Variable(sample[0], volatile=True).cuda()
         lbl = Variable(img.data[:, 0] * 255, volatile=True).long().cuda()
@@ -57,7 +57,7 @@ def test(pcnn, testset, batch_size, directory):
         likelihood += tmp.tolist()
 
     alphabet_dir = '/home/scom/data/alphabet_mnist'
-    alphabetset = dataset.VideoDataset('data/alphabet_mnist', alphabet_dir, 'L', args.image_size)
+    alphabetset = dataset.VideoDataset('data/alphabet_mnist', alphabet_dir, 'L', '28,28,1')
     dataloader = DataLoader(alphabetset, batch_size=batch_size, shuffle=True, num_workers=4)
     #Process the testset
     for i_batch, sample in enumerate(tqdm(dataloader)):
