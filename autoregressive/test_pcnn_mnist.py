@@ -38,15 +38,19 @@ def test(pcnn, testset, batch_size, directory):
         lbl = Variable(img.data[:, 0] * 255, volatile=True).long().cuda()
 
         masked = Variable(torch.zeros(img.size(0), 1, 28, 28).cuda())
+        likelihood = []
         for i in tqdm(range(28)):
             for j in range(28):
                 masked[:, :, 0:i+1, 0:j+1] = img[:, :, 0:i+1, 0:j+1]
                 probs = pcnn(masked)[0]
                 probs = torch.nn.functional.softmax(probs[:, :, i, j])
-                probs = probs.data.cpu().numpy()
-                plt.clf()
-                plt.plot(list(range(256)), probs[0])
-                plt.savefig(os.path.join(directory, 'plots', 'proba_{}_{}.svg'.format(i, j)), format='svg', bbox_inches='tight')
+                probs = torch.log(probs)
+                likelihood += probs.data.cpu().numpy().tolist()
+                print(likelihood)
+                # probs = probs.data.cpu().numpy()
+                # plt.clf()
+                # plt.plot(list(range(256)), probs[0])
+                # plt.savefig(os.path.join(directory, 'plots', 'proba_{}_{}.svg'.format(i, j)), format='svg', bbox_inches='tight')
                 # masked2 = masked.data.cpu().numpy()
                 # plt.clf()
                 # plt.imshow(masked2[0].reshape((28, 28)))
