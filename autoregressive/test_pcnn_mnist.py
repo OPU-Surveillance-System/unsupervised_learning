@@ -110,7 +110,7 @@ def main(args):
     #Load the trained model
     pcnn.load_state_dict(torch.load(args.model))
 
-    testset = datasets.MNIST('data', train=False, download=True, transform=transforms.ToTensor())
+    testset = datasets.MNIST('data', train=True, download=True, transform=transforms.ToTensor())
 
     #Evaluate the model
     test(pcnn, testset, args.batch_size, args.directory)
