@@ -39,6 +39,7 @@ def test(pcnn, testset, batch_size, directory):
         for i in tqdm(range(28)):
             for j in range(28):
                 masked = torch.zeros(img.size(0), 1, 28, 28).cuda()
+                print(img.shape)
                 masked[:, :, 0:i, 0:j] = img[:, :, 0:i, 0:j]
                 masked = masked.cpu().numpy()
                 plt.clf()
