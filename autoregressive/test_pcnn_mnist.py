@@ -59,6 +59,7 @@ def test(pcnn, testset, batch_size, directory):
     alphabet_dir = '/home/scom/data/alphabet_mnist'
     alphabetset = dataset.VideoDataset('data/alphabet_mnist', alphabet_dir, 'L', '28,28,1')
     dataloader = DataLoader(alphabetset, batch_size=batch_size, shuffle=True, num_workers=4)
+    items = {}
     #Process the testset
     for i_batch, sample in enumerate(tqdm(dataloader)):
         img = Variable(sample['img'], volatile=True).float().cuda()
@@ -81,6 +82,8 @@ def test(pcnn, testset, batch_size, directory):
                 tmp.append(proba.data.cpu().numpy().tolist())
         tmp = np.array(tmp)
         tmp = np.sum(tmp, 0)
+        for n in range(img.size(0)):
+            items[sample['name'][n]] = proba[n]
         likelihood += tmp.tolist()
 
     fpr, tpr, thresholds = metrics.roc_curve(groundtruth, likelihood)
