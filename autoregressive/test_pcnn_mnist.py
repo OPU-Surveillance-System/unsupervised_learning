@@ -44,6 +44,7 @@ def test(pcnn, testset, batch_size, directory):
                 probs = pcnn(masked)[0]
                 probs = torch.nn.functional.softmax(probs[:, :, i, j])
                 probs = probs.data.cpu().numpy()
+                plt.clf()
                 plt.plot(list(range(256)), probs[0])
                 plt.savefig(os.path.join(directory, 'plots', 'proba_{}_{}.svg'.format(i, j)), format='svg', bbox_inches='tight')
                 # masked2 = masked.data.cpu().numpy()
