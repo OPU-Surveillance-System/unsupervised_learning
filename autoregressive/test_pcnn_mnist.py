@@ -95,7 +95,7 @@ def main(args):
     #Load the trained model
     pcnn.load_state_dict(torch.load(args.model))
 
-    testset = dataset.VideoDataset(args.testset, args.root_dir, 'L', args.image_size)
+    testset = datasets.MNIST('data', train=False, download=True, transform=transforms.ToTensor())
 
     #Evaluate the model
     test(pcnn, testset, args.batch_size, args.directory)
@@ -110,7 +110,6 @@ if __name__ == '__main__':
     parser.add_argument('--rd', dest='root_dir', type=str, default='/datasets', help='Path to the images')
     parser.add_argument('--bs', dest='batch_size', type=int, default=16, help='Mini batch size')
     parser.add_argument('--dir', dest='directory', type=str, default='train_autoencoder', help='Directory to store results')
-    parser.add_argument('--ims', dest='image_size', type=str, default='64,64,1', help='Image size')
     args = parser.parse_args()
 
     main(args)
