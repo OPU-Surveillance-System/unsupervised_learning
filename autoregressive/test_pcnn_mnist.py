@@ -51,7 +51,7 @@ def test(pcnn, testset, batch_size, directory):
                 probs = torch.nn.functional.softmax(probs[:, :, i, j], dim=1)
                 probs = probs * onehot_lbl[:, :, i, j]
                 probs = torch.sum(probs, 1)
-                proba = torch.log(probs)
+                proba = torch.log(probs) * -1
                 tmp.append(proba.data.cpu().numpy().tolist())
         tmp = np.array(tmp)
         tmp = np.sum(tmp, 0)
@@ -78,7 +78,7 @@ def test(pcnn, testset, batch_size, directory):
                 probs = torch.nn.functional.softmax(probs[:, :, i, j], dim=1)
                 probs = probs * onehot_lbl[:, :, i, j]
                 probs = torch.sum(probs, 1)
-                proba = torch.log(probs)
+                proba = torch.log(probs) * -1
                 tmp.append(proba.data.cpu().numpy().tolist())
         tmp = np.array(tmp)
         tmp = np.sum(tmp, 0)
