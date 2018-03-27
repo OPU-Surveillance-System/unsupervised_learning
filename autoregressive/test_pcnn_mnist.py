@@ -33,8 +33,8 @@ def test(pcnn, testset, batch_size, directory):
     for i_batch, sample in enumerate(tqdm(dataloader)):
         if i_batch > 0:
             break
-        img = Variable(sample['img'], volatile=True).float().cuda()
-        lbl = Variable(img.data[:, 0] * 255, volatile=True).long().cuda()
+        img = Variable(sample[0], volatile=(p == 'test')).cuda()
+        lbl = Variable(img.data[:, 0] * 255, volatile=(p == 'test')).long().cuda()
 
         for i in tqdm(range(28)):
             for j in range(28):
