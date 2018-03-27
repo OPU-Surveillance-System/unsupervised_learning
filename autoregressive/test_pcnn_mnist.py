@@ -2,6 +2,7 @@ import argparse
 import os
 import torch
 import numpy as np
+import matplotlib.pyplot as plt
 from torchvision import datasets, transforms, utils
 from torch.utils.data import DataLoader
 from torch.autograd import Variable
@@ -30,7 +31,7 @@ def test(pcnn, testset, batch_size, directory):
     dist = torch.nn.PairwiseDistance(p=2, eps=1e-06)
 
     #Process the testset
-    for i_batch, sample in enumerate(tqdm(dataloader)):
+    for i_batch, sample in enumerate(dataloader):
         if i_batch > 0:
             break
         img = Variable(sample[0], volatile=True).cuda()
