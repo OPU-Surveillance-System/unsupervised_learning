@@ -50,11 +50,10 @@ def test(pcnn, testset, batch_size, directory):
                 probs = torch.log(probs)
                 probs = probs * onehot_lbl[:, :, i, j]
                 probs = torch.sum(probs, 1)
-                print(probs.shape)
                 likelihood.append(probs.data.cpu().numpy().tolist())
-                #print(likelihood)
         likelihood = np.array(likelihood)
         likelihood = np.sum(likelihood, 0)
+        print(likelihood)
         print(likelihood.shape)
                 # probs = probs.data.cpu().numpy()
                 # plt.clf()
