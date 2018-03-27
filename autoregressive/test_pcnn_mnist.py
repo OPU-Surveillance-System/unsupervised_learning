@@ -83,7 +83,7 @@ def test(pcnn, testset, batch_size, directory):
         tmp = np.array(tmp)
         tmp = np.sum(tmp, 0)
         for n in range(img.size(0)):
-            items[sample['name'][n]] = proba[n]
+            items[sample['name'][n]] = proba[n].data[0]
         likelihood += tmp.tolist()
 
     print(items)
