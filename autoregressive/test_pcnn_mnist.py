@@ -37,6 +37,7 @@ def test(pcnn, testset, batch_size, directory):
         img = Variable(sample[0], volatile=True).cuda()
         lbl = Variable(img.data[:, 0] * 255, volatile=True).long().cuda()
         lbl = torch.unsqueeze(lbl, 1)
+        groundtruth += [0 for g in range(img.size(0))]
         onehot_lbl = torch.FloatTensor(img.size(0), 256, 28, 28).zero_().cuda()
         onehot_lbl = Variable(onehot_lbl.scatter_(1, lbl.data, 1))
 
@@ -52,47 +53,39 @@ def test(pcnn, testset, batch_size, directory):
                 proba = torch.log(probs)
                 tmp.append(proba.data.cpu().numpy().tolist())
         tmp = np.array(tmp)
-        # tmp[np.isnan(tmp)]=np.nanmin(tmp)
         tmp = np.sum(tmp, 0)
         likelihood += tmp.tolist()
-    print(likelihood)
-                # probs = probs.data.cpu().numpy()
-                # plt.clf()
-                # plt.plot(list(range(256)), probs[0])
-                # plt.savefig(os.path.join(directory, 'plots', 'proba_{}_{}.svg'.format(i, j)), format='svg', bbox_inches='tight')
-                # masked2 = masked.data.cpu().numpy()
-                # plt.clf()
-                # plt.imshow(masked2[0].reshape((28, 28)))
-                # plt.savefig(os.path.join(directory, 'plots', '{}_{}.svg'.format(i, j)), format='svg', bbox_inches='tight')
-        #         probs = pcnn(Variable(synthetic, volatile=True))[0]
-        #         probs = torch.nn.functional.softmax(probs[:, :, i, j]).data
-        #         synthetic[:, :, i, j] = torch.multinomial(probs, 1).float() / 255.
-        #
-        # synthetic = synthetic.cpu().numpy()
-        # synthetic = np.reshape(synthetic, (4, 4, 28, 28))
-        # synthetic = np.swapaxes(synthetic, 1, 2)
-        # synthetic = np.reshape(synthetic, (28 * 4, 28 * 4))
-        # plt.clf()
-        # plt.imshow(synthetic)
-        # plt.savefig(os.path.join(directory, 'generation', '{}.svg'.format(e)), format='svg', bbox_inches='tight')
-        #
-        # torch.save(pcnn.state_dict(), os.path.join(directory, 'serial', 'model_{}'.format(e)))
-    #     lbl = torch.unsqueeze(lbl, 1)
-    #     output = pcnn(img)[1]
-    #     onehot_lbl = torch.FloatTensor(img.size(0), 256, 64, 64).zero_().cuda()
-    #     onehot_lbl = Variable(onehot_lbl.scatter_(1, lbl.data, 1))
-    #     merge = output * onehot_lbl
-    #     merge = torch.sum(merge, 1)
-    #     merge = merge.view(img.size(0), -1)
-    #     merge = torch.log(merge)
-    #     prob = torch.sum(merge, 1)
-    #     answer += prob.data.cpu().numpy().tolist()
-    #     groundtruth += sample['lbl'].numpy().tolist()
-    # answer = np.array(answer)
-    # answer[answer == -np.inf] = -20000
-    # fpr, tpr, thresholds = metrics.roc_curve(groundtruth, answer)
-    # auc = metrics.auc(fpr, tpr)
-    # print('AUC:', auc)
+
+    alphabet_dir = '/home/scom/data/alphabet_mnist'
+    alphabetset = dataset.VideoDataset('data/alphabet_mnist', alphabet_dir, 'L', args.image_size)
+    dataloader = DataLoader(alphabetset, batch_size=batch_size, shuffle=True, num_workers=4)
+    #Process the testset
+    for i_batch, sample in enumerate(tqdm(dataloader)):
+        img = Variable(sample['img'], volatile=True).float().cuda()
+        lbl = Variable(img.data[:, 0] * 255, volatile=True).long().cuda()
+        lbl = torch.unsqueeze(lbl, 1)
+        groundtruth += sample['lbl'].numpy().tolist()
+        onehot_lbl = torch.FloatTensor(img.size(0), 256, 28, 28).zero_().cuda()
+        onehot_lbl = Variable(onehot_lbl.scatter_(1, lbl.data, 1))
+
+        masked = Variable(torch.zeros(img.size(0), 1, 28, 28).cuda())
+        tmp = []
+        for i in range(28):
+            for j in range(28):
+                masked[:, :, 0:i+1, 0:j+1] = img[:, :, 0:i+1, 0:j+1]
+                probs = pcnn(masked)[0]
+                probs = torch.nn.functional.softmax(probs[:, :, i, j])
+                probs = probs * onehot_lbl[:, :, i, j]
+                probs = torch.sum(probs, 1)
+                proba = torch.log(probs)
+                tmp.append(proba.data.cpu().numpy().tolist())
+        tmp = np.array(tmp)
+        tmp = np.sum(tmp, 0)
+        likelihood += tmp.tolist()
+
+    fpr, tpr, thresholds = metrics.roc_curve(groundtruth, likelihood)
+    auc = metrics.auc(fpr, tpr)
+    print('AUC:', auc)
 
     return 0
 
