@@ -81,6 +81,7 @@ def test(pcnn, testset, batch_size, directory):
                 tmp.append(proba.data.cpu().numpy().tolist())
         tmp = np.array(tmp)
         tmp = np.sum(tmp, 0)
+        print(tmp)
         likelihood += tmp.tolist()
 
     fpr, tpr, thresholds = metrics.roc_curve(groundtruth, likelihood)
