@@ -42,7 +42,7 @@ def test(pcnn, testset, batch_size, directory):
             for j in range(28):
                 masked[:, :, 0:i+1, 0:j+1] = img[:, :, 0:i+1, 0:j+1]
                 probs = pcnn(masked)[0]
-                probs = torch.nn.functional(softmax(probs[:, :, i, j]))
+                probs = torch.nn.functional.softmax(probs[:, :, i, j])
                 probs = probs.data.cpu().numpy()
                 plt.clf()
                 plt.plot(list(range(256)), probs)
