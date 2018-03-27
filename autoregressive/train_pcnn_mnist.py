@@ -74,21 +74,6 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
             probs = torch.nn.functional.softmax(logits, dim=3)
             argmax = torch.max(probs, 3)[1]
             argmax = argmax.data.cpu().numpy()
-            nb_img = min(argmax.shape[0], 4)
-            argmax = np.reshape(argmax, (-1, 28, 28))[0:nb_img]
-
-            argmax = np.reshape(argmax, (1, nb_img, 28, 28))
-            argmax = np.swapaxes(argmax, 1, 2)
-            argmax = np.reshape(argmax, (28, nb_img * 28))
-            plt.clf()
-            plt.imshow(argmax)
-            plt.savefig(os.path.join(directory, 'reconstruction_{}'.format(p), '{}.svg'.format(e)), format='svg', bbox_inches='tight')
-
-            #Plot reconstructions
-            logits = logits.permute(0, 2, 3, 1)
-            probs = torch.nn.functional.softmax(logits, dim=3)
-            argmax = torch.max(probs, 3)[1]
-            argmax = argmax.data.cpu().numpy()
             lbl = lbl.data.cpu().numpy()
             nb_img = min(argmax.shape[0], 4)
             lbl = np.reshape(lbl, (-1, 28, 28))[0:nb_img]
