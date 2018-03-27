@@ -54,6 +54,7 @@ def test(pcnn, testset, batch_size, directory):
                 likelihood.append(probs.data.cpu().numpy().tolist())
                 #print(likelihood)
         likelihood = np.array(likelihood)
+        likelihood = np.sum(likelihood, 0)
         print(likelihood.shape)
                 # probs = probs.data.cpu().numpy()
                 # plt.clf()
