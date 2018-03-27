@@ -32,8 +32,8 @@ def test(pcnn, testset, batch_size, directory):
 
     #Process the testset
     for i_batch, sample in enumerate(tqdm(dataloader)):
-        if i_batch > 0:
-            break
+        # if i_batch > 0:
+        #     break
         img = Variable(sample[0], volatile=True).cuda()
         lbl = Variable(img.data[:, 0] * 255, volatile=True).long().cuda()
         lbl = torch.unsqueeze(lbl, 1)
