@@ -41,7 +41,7 @@ def test(pcnn, testset, batch_size, directory):
                 masked = Variable(torch.zeros(img.size(0), 1, 28, 28).cuda())
                 print(img.shape)
                 masked[:, :, 0:i+1, 0:j+1] = img[:, :, 0:i+1, 0:j+1]
-                masked = masked.cpu().numpy()
+                masked = masked.data.cpu().numpy()
                 plt.clf()
                 plt.imshow(masked[0].reshape((28, 28)))
                 plt.savefig(os.path.join(directory, 'plots', '{}_{}.svg'.format(i, j)), format='svg', bbox_inches='tight')
