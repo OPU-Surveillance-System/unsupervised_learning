@@ -47,6 +47,7 @@ def test(pcnn, testset, batch_size, directory):
             for j in range(28):
                 masked[:, :, 0:i+1, 0:j+1] = img[:, :, 0:i+1, 0:j+1]
                 probs = pcnn(masked)[0]
+                print(probs[:, :, i, j].shape)
                 probs = torch.nn.functional.softmax(probs[:, :, i, j], dim=1)
                 probs = probs * onehot_lbl[:, :, i, j]
                 probs = torch.sum(probs, 1)
