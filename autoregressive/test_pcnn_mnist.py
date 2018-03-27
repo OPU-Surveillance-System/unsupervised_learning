@@ -86,6 +86,7 @@ def test(pcnn, testset, batch_size, directory):
             items[sample['name'][n]] = proba[n]
         likelihood += tmp.tolist()
 
+    print(item)
     fpr, tpr, thresholds = metrics.roc_curve(groundtruth, likelihood)
     auc = metrics.auc(fpr, tpr)
     print('AUC:', auc)
