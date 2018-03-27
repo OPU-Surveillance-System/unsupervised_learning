@@ -31,7 +31,7 @@ def test(pcnn, testset, batch_size, directory):
     dist = torch.nn.PairwiseDistance(p=2, eps=1e-06)
 
     #Process the testset
-    for i_batch, sample in enumerate(dataloader):
+    for i_batch, sample in enumerate(tqdm(dataloader)):
         if i_batch > 0:
             break
         img = Variable(sample[0], volatile=True).cuda()
@@ -42,21 +42,17 @@ def test(pcnn, testset, batch_size, directory):
 
         masked = Variable(torch.zeros(img.size(0), 1, 28, 28).cuda())
         tmp = []
-        for i in tqdm(range(28)):
+        for i in range(28):
             for j in range(28):
                 masked[:, :, 0:i+1, 0:j+1] = img[:, :, 0:i+1, 0:j+1]
                 probs = pcnn(masked)[0]
                 probs = torch.nn.functional.softmax(probs[:, :, i, j])
                 probs = probs * onehot_lbl[:, :, i, j]
-                print(probs.shape)
                 probs = torch.sum(probs, 1)
                 proba = torch.log(probs)
-                lol = proba.data.cpu().numpy()
-                if np.isnan(lol).any():
-                    print(lol, proba)
                 tmp.append(proba.data.cpu().numpy().tolist())
         tmp = np.array(tmp)
-        tmp[np.isnan(tmp)]=np.nanmin(tmp)
+        # tmp[np.isnan(tmp)]=np.nanmin(tmp)
         tmp = np.sum(tmp, 0)
         likelihood += tmp.tolist()
     print(likelihood)
