@@ -36,6 +36,9 @@ def test(pcnn, testset, batch_size, directory):
             break
         img = Variable(sample[0], volatile=True).cuda()
         lbl = Variable(img.data[:, 0] * 255, volatile=True).long().cuda()
+        lbl = torch.unsqueeze(lbl, 1)
+        onehot_lbl = torch.FloatTensor(img.size(0), 256, 28, 28).zero_().cuda()
+        onehot_lbl = Variable(onehot_lbl.scatter_(1, lbl.data, 1))
 
         masked = Variable(torch.zeros(img.size(0), 1, 28, 28).cuda())
         likelihood = []
@@ -45,8 +48,8 @@ def test(pcnn, testset, batch_size, directory):
                 probs = pcnn(masked)[0]
                 probs = torch.nn.functional.softmax(probs[:, :, i, j])
                 probs = torch.log(probs)
-                probs = probs[:, lbl[:, i, j]]
-                print(probs[:, lbl[:, i, j]])
+                probs = probs * onehot_lbl
+                print(probs.shape)
                 likelihood += probs.data.cpu().numpy().tolist()
                 #print(likelihood)
         likelihood = np.array(likelihood)
