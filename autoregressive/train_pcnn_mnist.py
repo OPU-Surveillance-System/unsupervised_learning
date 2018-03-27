@@ -84,6 +84,29 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
             plt.imshow(argmax)
             plt.savefig(os.path.join(directory, 'reconstruction_{}'.format(p), '{}.svg'.format(e)), format='svg', bbox_inches='tight')
 
+            #Plot reconstructions
+            logits = logits.permute(0, 2, 3, 1)
+            probs = torch.nn.functional.softmax(logits, dim=3)
+            argmax = torch.max(probs, 3)[1]
+            argmax = argmax.data.cpu().numpy()
+            lbl = lbl.data.cpu().numpy()
+            nb_img = min(argmax.shape[0], 4)
+            lbl = np.reshape(lbl, (-1, 28, 28))[0:nb_img]
+            argmax = np.reshape(argmax, (-1, 28, 28))[0:nb_img]
+
+            plt.clf()
+            lbl = np.reshape(lbl, (1, nb_img, 28, 28))
+            lbl = np.swapaxes(lbl, 1, 2)
+            lbl = np.reshape(lbl, (28, nb_img * 28))
+            ax = plt.subplot2grid((2, 1), (0, 0), rowspan=1, colspan=1)
+            ax.imshow(lbl)
+            argmax = np.reshape(argmax, (1, nb_img, 28, 28))
+            argmax = np.swapaxes(argmax, 1, 2)
+            argmax = np.reshape(argmax, (28, nb_img * 28))
+            ax = plt.subplot2grid((2, 1), (1, 0), rowspan=1, colspan=1)
+            ax.imshow(argmax)
+            plt.savefig(os.path.join(directory, 'reconstruction_{}'.format(p), '{}.svg'.format(e)), format='svg', bbox_inches='tight')
+
 def main(args):
     """
     Train an autoencoder and save it
