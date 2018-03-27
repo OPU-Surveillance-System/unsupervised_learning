@@ -24,7 +24,7 @@ def test(pcnn, testset, batch_size, directory):
         batch_size (int): Mini batch size
         directory (str): Directory to save results
     """
-
+    torch.set_printoptions(threshold=5000)
     likelihood = []
     groundtruth = []
     dataloader = DataLoader(testset, batch_size=batch_size, shuffle=False, num_workers=4)
@@ -48,6 +48,7 @@ def test(pcnn, testset, batch_size, directory):
                 probs = pcnn(masked)[0]
                 probs = torch.nn.functional.softmax(probs[:, :, i, j])
                 probs = probs * onehot_lbl[:, :, i, j]
+                print(probs[0])
                 probs = torch.sum(probs, 1)
                 proba = torch.log(probs)
                 lol = proba.data.cpu().numpy()
