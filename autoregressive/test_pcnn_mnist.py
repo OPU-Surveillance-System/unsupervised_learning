@@ -2,6 +2,7 @@ import argparse
 import os
 import torch
 import numpy as np
+from torchvision import datasets, transforms, utils
 from torch.utils.data import DataLoader
 from torch.autograd import Variable
 from tqdm import tqdm
