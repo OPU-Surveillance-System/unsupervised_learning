@@ -48,7 +48,7 @@ def test(pcnn, testset, batch_size, directory):
                 probs = pcnn(masked)[0]
                 probs = torch.nn.functional.softmax(probs[:, :, i, j])
                 probs = torch.log(probs)
-                print(probs.shape, onehot_lbl.shape[:, :, i, j])
+                print(probs.shape, onehot_lbl[:, :, i, j].shape)
                 probs = probs * onehot_lbl[:, :, i, j]
                 print(probs.shape)
                 likelihood += probs.data.cpu().numpy().tolist()
