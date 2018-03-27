@@ -54,6 +54,7 @@ def test(pcnn, testset, batch_size, directory):
         likelihood = np.array(likelihood)
         print(np.nanmin(likelihood))
         print(np.isnan(likelihood).any())
+        likelihood[np.isnan(likelihood)]=np.nanmin(likelihood)
         likelihood = np.sum(likelihood, 0)
         print(likelihood)
         print(likelihood.shape)
