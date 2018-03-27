@@ -45,10 +45,13 @@ def test(pcnn, testset, batch_size, directory):
                 masked[:, :, 0:i+1, 0:j+1] = img[:, :, 0:i+1, 0:j+1]
                 probs = pcnn(masked)[0]
                 probs = torch.nn.functional.softmax(probs[:, :, i, j])
-                probs = torch.log(probs)
                 probs = probs * onehot_lbl[:, :, i, j]
                 probs = torch.sum(probs, 1)
-                tmp.append(probs.data.cpu().numpy().tolist())
+                proba = torch.log(probs)
+                lol = proba.data.cpu().numpy()
+                if np.isnan(tmp).any():
+                    print()
+                tmp.append(proba.data.cpu().numpy().tolist())
         tmp = np.array(tmp)
         tmp[np.isnan(tmp)]=np.nanmin(tmp)
         tmp = np.sum(tmp, 0)
