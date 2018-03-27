@@ -49,8 +49,8 @@ def test(pcnn, testset, batch_size, directory):
                 probs = torch.sum(probs, 1)
                 proba = torch.log(probs)
                 lol = proba.data.cpu().numpy()
-                if np.isnan(tmp).any():
-                    print()
+                if np.isnan(lol).any():
+                    print(lol, proba)
                 tmp.append(proba.data.cpu().numpy().tolist())
         tmp = np.array(tmp)
         tmp[np.isnan(tmp)]=np.nanmin(tmp)
