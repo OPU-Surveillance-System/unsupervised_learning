@@ -49,7 +49,6 @@ def test(pcnn, testset, batch_size, directory):
         probs = probs.view((-1, 28 * 28))
         probs = torch.sum(probs, dim=1)
         probs = probs.data.cpu().numpy().tolist()
-        print(probs)
         likelihood += probs
         # masked = Variable(torch.zeros(img.size(0), 1, 28, 28).cuda())
         # tmp = []
@@ -79,22 +78,32 @@ def test(pcnn, testset, batch_size, directory):
         onehot_lbl = torch.FloatTensor(img.size(0), 256, 28, 28).zero_().cuda()
         onehot_lbl = Variable(onehot_lbl.scatter_(1, lbl.data, 1))
 
-        masked = Variable(torch.zeros(img.size(0), 1, 28, 28).cuda())
-        tmp = []
-        for i in range(28):
-            for j in range(28):
-                masked[:, :, 0:i+1, 0:j+1] = img[:, :, 0:i+1, 0:j+1]
-                probs = pcnn(masked)[0]
-                probs = torch.nn.functional.softmax(probs[:, :, i, j], dim=1)
-                probs = probs * onehot_lbl[:, :, i, j]
-                probs = torch.sum(probs, 1)
-                proba = torch.log(probs) * -1
-                tmp.append(proba.data.cpu().numpy().tolist())
-        tmp = np.array(tmp)
-        tmp = np.sum(tmp, 0)
-        for n in range(img.size(0)):
-            items[sample['name'][n]] = proba[n].data[0]
-        likelihood += tmp.tolist()
+        probs = pcnn(img)[0]
+        probs = torch.nn.functional.softmax(probs, dim=1)
+        probs = probs * onehot_lbl
+        probs = torch.sum(probs, 1)
+        probs = torch.log(probs) * -1
+        probs = probs.view((-1, 28 * 28))
+        probs = torch.sum(probs, dim=1)
+        probs = probs.data.cpu().numpy().tolist()
+        likelihood += probs
+
+        # masked = Variable(torch.zeros(img.size(0), 1, 28, 28).cuda())
+        # tmp = []
+        # for i in range(28):
+        #     for j in range(28):
+        #         masked[:, :, 0:i+1, 0:j+1] = img[:, :, 0:i+1, 0:j+1]
+        #         probs = pcnn(masked)[0]
+        #         probs = torch.nn.functional.softmax(probs[:, :, i, j], dim=1)
+        #         probs = probs * onehot_lbl[:, :, i, j]
+        #         probs = torch.sum(probs, 1)
+        #         proba = torch.log(probs) * -1
+        #         tmp.append(proba.data.cpu().numpy().tolist())
+        # tmp = np.array(tmp)
+        # tmp = np.sum(tmp, 0)
+        # for n in range(img.size(0)):
+        #     items[sample['name'][n]] = proba[n].data[0]
+        # likelihood += tmp.tolist()
 
     print(items)
     fpr, tpr, thresholds = metrics.roc_curve(groundtruth, likelihood)
