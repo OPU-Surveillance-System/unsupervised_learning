@@ -47,7 +47,7 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
                     loss.backward()
                     optimizer.step()
 
-            epoch_loss = running_loss / (i_batch + 1)
+            epoch_loss = loss.data[0] #/ (i_batch + 1)
             writer.add_scalar('learning_curve/{}'.format(p), epoch_loss, e)
             print('Epoch {} ({}): loss = {}'.format(e, p, epoch_loss))
 
