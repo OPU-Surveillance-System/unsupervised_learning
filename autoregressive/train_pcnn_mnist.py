@@ -27,9 +27,9 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
     writer = SummaryWriter(os.path.join(directory, 'logs'))
 
     for e in range(epoch):
-        running_loss = 0
 
         for p in phase:
+            running_loss = 0
             pcnn.train(p == 'train')
 
             dataloader = DataLoader(sets[p], batch_size=batch_size, shuffle=True, num_workers=4)
@@ -47,7 +47,7 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
                     loss.backward()
                     optimizer.step()
 
-            epoch_loss = loss.data[0] #/ (i_batch + 1)
+            epoch_loss = loss.data[0] / (i_batch + 1)
             writer.add_scalar('learning_curve/{}'.format(p), epoch_loss, e)
             print('Epoch {} ({}): loss = {}'.format(e, p, epoch_loss))
 
