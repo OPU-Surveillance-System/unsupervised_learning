@@ -63,7 +63,7 @@ def plot_likelihood_hist(n, a, name=None):
     for item2 in p2:
         item2.set_height(item2.get_height()/sum(x2))
     plt.xlabel('Log likelihood')
-    plt.ylabel('Number of images')
+    plt.ylabel('Normalized number of images')
     plt.legend(loc='upper right')
 
     if name != None:
