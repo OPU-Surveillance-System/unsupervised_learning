@@ -46,6 +46,27 @@ def plot_reconstruction_hist(n, a, name=None):
     else:
         plt.show()
 
+def plot_likelihood_hist(n, a, name=None):
+    """
+    Plot histograms of reconstruction error distributions
+    Args:
+        n (numpy.array): Normal distribution
+        a (numpy.array): Abnormal distribution
+        name (str): name to save the figure (if None: show the figure)
+    """
+
+    plt.clf()
+    plt.hist(n, bins=100, alpha=0.75, label='MNIST')
+    plt.hist(a, bins=100, alpha=0.75, label='Alphabet')
+    plt.xlabel('Log likelihood')
+    plt.ylabel('Number of images')
+    plt.legend(loc='upper left')
+
+    if name != None:
+        plt.savefig(name, format='svg', bbox_inches='tight')
+    else:
+        plt.show()
+
 def plot_reconstruction_images(inputs, pred, name):
     """
     Plot example of reconstruction images
@@ -183,4 +204,4 @@ def plot_distribution(distribution, name):
     if name != None:
         plt.savefig(name, format='svg', bbox_inches='tight')
     else:
-        plt.show()    
+        plt.show()
