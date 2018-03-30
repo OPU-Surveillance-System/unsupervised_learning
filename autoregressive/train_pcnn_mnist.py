@@ -26,6 +26,9 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
 
     writer = SummaryWriter(os.path.join(directory, 'logs'))
 
+    best_loss = float('inf')
+    best_model = copy.deepcopy(pcnn)
+
     for e in range(epoch):
 
         for p in phase:
@@ -69,6 +72,9 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
 
                 torch.save(pcnn.state_dict(), os.path.join(directory, 'serial', 'model_{}'.format(e)))
 
+                if running_loss < best_loss:
+                    best_model = copy.deepcopy(pcnn)
+
             #Plot reconstructions
             logits = logits.permute(0, 2, 3, 1)
             probs = torch.nn.functional.softmax(logits, dim=3)
@@ -92,6 +98,8 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
             ax.imshow(argmax)
             plt.savefig(os.path.join(directory, 'reconstruction_{}'.format(p), '{}.svg'.format(e)), format='svg', bbox_inches='tight')
 
+            return best_model
+            
 def main(args):
     """
     Train an autoencoder and save it
@@ -128,7 +136,7 @@ def main(args):
 
     #Train the model and save it
     best_model = train(pcnn, optimizer, trainset, testset, args.epoch, args.batch_size, args.directory)
-    # torch.save(best_model.state_dict(), os.path.join(args.directory, 'serial', 'best_model'))
+    torch.save(best_model.state_dict(), os.path.join(args.directory, 'serial', 'best_model'))
 
     return 0
 
