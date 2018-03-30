@@ -29,6 +29,7 @@ def test(pcnn, testset, batch_size, directory):
     groundtruth = []
     dataloader = DataLoader(testset, batch_size=batch_size, shuffle=True, num_workers=4)
     dist = torch.nn.PairwiseDistance(p=2, eps=1e-06)
+    likelihood_distributions = {'mnist': [], 'alphabet': []}
 
     #Process the testset
     for i_batch, sample in enumerate(tqdm(dataloader)):
@@ -50,20 +51,7 @@ def test(pcnn, testset, batch_size, directory):
         probs = torch.sum(probs, dim=1)
         probs = probs.data.cpu().numpy().tolist()
         likelihood += probs
-        # masked = Variable(torch.zeros(img.size(0), 1, 28, 28).cuda())
-        # tmp = []
-        # for i in range(28):
-        #     for j in range(28):
-        #         masked[:, :, 0:i+1, 0:j+1] = img[:, :, 0:i+1, 0:j+1]
-        #         probs = pcnn(masked)[0]
-        #         probs = torch.nn.functional.softmax(probs[:, :, i, j], dim=1)
-        #         probs = probs * onehot_lbl[:, :, i, j]
-        #         probs = torch.sum(probs, 1)
-        #         proba = torch.log(probs) * -1
-        #         tmp.append(proba.data.cpu().numpy().tolist())
-        # tmp = np.array(tmp)
-        # tmp = np.sum(tmp, 0)
-        # likelihood += tmp.tolist()
+        likelihood_distributions['mnist'] += probs
 
     alphabet_dir = '/home/scom/data/alphabet_mnist'
     alphabetset = dataset.VideoDataset('data/alphabet_mnist', alphabet_dir, 'L', '28,28,1')
@@ -87,28 +75,27 @@ def test(pcnn, testset, batch_size, directory):
         probs = torch.sum(probs, dim=1)
         probs = probs.data.cpu().numpy().tolist()
         likelihood += probs
+        likelihood_distributions['alphabet'] += probs
 
-        # masked = Variable(torch.zeros(img.size(0), 1, 28, 28).cuda())
-        # tmp = []
-        # for i in range(28):
-        #     for j in range(28):
-        #         masked[:, :, 0:i+1, 0:j+1] = img[:, :, 0:i+1, 0:j+1]
-        #         probs = pcnn(masked)[0]
-        #         probs = torch.nn.functional.softmax(probs[:, :, i, j], dim=1)
-        #         probs = probs * onehot_lbl[:, :, i, j]
-        #         probs = torch.sum(probs, 1)
-        #         proba = torch.log(probs) * -1
-        #         tmp.append(proba.data.cpu().numpy().tolist())
-        # tmp = np.array(tmp)
-        # tmp = np.sum(tmp, 0)
         for n in range(img.size(0)):
             items[sample['name'][n]] = probs[n]
-        # likelihood += tmp.tolist()
 
     print(items)
+
     fpr, tpr, thresholds = metrics.roc_curve(groundtruth, likelihood)
     auc = metrics.auc(fpr, tpr)
     print('AUC:', auc)
+
+    mnist_distribution = np.array(likelihood_distributions['mnist'])
+    alphabet_distribution = np.array(likelihood_distributions['alphabet'])
+    print("Normal: mean={}, var={}, std={}".format(mnist_distribution.mean(), mnist_distribution.var(), mnist_distribution.std()))
+    print("Anomaly: mean={}, var={}, std={}".format(alphabet_distribution.mean(), alphabet_distribution.var(), alphabet_distribution.std()))
+    hist_m, _ = np.histogram(mnist_distribution, bins=50, range=[mnist_distribution.min(), alphabet_distribution.max()])
+    hist_a, _ = np.histogram(alphabet_distribution, bins=50, range=[mnist_distribution.min(), alphabet_distribution.max()])
+    minima = np.minimum(hist_m, hist_a)
+    intersection = np.true_divide(np.sum(minima), np.sum(hist_a))
+    utils.plot.plot_likelihood_hist(mnist_distribution, alphabet_distribution, os.path.join(directory, 'plots', 'loglikelihood_hist.svg'))
+    print('Intersection: {}'.format(intersection))
 
     return 0
 
