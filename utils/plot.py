@@ -56,10 +56,10 @@ def plot_likelihood_hist(n, a, name=None):
     """
 
     plt.clf()
-    x1, bins1, p1 = plt.hist(n, bins=100, alpha=0.5, label='MNIST', color='blue')
-    for item1 in p1:
-        item1.set_height(item1.get_height()/sum(x1))
-    x2, bins2, p2 = plt.hist(a, bins=100, alpha=0.5, label='Alphabet', color='red')
+    weights = np.ones_like(n)/(len(n))
+    plt.hist(n, bins=100, alpha=0.5, weights=weights, label='MNIST', color='blue')
+    weights = np.ones_like(a)/(len(n))
+    x2, bins2, p2 = plt.hist(a, bins=100, alpha=0.5, weights=weights, label='Alphabet', color='red')
     for item2 in p2:
         item2.set_height(item2.get_height()/sum(x2))
     plt.xlabel('Log likelihood')
