@@ -98,8 +98,8 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
             ax.imshow(argmax)
             plt.savefig(os.path.join(directory, 'reconstruction_{}'.format(p), '{}.svg'.format(e)), format='svg', bbox_inches='tight')
 
-            return best_model
-            
+    return best_model
+
 def main(args):
     """
     Train an autoencoder and save it
