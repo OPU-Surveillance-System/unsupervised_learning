@@ -56,8 +56,12 @@ def plot_likelihood_hist(n, a, name=None):
     """
 
     plt.clf()
-    plt.hist(n, bins=100, alpha=0.5, normed=1, label='MNIST', color='blue')
-    plt.hist(a, bins=100, alpha=0.5, normed=1, label='Alphabet', color='red')
+    x, bins, p = plt.hist(n, bins=100, alpha=0.5, label='MNIST', color='blue')
+    for item in p:
+        item.set_height(item.get_height()/sum(x))
+    x, bins, p = plt.hist(a, bins=100, alpha=0.5, label='Alphabet', color='red')
+    for item in p:
+        item.set_height(item.get_height()/sum(x))
     plt.xlabel('Log likelihood')
     plt.ylabel('Number of images')
     plt.legend(loc='upper right')
