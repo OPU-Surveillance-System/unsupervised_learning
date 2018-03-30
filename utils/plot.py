@@ -56,11 +56,11 @@ def plot_likelihood_hist(n, a, name=None):
     """
 
     plt.clf()
-    plt.hist(n, bins=100, alpha=0.75, label='MNIST')
-    plt.hist(a, bins=100, alpha=0.75, label='Alphabet')
+    plt.hist(n, bins=100, alpha=0.5, label='MNIST', c='blue')
+    plt.hist(a, bins=100, alpha=0.5, label='Alphabet', c='red')
     plt.xlabel('Log likelihood')
     plt.ylabel('Number of images')
-    plt.legend(loc='upper left')
+    plt.legend(loc='upper right')
 
     if name != None:
         plt.savefig(name, format='svg', bbox_inches='tight')
