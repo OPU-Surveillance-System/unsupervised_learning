@@ -60,7 +60,7 @@ def plot_likelihood_hist(n, a, name=None):
     for item1 in p1:
         item1.set_height(item1.get_height()/sum(x1))
     x2, bins2, p2 = plt.hist(a, bins=100, alpha=0.5, label='Alphabet', color='red')
-    for item in p2:
+    for item2 in p2:
         item2.set_height(item2.get_height()/sum(x2))
     plt.xlabel('Log likelihood')
     plt.ylabel('Number of images')
