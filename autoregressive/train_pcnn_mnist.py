@@ -45,8 +45,8 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory, tran
             for i_batch, sample in enumerate(tqdm(dataloader)):
                 optimizer.zero_grad()
                 img = Variable(sample[0], volatile=(p == 'test')).cuda()
-                if p == 'train' and translate:
-                    img = translation(img)
+                # if p == 'train' and translate:
+                #     img = translation(img)
                 lbl = Variable(img.data[:, 0] * 255, volatile=(p == 'test')).long().cuda()
 
                 logits = pcnn(img)[0]
