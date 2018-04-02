@@ -29,7 +29,7 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory, tran
     best_auc = 0.0
     best_model = copy.deepcopy(pcnn)
 
-    translation = transforms.RandomAffine(translate=(0.25, 0.25))
+    #translation = transforms.RandomAffine(translate=(0.25, 0.25))
 
     for e in range(epoch):
 
