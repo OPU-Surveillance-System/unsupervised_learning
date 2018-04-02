@@ -66,7 +66,6 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
                     probs = torch.sum(probs, dim=1)
                     probs = probs.data.cpu().numpy().tolist()
                     likelihood += probs
-                    likelihood_distributions['mnist'] += probs
 
             if p == 'test':
                 alphabet_dir = '/home/scom/data/alphabet_mnist'
