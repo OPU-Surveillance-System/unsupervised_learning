@@ -17,25 +17,36 @@ import utils.metrics
 import utils.plot
 import utils.process
 
-def train(pcnn, optimizer, trainset, testset, epoch, batch_size, ims, directory):
+def train(pcnn, optimizer, datasets, epoch, batch_size, ims, directory):
     """
+    pcnn (autoregressive.pixelcnn.PixelCNN): Model to train
+    optimizer (torch.optim.Optimizer): Optimizer
+    datasets (list of torch.utils.data.Dataset): Trainset and testset
+    epoch (int): Number of training epochs
+    batch_size (int): Mini-batch size
+    ims (list of int): Images' dimension
+    directory (str): Path to a directory to store results
     """
 
     phase = ('train', 'test')
+    trainset, testset = datasets
     sets = {'train':trainset, 'test':testset}
-    dist = torch.nn.PairwiseDistance(p=2, eps=1e-06)
 
     writer = SummaryWriter(os.path.join(directory, 'logs'))
 
+    best_auc = 0.0
+    best_model = copy.deepcopy(pcnn)
+
     for e in range(epoch):
-        running_loss = 0
+
+        likelihood = []
+        groundtruth = []
 
         for p in phase:
+            running_loss = 0
             pcnn.train(p == 'train')
 
             dataloader = DataLoader(sets[p], batch_size=batch_size, shuffle=True, num_workers=4)
-            errors = []
-            labels = []
 
             for i_batch, sample in enumerate(tqdm(dataloader)):
                 optimizer.zero_grad()
@@ -50,22 +61,30 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, ims, directory)
                     loss.backward()
                     optimizer.step()
                 if p == 'test':
-                    permuted = logits.permute(0, 2, 3, 1)
-                    probs = torch.nn.functional.softmax(permuted, dim=3)
-                    argmax = torch.max(probs, 3)[1]
-                    tmp = utils.metrics.per_image_error(dist, argmax.float(), lbl.float())
-                    errors += tmp.data.cpu().numpy().tolist()
-                    labels += sample['lbl'].numpy().tolist()
+                    lbl = torch.unsqueeze(lbl, 1)
+                    groundtruth += sample['lbl'].numpy().tolist()
+                    onehot_lbl = torch.FloatTensor(img.size(0), 256, ims[0], ims[1]).zero_().cuda()
+                    onehot_lbl = Variable(onehot_lbl.scatter_(1, lbl.data, 1))
+
+                    probs = torch.nn.functional.softmax(logits, dim=1)
+                    probs = probs * onehot_lbl
+                    probs = torch.sum(probs, 1)
+                    probs = torch.log(probs) * -1
+                    probs = probs.view((-1, ims[0] * ims[1]))
+                    probs = torch.sum(probs, dim=1)
+                    probs = probs.data.cpu().numpy().tolist()
+                    likelihood += probs
+
             if p == 'test':
                 fpr, tpr, thresholds = metrics.roc_curve(labels, errors)
                 auc = metrics.auc(fpr, tpr)
-                writer.add_scalar('ditance_auc', auc, e)
             else:
                 auc = 0
 
             epoch_loss = running_loss / (i_batch + 1)
             writer.add_scalar('learning_curve/{}'.format(p), epoch_loss, e)
-            print('Epoch {} ({}): loss = {}, distance AUC = {}'.format(e, p, epoch_loss, auc))
+            writer.add_scalar('auc/{}'.format(p), auc, e)
+            print('Epoch {} ({}): loss = {}, AUC = {}'.format(e, p, epoch_loss, auc))
 
             if p == 'test' and e % 10 == 0:
                 synthetic = torch.zeros(16, 1, ims[0], ims[1]).cuda()
@@ -83,7 +102,10 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, ims, directory)
                 plt.imshow(synthetic)
                 plt.savefig(os.path.join(directory, 'generation', '{}.svg'.format(e)), format='svg', bbox_inches='tight')
 
-                torch.save(pcnn.state_dict(), os.path.join(directory, 'serial', 'model_{}'.format(e)))
+                if auc > best_auc:
+                    best_model = copy.deepcopy(pcnn)
+                    torch.save(pcnn.state_dict(), os.path.join(directory, 'serial', 'best_model'.format(e)))
+                    best_auc = auc
 
             #Plot reconstructions
             logits = logits.permute(0, 2, 3, 1)
@@ -145,14 +167,12 @@ def main(args):
 
     trainset = dataset.VideoDataset(args.trainset, args.root_dir, 'L', args.image_size)
     testset = dataset.VideoDataset(args.testset, args.root_dir, 'L', args.image_size)
-    # trainset = datasets.MNIST('data', train=True, download=True, transform=transforms.ToTensor())
-    # testset = datasets.MNIST('data', train=False, download=True, transform=transforms.ToTensor())
+    datasets = [trainset, testset]
 
     #Train the model and save it
-    best_model = train(pcnn, optimizer, trainset, testset, args.epoch, args.batch_size, ims, args.directory)
-    # torch.save(best_model.state_dict(), os.path.join(args.directory, 'serial', 'best_model'))
+    best_model = train(pcnn, optimizer, datasets, args.epoch, args.batch_size, ims, args.directory)
 
-    return 0
+    return best_model
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')

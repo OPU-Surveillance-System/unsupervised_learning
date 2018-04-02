@@ -80,22 +80,22 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory, tran
                 items = {}
                 #Process the testset
                 for i_batch, sample in enumerate(tqdm(dataloader)):
-                    img = Variable(sample['img'], volatile=True).float().cuda()
-                    lbl = Variable(img.data[:, 0] * 255, volatile=True).long().cuda()
-                    lbl = torch.unsqueeze(lbl, 1)
+                    a_img = Variable(sample['img'], volatile=True).float().cuda()
+                    a_lbl = Variable(a_img.data[:, 0] * 255, volatile=True).long().cuda()
+                    a_lbl = torch.unsqueeze(lbl, 1)
                     groundtruth += sample['lbl'].numpy().tolist()
-                    onehot_lbl = torch.FloatTensor(img.size(0), 256, 28, 28).zero_().cuda()
-                    onehot_lbl = Variable(onehot_lbl.scatter_(1, lbl.data, 1))
+                    a_onehot_lbl = torch.FloatTensor(a_img.size(0), 256, 28, 28).zero_().cuda()
+                    a_onehot_lbl = Variable(a_onehot_lbl.scatter_(1, a_lbl.data, 1))
 
-                    probs = pcnn(img)[0]
-                    probs = torch.nn.functional.softmax(probs, dim=1)
-                    probs = probs * onehot_lbl
-                    probs = torch.sum(probs, 1)
-                    probs = torch.log(probs) * -1
-                    probs = probs.view((-1, 28 * 28))
-                    probs = torch.sum(probs, dim=1)
-                    probs = probs.data.cpu().numpy().tolist()
-                    likelihood += probs
+                    a_probs = pcnn(img)[0]
+                    a_probs = torch.nn.functional.softmax(a_probs, dim=1)
+                    a_probs = a_probs * a_onehot_lbl
+                    a_probs = torch.sum(a_probs, 1)
+                    a_probs = torch.log(a_probs) * -1
+                    a_probs = a_probs.view((-1, 28 * 28))
+                    a_probs = torch.sum(a_probs, dim=1)
+                    a_probs = a_probs.data.cpu().numpy().tolist()
+                    likelihood += a_probs
 
                 fpr, tpr, thresholds = metrics.roc_curve(groundtruth, likelihood)
                 auc = metrics.auc(fpr, tpr)
