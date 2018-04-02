@@ -17,7 +17,7 @@ import utils.metrics
 import utils.plot
 import utils.process
 
-def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
+def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory, translate=False):
     """
     """
 
@@ -28,6 +28,8 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
 
     best_auc = 0.0
     best_model = copy.deepcopy(pcnn)
+
+    translation = transforms.RandomAffine(translate=(0.25, 0.25))
 
     for e in range(epoch):
 
@@ -43,6 +45,8 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
             for i_batch, sample in enumerate(tqdm(dataloader)):
                 optimizer.zero_grad()
                 img = Variable(sample[0], volatile=(p == 'test')).cuda()
+                if p == 'train' and translate:
+                    img = translation(img)
                 lbl = Variable(img.data[:, 0] * 255, volatile=(p == 'test')).long().cuda()
 
                 logits = pcnn(img)[0]
@@ -184,7 +188,11 @@ def main(args):
     testset = datasets.MNIST('data', train=False, download=True, transform=transforms.ToTensor())
 
     #Train the model and save it
-    best_model = train(pcnn, optimizer, trainset, testset, args.epoch, args.batch_size, args.directory)
+    if args.translate == 0:
+        translate = False
+    else:
+        translate = True
+    best_model = train(pcnn, optimizer, trainset, testset, args.epoch, args.batch_size, args.directory, translate)
     #torch.save(best_model.state_dict(), os.path.join(args.directory, 'serial', 'best_model'))
 
     return 0
@@ -196,6 +204,7 @@ if __name__ == '__main__':
     parser.add_argument('--lr', dest='learning_rate', type=float, default=0.001, help='Learning rate')
     parser.add_argument('--ep', dest='epoch', type=int, default=100, help='Number of training epochs')
     parser.add_argument('--dir', dest='directory', type=str, default='train_autoencoder', help='Directory to store results')
+    parser.add_argument('-t', dest='translate', type=int, default=0, help='Translate training images')
     #Model arguments
     parser.add_argument('-f', dest='f', type=int, default=128, help='Number of hidden features')
     parser.add_argument('-d', dest='d', type=int, default=32, help='Number of top layer features')
