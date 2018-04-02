@@ -31,6 +31,9 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
 
     for e in range(epoch):
 
+        likelihood = []
+        groundtruth = []
+
         for p in phase:
             running_loss = 0
             pcnn.train(p == 'train')
@@ -49,10 +52,55 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
                 if p == 'train':
                     loss.backward()
                     optimizer.step()
+                if p == 'test':
+                    lbl = torch.unsqueeze(lbl, 1)
+                    groundtruth += [0 for g in range(img.size(0))]
+                    onehot_lbl = torch.FloatTensor(img.size(0), 256, 28, 28).zero_().cuda()
+                    onehot_lbl = Variable(onehot_lbl.scatter_(1, lbl.data, 1))
+
+                    probs = torch.nn.functional.softmax(logits, dim=1)
+                    probs = probs * onehot_lbl
+                    probs = torch.sum(probs, 1)
+                    probs = torch.log(probs) * -1
+                    probs = probs.view((-1, 28 * 28))
+                    probs = torch.sum(probs, dim=1)
+                    probs = probs.data.cpu().numpy().tolist()
+                    likelihood += probs
+                    likelihood_distributions['mnist'] += probs
+
+            if p == 'test':
+                alphabet_dir = '/home/scom/data/alphabet_mnist'
+                alphabetset = dataset.VideoDataset('data/alphabet_mnist', alphabet_dir, 'L', '28,28,1')
+                dataloader = DataLoader(alphabetset, batch_size=batch_size, shuffle=True, num_workers=4)
+                items = {}
+                #Process the testset
+                for i_batch, sample in enumerate(tqdm(dataloader)):
+                    img = Variable(sample['img'], volatile=True).float().cuda()
+                    lbl = Variable(img.data[:, 0] * 255, volatile=True).long().cuda()
+                    lbl = torch.unsqueeze(lbl, 1)
+                    groundtruth += sample['lbl'].numpy().tolist()
+                    onehot_lbl = torch.FloatTensor(img.size(0), 256, 28, 28).zero_().cuda()
+                    onehot_lbl = Variable(onehot_lbl.scatter_(1, lbl.data, 1))
+
+                    probs = pcnn(img)[0]
+                    probs = torch.nn.functional.softmax(probs, dim=1)
+                    probs = probs * onehot_lbl
+                    probs = torch.sum(probs, 1)
+                    probs = torch.log(probs) * -1
+                    probs = probs.view((-1, 28 * 28))
+                    probs = torch.sum(probs, dim=1)
+                    probs = probs.data.cpu().numpy().tolist()
+                    likelihood += probs
+
+                fpr, tpr, thresholds = metrics.roc_curve(groundtruth, likelihood)
+                auc = metrics.auc(fpr, tpr)
+            else:
+                auc = 0.0
 
             epoch_loss = loss.data[0] / (i_batch + 1)
             writer.add_scalar('learning_curve/{}'.format(p), epoch_loss, e)
-            print('Epoch {} ({}): loss = {}'.format(e, p, epoch_loss))
+            writer.add_scalar('auc/{}'.format(p), auc, e)
+            print('Epoch {} ({}): loss = {}, AUC = {}'.format(e, p, epoch_loss, auc))
 
             if p == 'test' and e % 10 == 0:
                 synthetic = torch.zeros(16, 1, 28, 28).cuda()
