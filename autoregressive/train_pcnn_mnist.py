@@ -67,6 +67,8 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
                     probs = probs.data.cpu().numpy().tolist()
                     likelihood += probs
 
+            epoch_loss = loss.data[0] / (i_batch + 1)
+
             if p == 'test':
                 alphabet_dir = '/home/scom/data/alphabet_mnist'
                 alphabetset = dataset.VideoDataset('data/alphabet_mnist', alphabet_dir, 'L', '28,28,1')
@@ -96,7 +98,6 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
             else:
                 auc = 0.0
 
-            epoch_loss = loss.data[0] / (i_batch + 1)
             writer.add_scalar('learning_curve/{}'.format(p), epoch_loss, e)
             writer.add_scalar('auc/{}'.format(p), auc, e)
             print('Epoch {} ({}): loss = {}, AUC = {}'.format(e, p, epoch_loss, auc))
