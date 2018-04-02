@@ -26,7 +26,7 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
 
     writer = SummaryWriter(os.path.join(directory, 'logs'))
 
-    best_loss = float('inf')
+    best_auc = 0.0
     best_model = copy.deepcopy(pcnn)
 
     for e in range(epoch):
@@ -117,10 +117,11 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory):
                 plt.imshow(synthetic)
                 plt.savefig(os.path.join(directory, 'generation', '{}.svg'.format(e)), format='svg', bbox_inches='tight')
 
-                torch.save(pcnn.state_dict(), os.path.join(directory, 'serial', 'model_{}'.format(e)))
+                #torch.save(pcnn.state_dict(), os.path.join(directory, 'serial', 'model_{}'.format(e)))
 
-                if running_loss < best_loss:
+                if auc > best_auc:
                     best_model = copy.deepcopy(pcnn)
+                    torch.save(pcnn.state_dict(), os.path.join(directory, 'serial', 'best_model'.format(e)))
 
             #Plot reconstructions
             logits = logits.permute(0, 2, 3, 1)
@@ -183,7 +184,7 @@ def main(args):
 
     #Train the model and save it
     best_model = train(pcnn, optimizer, trainset, testset, args.epoch, args.batch_size, args.directory)
-    torch.save(best_model.state_dict(), os.path.join(args.directory, 'serial', 'best_model'))
+    #torch.save(best_model.state_dict(), os.path.join(args.directory, 'serial', 'best_model'))
 
     return 0
 
