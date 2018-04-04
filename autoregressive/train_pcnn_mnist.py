@@ -82,7 +82,7 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory, tran
                 for i_batch, sample in enumerate(tqdm(dataloader)):
                     a_img = Variable(sample['img'], volatile=True).float().cuda()
                     a_lbl = Variable(a_img.data[:, 0] * 255, volatile=True).long().cuda()
-                    a_lbl = torch.unsqueeze(lbl, 1)
+                    a_lbl = torch.unsqueeze(a_lbl, 1)
                     groundtruth += sample['lbl'].numpy().tolist()
                     a_onehot_lbl = torch.FloatTensor(a_img.size(0), 256, 28, 28).zero_().cuda()
                     a_onehot_lbl = Variable(a_onehot_lbl.scatter_(1, a_lbl.data, 1))
