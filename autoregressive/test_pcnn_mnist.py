@@ -45,6 +45,7 @@ def test(pcnn, testset, batch_size, directory):
         probs = pcnn(img)[0]
         probs = torch.nn.functional.softmax(probs, dim=1)
         probs = probs * onehot_lbl
+        probs = torch.sum(probs, 1)
         if i_batch == 0:
             for i in range(probs.size(0)):
                 plt.clf()
@@ -52,7 +53,6 @@ def test(pcnn, testset, batch_size, directory):
                 imgprobs = imgprobs.data.cpu().numpy()
                 plt.imshow(imgprobs)
                 plt.savefig(os.path.join(directory, 'plots', 'normal_imgprobs_{}'.format(i)), format='svg', bbox_inches='tight')
-        probs = torch.sum(probs, 1)
         probs = torch.log(probs) * -1
         probs = probs.view((-1, 28 * 28))
         probs = torch.sum(probs, dim=1)
