@@ -40,6 +40,8 @@ if not os.path.exists(os.path.join(args.directory, 'reconstruction_train')):
     os.makedirs(os.path.join(args.directory, 'reconstruction_train'))
 if not os.path.exists(os.path.join(args.directory, 'reconstruction_test')):
     os.makedirs(os.path.join(args.directory, 'reconstruction_test'))
+if not os.path.exists(os.path.join(args.directory, 'reconstruction_alphabet')):
+    os.makedirs(os.path.join(args.directory, 'reconstruction_alphabet'))
 if not os.path.exists(os.path.join(args.directory, 'logs')):
     os.makedirs(os.path.join(args.directory, 'logs'))
 
@@ -127,7 +129,7 @@ for e in range(args.epoch):
             inputs = utils.process.deprocess(inputs)
             inputs = inputs.data.cpu().numpy()
             inputs = np.rollaxis(inputs, 1, 4)
-            utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(args.directory, 'reconstruction_{}'.format(p), 'epoch_{}.svg'.format(e)))
+            utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(args.directory, 'reconstruction_alphabet', 'epoch_{}.svg'.format(e)))
 
             fpr, tpr, thresholds = metrics.roc_curve(groundtruth, errors)
             auc = metrics.auc(fpr, tpr)
