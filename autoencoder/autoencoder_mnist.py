@@ -24,7 +24,7 @@ class Autoencoder(torch.nn.Module):
             layers.append(torch.nn.ReLU())
             for n in range(nb_l):
                 layers.append(torch.nn.Conv2d(nb_f, nb_f, (3, 3), padding=1))
-                layers.append(torch.nn.SELU())
+                layers.append(torch.nn.ReLU())
 
             return layers
 
@@ -47,8 +47,7 @@ class Autoencoder(torch.nn.Module):
         #Decoder
         layers = []
         for n in range(self.nb_b):
-            next_f = prev_f // 2
-            layers += upsampling_block(prev_f, next_f, self.nb_l)
+            layers += upsampling_block(prev_f, prev_f//2, self.nb_l)
             prev_f //= 2
         layers.append(torch.nn.Conv2d(next_f, 1, (3, 3), padding=1))
         self.decoder = torch.nn.Sequential(*layers)
