@@ -71,7 +71,7 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory, tran
                     probs = probs.data.cpu().numpy().tolist()
                     likelihood += probs
 
-            epoch_loss = loss.data[0] / (i_batch + 1)
+            epoch_loss = running_loss / (i_batch + 1)
 
             if p == 'test':
                 alphabet_dir = '/home/scom/data/alphabet_mnist'
