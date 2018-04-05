@@ -146,5 +146,5 @@ for e in range(args.epoch):
             print('Best model saved.')
             best_auc = auc
 
-writer.export_scalars_to_json(os.path.join(directory, 'logs', 'scalars.json'))
+writer.export_scalars_to_json(os.path.join(args.directory, 'logs', 'scalars.json'))
 writer.close()
