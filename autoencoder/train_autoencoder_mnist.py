@@ -104,7 +104,7 @@ for e in range(args.epoch):
             items = {}
             #Process the testset
             for i_batch, sample in enumerate(tqdm(dataloader)):
-                inputs = Variable(sample[0].float().cuda())
+                inputs = Variable(sample['img'].float().cuda())
                 logits = ae(inputs)
 
                 tmp = utils.metrics.per_image_error(dist, logits, inputs)
