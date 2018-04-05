@@ -89,7 +89,6 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory, tran
 
                     a_probs = pcnn(a_img)[0]
                     a_probs = torch.nn.functional.softmax(a_probs, dim=1)
-                    print(a_probs.shape, a_onehot_lbl.shape)
                     a_probs = a_probs * a_onehot_lbl
                     a_probs = torch.sum(a_probs, 1)
                     a_probs = torch.log(a_probs) * -1
