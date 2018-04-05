@@ -95,7 +95,7 @@ for e in range(args.epoch):
                 errors += tmp.data.cpu().numpy().tolist()
                 groundtruth += [0 for g in range(inputs.size(0))]
 
-        epoch_loss = running_loss / len(datasets[p])
+        epoch_loss = running_loss / len(sets[p])
 
         if p == 'test':
             alphabet_dir = '/home/scom/data/alphabet_mnist'
