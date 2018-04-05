@@ -97,6 +97,15 @@ for e in range(args.epoch):
 
         epoch_loss = running_loss / len(sets[p])
 
+        #Plot example of reconstructed images
+        pred = utils.process.deprocess(logits)
+        pred = pred.data.cpu().numpy()
+        pred = np.rollaxis(pred, 1, 4)
+        inputs = utils.process.deprocess(inputs)
+        inputs = inputs.data.cpu().numpy()
+        inputs = np.rollaxis(inputs, 1, 4)
+        utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(args.directory, 'reconstruction_{}'.format(p), 'epoch_{}.svg'.format(e)))
+
         if p == 'test':
             alphabet_dir = '/home/scom/data/alphabet_mnist'
             alphabetset = dataset.VideoDataset('data/alphabet_mnist', alphabet_dir, 'L', '28,28,1')
@@ -126,15 +135,6 @@ for e in range(args.epoch):
                 torch.save(ae.state_dict(), os.path.join(args.directory, 'serial', 'best_model'.format(e)))
                 print('Best model saved.')
                 best_auc = auc
-
-        #Plot example of reconstructed images
-        pred = utils.process.deprocess(logits)
-        pred = pred.data.cpu().numpy()
-        pred = np.rollaxis(pred, 1, 4)
-        inputs = utils.process.deprocess(inputs)
-        inputs = inputs.data.cpu().numpy()
-        inputs = np.rollaxis(inputs, 1, 4)
-        utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(args.directory, 'reconstruction_{}'.format(p), 'epoch_{}.svg'.format(e)))
 
 writer.export_scalars_to_json(os.path.join(directory, 'logs', 'scalars.json'))
 writer.close()
