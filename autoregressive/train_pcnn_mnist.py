@@ -127,6 +127,7 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory, tran
                 if auc > best_auc:
                     best_model = copy.deepcopy(pcnn)
                     torch.save(pcnn.state_dict(), os.path.join(directory, 'serial', 'best_model'.format(e)))
+                    print('Best model saved.')
                     best_auc = auc
 
             #Plot reconstructions
