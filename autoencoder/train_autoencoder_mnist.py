@@ -40,6 +40,8 @@ if not os.path.exists(os.path.join(args.directory, 'reconstruction_train')):
     os.makedirs(os.path.join(args.directory, 'reconstruction_train'))
 if not os.path.exists(os.path.join(args.directory, 'reconstruction_test')):
     os.makedirs(os.path.join(args.directory, 'reconstruction_test'))
+if not os.path.exists(os.path.join(args.directory, 'reconstruction_alphabet')):
+    os.makedirs(os.path.join(args.directory, 'reconstruction_alphabet'))
 if not os.path.exists(os.path.join(args.directory, 'logs')):
     os.makedirs(os.path.join(args.directory, 'logs'))
 
@@ -119,6 +121,15 @@ for e in range(args.epoch):
                 tmp = utils.metrics.per_image_error(dist, logits, inputs)
                 errors += tmp.data.cpu().numpy().tolist()
                 groundtruth += [1 for g in range(inputs.size(0))]
+
+            #Plot example of reconstructed images
+            pred = utils.process.deprocess(logits)
+            pred = pred.data.cpu().numpy()
+            pred = np.rollaxis(pred, 1, 4)
+            inputs = utils.process.deprocess(inputs)
+            inputs = inputs.data.cpu().numpy()
+            inputs = np.rollaxis(inputs, 1, 4)
+            utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(args.directory, 'reconstruction_alphabet', 'epoch_{}.svg'.format(e)))
 
             fpr, tpr, thresholds = metrics.roc_curve(groundtruth, errors)
             auc = metrics.auc(fpr, tpr)
