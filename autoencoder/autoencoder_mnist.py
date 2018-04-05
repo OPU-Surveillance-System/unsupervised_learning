@@ -23,8 +23,9 @@ class Autoencoder(torch.nn.Module):
             layers = [torch.nn.Upsample(scale_factor=2, mode='bilinear')]
             layers.append(torch.nn.ReLU())
             for n in range(nb_l):
-                layers.append(torch.nn.Conv2d(nb_f, nb_f, (3, 3), padding=1))
+                layers.append(torch.nn.Conv2d(in_dim, nb_f, (3, 3), padding=1))
                 layers.append(torch.nn.ReLU())
+                in_dim = nb_f
 
             return layers
 
