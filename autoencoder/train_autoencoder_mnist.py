@@ -120,6 +120,15 @@ for e in range(args.epoch):
                 errors += tmp.data.cpu().numpy().tolist()
                 groundtruth += [1 for g in range(inputs.size(0))]
 
+            #Plot example of reconstructed images
+            pred = utils.process.deprocess(logits)
+            pred = pred.data.cpu().numpy()
+            pred = np.rollaxis(pred, 1, 4)
+            inputs = utils.process.deprocess(inputs)
+            inputs = inputs.data.cpu().numpy()
+            inputs = np.rollaxis(inputs, 1, 4)
+            utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(args.directory, 'reconstruction_{}'.format(p), 'epoch_{}.svg'.format(e)))
+
             fpr, tpr, thresholds = metrics.roc_curve(groundtruth, errors)
             auc = metrics.auc(fpr, tpr)
         else:
