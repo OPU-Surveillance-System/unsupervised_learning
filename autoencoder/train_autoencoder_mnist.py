@@ -140,12 +140,11 @@ for e in range(args.epoch):
         writer.add_scalar('auc/{}'.format(p), auc, e)
         print('Epoch {} ({}): loss = {}, AUC = {}'.format(e, p, epoch_loss, auc))
 
-        if p == 'test' and e % 10 == 0:
-            if auc > best_auc:
-                best_model = copy.deepcopy(ae)
-                torch.save(ae.state_dict(), os.path.join(args.directory, 'serial', 'best_model'.format(e)))
-                print('Best model saved.')
-                best_auc = auc
+        if auc > best_auc:
+            best_model = copy.deepcopy(ae)
+            torch.save(ae.state_dict(), os.path.join(args.directory, 'serial', 'best_model'.format(e)))
+            print('Best model saved.')
+            best_auc = auc
 
 writer.export_scalars_to_json(os.path.join(directory, 'logs', 'scalars.json'))
 writer.close()
