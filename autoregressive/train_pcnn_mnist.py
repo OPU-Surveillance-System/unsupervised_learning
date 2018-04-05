@@ -81,19 +81,13 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory, tran
                 #Process the testset
                 for i_batch, sample in enumerate(tqdm(dataloader)):
                     a_img = Variable(sample['img'], volatile=True).float().cuda()
-                    print("a_img", a_img.shape)
                     a_lbl = Variable(a_img.data[:, 0] * 255, volatile=True).long().cuda()
-                    print("a_lbl", a_lbl.shape)
                     a_lbl = torch.unsqueeze(a_lbl, 1)
-                    print("unsqueeze a_lbl", a_lbl.shape)
                     groundtruth += sample['lbl'].numpy().tolist()
                     a_onehot_lbl = torch.FloatTensor(a_img.size(0), 256, 28, 28).zero_().cuda()
-                    print("a_onehot_lbl", a_onehot_lbl.shape)
                     a_onehot_lbl = Variable(a_onehot_lbl.scatter_(1, a_lbl.data, 1))
-                    print("scatter a_onehot_lbl", a_onehot_lbl.shape)
 
-                    a_probs = pcnn(img)[0]
-                    print("a_probs", a_probs.shape)
+                    a_probs = pcnn(a_img)[0]
                     a_probs = torch.nn.functional.softmax(a_probs, dim=1)
                     print(a_probs.shape, a_onehot_lbl.shape)
                     a_probs = a_probs * a_onehot_lbl
