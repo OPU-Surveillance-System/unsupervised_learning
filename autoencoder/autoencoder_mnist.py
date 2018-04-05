@@ -48,8 +48,8 @@ class Autoencoder(torch.nn.Module):
         #Decoder
         layers = []
         for n in range(self.nb_b):
-            layers += upsampling_block(prev_f, prev_f//2, self.nb_l)
             prev_f //= 2
+            layers += upsampling_block(prev_f, prev_f//2, self.nb_l)
         layers.append(torch.nn.Conv2d(prev_f//2, 1, (3, 3), padding=1))
         self.decoder = torch.nn.Sequential(*layers)
 
