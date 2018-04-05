@@ -40,8 +40,6 @@ if not os.path.exists(os.path.join(args.directory, 'reconstruction_train')):
     os.makedirs(os.path.join(args.directory, 'reconstruction_train'))
 if not os.path.exists(os.path.join(args.directory, 'reconstruction_test')):
     os.makedirs(os.path.join(args.directory, 'reconstruction_test'))
-if not os.path.exists(os.path.join(args.directory, 'reconstruction_alphabet')):
-    os.makedirs(os.path.join(args.directory, 'reconstruction_alphabet'))
 if not os.path.exists(os.path.join(args.directory, 'logs')):
     os.makedirs(os.path.join(args.directory, 'logs'))
 
@@ -99,15 +97,6 @@ for e in range(args.epoch):
 
         epoch_loss = running_loss / len(sets[p])
 
-        #Plot example of reconstructed images
-        pred = utils.process.deprocess(logits)
-        pred = pred.data.cpu().numpy()
-        pred = np.rollaxis(pred, 1, 4)
-        inputs = utils.process.deprocess(inputs)
-        inputs = inputs.data.cpu().numpy()
-        inputs = np.rollaxis(inputs, 1, 4)
-        utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(args.directory, 'reconstruction_{}'.format(p), 'epoch_{}.svg'.format(e)))
-
         if p == 'test':
             alphabet_dir = '/home/scom/data/alphabet_mnist'
             alphabetset = dataset.VideoDataset('data/alphabet_mnist', alphabet_dir, 'L', '28,28,1')
@@ -121,15 +110,6 @@ for e in range(args.epoch):
                 tmp = utils.metrics.per_image_error(dist, logits, inputs)
                 errors += tmp.data.cpu().numpy().tolist()
                 groundtruth += [1 for g in range(inputs.size(0))]
-
-            #Plot example of reconstructed images
-            pred = utils.process.deprocess(logits)
-            pred = pred.data.cpu().numpy()
-            pred = np.rollaxis(pred, 1, 4)
-            inputs = utils.process.deprocess(inputs)
-            inputs = inputs.data.cpu().numpy()
-            inputs = np.rollaxis(inputs, 1, 4)
-            utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(args.directory, 'reconstruction_alphabet', 'epoch_{}.svg'.format(e)))
 
             fpr, tpr, thresholds = metrics.roc_curve(groundtruth, errors)
             auc = metrics.auc(fpr, tpr)
@@ -146,6 +126,15 @@ for e in range(args.epoch):
                 torch.save(ae.state_dict(), os.path.join(args.directory, 'serial', 'best_model'.format(e)))
                 print('Best model saved.')
                 best_auc = auc
+
+        #Plot example of reconstructed images
+        pred = utils.process.deprocess(logits)
+        pred = pred.data.cpu().numpy()
+        pred = np.rollaxis(pred, 1, 4)
+        inputs = utils.process.deprocess(inputs)
+        inputs = inputs.data.cpu().numpy()
+        inputs = np.rollaxis(inputs, 1, 4)
+        utils.plot.plot_reconstruction_images(inputs, pred, os.path.join(args.directory, 'reconstruction_{}'.format(p), 'epoch_{}.svg'.format(e)))
 
 writer.export_scalars_to_json(os.path.join(directory, 'logs', 'scalars.json'))
 writer.close()
