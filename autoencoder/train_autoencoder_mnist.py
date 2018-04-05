@@ -52,7 +52,11 @@ with open(os.path.join(args.directory, 'hyper-parameters'), 'w') as f:
         f.write('{}:{}\n'.format(k, d[k]))
 
 #Variables
-ae = autoencoder.autoencoder_mnist.Autoencoder(args.f, args.l, args.b, args.z)
+if args.z == 0:
+    z = None
+else:
+    z = args.z
+ae = autoencoder.autoencoder_mnist.Autoencoder(args.f, args.l, args.b, z)
 ae = ae.cuda()
 print(ae)
 optimizer = torch.optim.Adam(ae.parameters(), args.learning_rate)
