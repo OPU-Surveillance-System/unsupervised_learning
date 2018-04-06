@@ -53,7 +53,7 @@ def test(pcnn, testset, batch_size, directory):
                 imgprobs = imgprobs.data.cpu().numpy()
                 plt.imshow(imgprobs)
                 plt.savefig(os.path.join(directory, 'plots', 'normal_imgprobs_{}.svg'.format(i)), format='svg', bbox_inches='tight')
-        probs = torch.log(probs) * -1
+        probs = torch.log(probs) #* -1
         probs = probs.view((-1, 28 * 28))
         probs = torch.sum(probs, dim=1)
         probs = probs.data.cpu().numpy().tolist()
@@ -83,7 +83,7 @@ def test(pcnn, testset, batch_size, directory):
             imgprobs = imgprobs.data.cpu().numpy()
             plt.imshow(imgprobs)
             plt.savefig(os.path.join(directory, 'plots', 'imgprobs_{}.svg'.format(i)), format='svg', bbox_inches='tight')
-        probs = torch.log(probs) * -1
+        probs = torch.log(probs) #* -1
         probs = probs.view((-1, 28 * 28))
         probs = torch.sum(probs, dim=1)
         probs = probs.data.cpu().numpy().tolist()
