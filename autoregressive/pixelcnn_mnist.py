@@ -8,7 +8,6 @@ class MaskedConvolution(torch.nn.Conv2d):
     self.out_dim = out_dim
     self.kernel_size = kernel_size
     self.mask_type = mask_type
-    self.bnmomentum = bnmomentum
 
     self.register_buffer('mask', self.weight.data.clone())
     _, _, height, width = self.weight.size()
