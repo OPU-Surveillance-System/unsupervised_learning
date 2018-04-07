@@ -62,7 +62,7 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory, tran
                     optimizer.step()
                 if p == 'test':
                     lbl = torch.unsqueeze(lbl, 1)
-                    groundtruth += [0 for g in range(img.size(0))]
+                    groundtruth += [1 for g in range(img.size(0))]
                     onehot_lbl = torch.FloatTensor(img.size(0), 256, 28, 28).zero_().cuda()
                     onehot_lbl = Variable(onehot_lbl.scatter_(1, lbl.data, 1))
 
@@ -72,7 +72,6 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory, tran
                     probs = torch.log(probs) #* -1
                     probs = probs.view((-1, 28 * 28))
                     probs = torch.sum(probs, dim=1)
-                    print(probs)
                     probs = probs.data.cpu().numpy().tolist()
                     likelihood += probs
 
@@ -99,7 +98,6 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory, tran
                     a_probs = torch.log(a_probs) #* -1
                     a_probs = a_probs.view((-1, 28 * 28))
                     a_probs = torch.sum(a_probs, dim=1)
-                    print(a_probs)
                     a_probs = a_probs.data.cpu().numpy().tolist()
                     likelihood += a_probs
 
