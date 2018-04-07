@@ -38,7 +38,11 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory, tran
 
         for p in phase:
             running_loss = 0
-            pcnn.train(p == 'train')
+
+            if p == 'train':
+                pcnn.train()
+            else:
+                pcnn.eval()
 
             dataloader = DataLoader(sets[p], batch_size=batch_size, shuffle=True, num_workers=4)
 
@@ -181,7 +185,7 @@ def main(args):
             f.write('{}:{}\n'.format(k, d[k]))
 
     #Variables
-    pcnn = autoregressive.pixelcnn_mnist.PixelCNN(args.f, args.n, args.d)
+    pcnn = autoregressive.pixelcnn_mnist.PixelCNN(args.f, args.n, args.d, args.m)
     pcnn = pcnn.cuda()
     print(pcnn)
     optimizer = torch.optim.Adam(pcnn.parameters(), args.learning_rate)
@@ -211,6 +215,7 @@ if __name__ == '__main__':
     parser.add_argument('-f', dest='f', type=int, default=128, help='Number of hidden features')
     parser.add_argument('-d', dest='d', type=int, default=32, help='Number of top layer features')
     parser.add_argument('-n', dest='n', type=int, default=15, help='Number of residual blocks')
+    parser.add_argument('-m', dest='m', type=float, default=0.1, help='Batch norm momentum')
     args = parser.parse_args()
 
     main(args)
