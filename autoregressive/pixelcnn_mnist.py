@@ -1,7 +1,7 @@
 import torch
 
 class MaskedConvolution(torch.nn.Conv2d):
-  def __init__(self, in_dim, out_dim, kernel_size, mask_type, padding, bnmomentum=0.1):
+  def __init__(self, in_dim, out_dim, kernel_size, mask_type, padding):
     super(MaskedConvolution, self).__init__(in_channels=in_dim, out_channels=out_dim, kernel_size=kernel_size, padding=padding)
 
     self.in_dim = in_dim
@@ -28,10 +28,11 @@ class MaskedConvolution(torch.nn.Conv2d):
     return x
 
 class ResidualBlock(torch.nn.Module):
-  def __init__(self, h):
+  def __init__(self, h, bnmomentum=0.1):
     super(ResidualBlock, self).__init__()
 
     self.h = h
+    self.bnmomentum = bnmomentum
 
     layers = []
     layers.append(torch.nn.ReLU())
@@ -57,12 +58,13 @@ class ResidualBlock(torch.nn.Module):
     return x
 
 class PixelCNN(torch.nn.Module):
-  def __init__(self, h, n, d):
+  def __init__(self, h, n, d, bnmomentum=0.1):
     super(PixelCNN, self).__init__()
 
     self.h = h
     self.n = n
     self.d = d
+    self.bnmomentum = bnmomentum
 
     self.first_layer = torch.nn.Sequential(MaskedConvolution(1, 2 * self.h, (7, 7), 'A', 3), torch.nn.BatchNorm2d(2 * self.h, momentum=self.bnmomentum))
     self.residual_blocks = torch.nn.Sequential(*[ResidualBlock(self.h) for n in range(self.n + 1)])
