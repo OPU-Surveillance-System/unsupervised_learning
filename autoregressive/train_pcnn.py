@@ -76,7 +76,7 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, ims, directory):
                     likelihood += probs
 
             if p == 'test':
-                fpr, tpr, thresholds = metrics.roc_curve(groundtruth, errors)
+                fpr, tpr, thresholds = metrics.roc_curve(groundtruth, likelihood)
                 auc = metrics.auc(fpr, tpr)
             else:
                 auc = 0
