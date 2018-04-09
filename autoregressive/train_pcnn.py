@@ -69,7 +69,7 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, ims, directory):
                     probs = torch.nn.functional.softmax(logits, dim=1)
                     probs = probs * onehot_lbl
                     probs = torch.sum(probs, 1)
-                    probs = torch.log(probs) * -1
+                    probs = torch.log(probs) #* -1
                     probs = probs.view((-1, ims[0] * ims[1]))
                     probs = torch.sum(probs, dim=1)
                     probs = probs.data.cpu().numpy().tolist()
