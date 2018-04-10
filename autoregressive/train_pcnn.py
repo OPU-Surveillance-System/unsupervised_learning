@@ -80,7 +80,7 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, ims, directory):
 
             if p == 'test':
                 likelihood = np.array(likelihood)
-                infidx = np.argwhere(np.isinf(x))
+                infidx = np.argwhere(np.isinf(likelihood))
                 for infx in infidx:
                     print(name[infx[0]])
                 likelihood[likelihood == -np.inf] = likelihood[likelihood != -np.inf].min() #Remove -inf
