@@ -42,17 +42,19 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, ims, directory):
 
         likelihood = []
         groundtruth = []
+        name = []
 
         for p in phase:
             running_loss = 0
             pcnn.train(p == 'train')
 
-            dataloader = DataLoader(sets[p], batch_size=batch_size, shuffle=True, num_workers=4)
+            dataloader = DataLoader(sets[p], batch_size=batch_size, shuffle=(p == 'train'), num_workers=4)
 
             for i_batch, sample in enumerate(tqdm(dataloader)):
                 optimizer.zero_grad()
                 img = Variable(sample['img'], volatile=(p == 'test')).float().cuda()
                 lbl = Variable(img.data[:, 0] * 255, volatile=(p == 'test')).long().cuda()
+                name += sample['name'].numpy().tolist()
 
                 logits = pcnn(img)[0]
 
@@ -78,7 +80,10 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, ims, directory):
 
             if p == 'test':
                 likelihood = np.array(likelihood)
-                likelihood[likelihood != -np.inf].min() #Remove -inf
+                infidx = np.argwhere(np.isinf(x))
+                for infx in infidx:
+                    print(name[infx[0]])
+                likelihood[likelihood == -np.inf] = likelihood[likelihood != -np.inf].min() #Remove -inf
                 if (likelihood.dtype.char in np.typecodes['AllFloat'] and not np.isfinite(likelihood.sum()) and not np.isfinite(likelihood).all()):
                     import pudb; pudb.set_trace()
                 fpr, tpr, thresholds = metrics.roc_curve(groundtruth, likelihood)
