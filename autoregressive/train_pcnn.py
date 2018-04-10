@@ -16,6 +16,7 @@ import autoregressive.pixelcnn
 import utils.metrics
 import utils.plot
 import utils.process
+import utils.debug
 
 def train(pcnn, optimizer, datasets, epoch, batch_size, ims, directory):
     """
@@ -76,6 +77,7 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, ims, directory):
                     likelihood += probs
 
             if p == 'test':
+                import pudb; pudb.set_trace()
                 fpr, tpr, thresholds = metrics.roc_curve(groundtruth, likelihood)
                 auc = metrics.auc(fpr, tpr)
             else:

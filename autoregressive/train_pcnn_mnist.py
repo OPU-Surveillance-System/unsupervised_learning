@@ -16,6 +16,7 @@ import autoregressive.pixelcnn_mnist
 import utils.metrics
 import utils.plot
 import utils.process
+import utils.debug
 
 def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory, translate=False):
     """
@@ -101,6 +102,7 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory, tran
                     a_probs = a_probs.data.cpu().numpy().tolist()
                     likelihood += a_probs
 
+                import pudb; pudb.set_trace()
                 fpr, tpr, thresholds = metrics.roc_curve(groundtruth, likelihood)
                 auc = metrics.auc(fpr, tpr)
             else:
@@ -188,6 +190,10 @@ def main(args):
     pcnn = autoregressive.pixelcnn_mnist.PixelCNN(args.f, args.n, args.d, args.m)
     pcnn = pcnn.cuda()
     print(pcnn)
+    if args.model != '':
+        print('Load model {}'.format(args.model))
+        pcnn.load_state_dict(torch.load(args.model))
+
     optimizer = torch.optim.Adam(pcnn.parameters(), args.learning_rate)
 
     trainset = datasets.MNIST('data', train=True, download=True, transform=transforms.ToTensor())
@@ -211,6 +217,7 @@ if __name__ == '__main__':
     parser.add_argument('--ep', dest='epoch', type=int, default=100, help='Number of training epochs')
     parser.add_argument('--dir', dest='directory', type=str, default='train_autoencoder', help='Directory to store results')
     parser.add_argument('-t', dest='translate', type=int, default=0, help='Translate training images')
+    parser.add_argument('--mo', dest='model', type=str, default='', help='Path to a serialized model')
     #Model arguments
     parser.add_argument('-f', dest='f', type=int, default=128, help='Number of hidden features')
     parser.add_argument('-d', dest='d', type=int, default=32, help='Number of top layer features')
