@@ -78,6 +78,7 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, ims, directory):
 
             if p == 'test':
                 likelihood = np.array(likelihood)
+                likelihood[likelihood != -np.inf].min() #Remove -inf
                 if (likelihood.dtype.char in np.typecodes['AllFloat'] and not np.isfinite(likelihood.sum()) and not np.isfinite(likelihood).all()):
                     import pudb; pudb.set_trace()
                 fpr, tpr, thresholds = metrics.roc_curve(groundtruth, likelihood)
