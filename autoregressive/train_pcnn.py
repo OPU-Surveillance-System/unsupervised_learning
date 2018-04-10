@@ -104,10 +104,11 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, ims, directory):
                 plt.imshow(synthetic)
                 plt.savefig(os.path.join(directory, 'generation', '{}.svg'.format(e)), format='svg', bbox_inches='tight')
 
-                if auc > best_auc:
-                    best_model = copy.deepcopy(pcnn)
-                    torch.save(pcnn.state_dict(), os.path.join(directory, 'serial', 'best_model'.format(e)))
-                    best_auc = auc
+            if auc > best_auc:
+                best_model = copy.deepcopy(pcnn)
+                torch.save(pcnn.state_dict(), os.path.join(directory, 'serial', 'best_model'.format(e)))
+                print('Best model saved.')
+                best_auc = auc
 
             #Plot reconstructions
             logits = logits.permute(0, 2, 3, 1)
