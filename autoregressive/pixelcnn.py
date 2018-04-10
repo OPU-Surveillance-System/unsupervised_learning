@@ -27,21 +27,25 @@ class MaskedConvolution(torch.nn.Conv2d):
         return x
 
 class ResidualBlock(torch.nn.Module):
-    def __init__(self, h):
+    def __init__(self, h, bn):
         super(ResidualBlock, self).__init__()
 
         self.h = h
+        self.bn = bn
 
         layers = []
         layers.append(torch.nn.ReLU())
         layers.append(torch.nn.Conv2d(2 * self.h, self.h, (1, 1)))
-        #layers.append(torch.nn.BatchNorm2d(self.h))
+        if self.bn:
+            layers.append(torch.nn.BatchNorm2d(self.h))
         layers.append(torch.nn.ReLU())
         layers.append(MaskedConvolution(self.h, self.h, (3, 3), 'B', 1))
-        #layers.append(torch.nn.BatchNorm2d(self.h))
+        if self.bn:
+            layers.append(torch.nn.BatchNorm2d(self.h))
         layers.append(torch.nn.ReLU())
         layers.append(torch.nn.Conv2d(self.h, 2 * self.h, (1, 1)))
-        #layers.append(torch.nn.BatchNorm2d(2 * self.h))
+        if self.bn:
+            layers.append(torch.nn.BatchNorm2d(self.h))
         self.layers = torch.nn.Sequential(*layers)
 
         #Weights initialization
@@ -56,18 +60,22 @@ class ResidualBlock(torch.nn.Module):
         return x
 
 class PixelCNN(torch.nn.Module):
-    def __init__(self, h, n, d):
+    def __init__(self, h, n, d, bn=False):
         super(PixelCNN, self).__init__()
 
         self.h = h
         self.n = n
         self.d = d
+        self.bn = bn
 
         self.first_layer = MaskedConvolution(1, 2 * self.h, (7, 7), 'A', 3)
-        #self.bn = torch.nn.BatchNorm2d(2 * self.h)
-        self.residual_blocks = torch.nn.Sequential(*[ResidualBlock(self.h) for n in range(self.n + 1)])
-        #self.top_layer = torch.nn.Sequential(*[torch.nn.ReLU(), torch.nn.Conv2d(2 * self.h, self.d, (1, 1)), torch.nn.BatchNorm2d(self.d), torch.nn.ReLU()])
-        self.top_layer = torch.nn.Sequential(*[torch.nn.ReLU(), torch.nn.Conv2d(2 * self.h, self.d, (1, 1)), torch.nn.ReLU()])
+        if self.bn:
+            self.bn = torch.nn.BatchNorm2d(2 * self.h)
+        self.residual_blocks = torch.nn.Sequential(*[ResidualBlock(self.h, self.bn) for n in range(self.n + 1)])
+        if self.bn:
+            self.top_layer = torch.nn.Sequential(*[torch.nn.ReLU(), torch.nn.Conv2d(2 * self.h, self.d, (1, 1)), torch.nn.BatchNorm2d(self.d), torch.nn.ReLU()])
+        else:
+            self.top_layer = torch.nn.Sequential(*[torch.nn.ReLU(), torch.nn.Conv2d(2 * self.h, self.d, (1, 1)), torch.nn.ReLU()])
         self.evidence = torch.nn.Conv2d(self.d, 256, (1, 1))
 
         #Weights initialization
@@ -77,7 +85,8 @@ class PixelCNN(torch.nn.Module):
 
     def forward(self, x):
         x = self.first_layer(x)
-        #x = self.bn(x)
+        if self.bn:
+            x = self.bn(x)
         x = self.residual_blocks(x)
         x = self.top_layer(x)
         logits = self.evidence(x)
