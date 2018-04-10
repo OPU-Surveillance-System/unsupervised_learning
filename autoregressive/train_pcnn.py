@@ -80,7 +80,6 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, ims, directory):
                 likelihood = np.array(likelihood)
                 if (likelihood.dtype.char in np.typecodes['AllFloat'] and not np.isfinite(likelihood.sum()) and not np.isfinite(likelihood).all()):
                     import pudb; pudb.set_trace()
-                likelihood[-1] = float('inf')
                 fpr, tpr, thresholds = metrics.roc_curve(groundtruth, likelihood)
                 auc = metrics.auc(fpr, tpr)
             else:
