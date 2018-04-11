@@ -102,6 +102,7 @@ def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory, tran
                     a_probs = a_probs.data.cpu().numpy().tolist()
                     likelihood += a_probs
 
+                likelihood = np.array(likelihood)
                 likelihood[likelihood == -np.inf] = likelihood[likelihood != -np.inf].min()
                 fpr, tpr, thresholds = metrics.roc_curve(groundtruth, likelihood)
                 auc = metrics.auc(fpr, tpr)
