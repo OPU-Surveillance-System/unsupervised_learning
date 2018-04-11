@@ -38,7 +38,7 @@ def test(pcnn, testset, batch_size, directory):
         img = Variable(sample[0], volatile=True).cuda()
         lbl = Variable(img.data[:, 0] * 255, volatile=True).long().cuda()
         lbl = torch.unsqueeze(lbl, 1)
-        groundtruth += [0 for g in range(img.size(0))]
+        groundtruth += [1 for g in range(img.size(0))]
         onehot_lbl = torch.FloatTensor(img.size(0), 256, 28, 28).zero_().cuda()
         onehot_lbl = Variable(onehot_lbl.scatter_(1, lbl.data, 1))
 
