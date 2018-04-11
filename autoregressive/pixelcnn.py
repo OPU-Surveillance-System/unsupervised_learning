@@ -70,7 +70,7 @@ class PixelCNN(torch.nn.Module):
 
         self.first_layer = MaskedConvolution(1, 2 * self.h, (7, 7), 'A', 3)
         if self.bn:
-            self.bn = torch.nn.BatchNorm2d(2 * self.h)
+            self.bn_layer = torch.nn.BatchNorm2d(2 * self.h)
         self.residual_blocks = torch.nn.Sequential(*[ResidualBlock(self.h, self.bn) for n in range(self.n + 1)])
         if self.bn:
             self.top_layer = torch.nn.Sequential(*[torch.nn.ReLU(), torch.nn.Conv2d(2 * self.h, self.d, (1, 1)), torch.nn.BatchNorm2d(self.d), torch.nn.ReLU()])
@@ -86,7 +86,7 @@ class PixelCNN(torch.nn.Module):
     def forward(self, x):
         x = self.first_layer(x)
         if self.bn:
-            x = self.bn(x)
+            x = self.bn_layer(x)
         x = self.residual_blocks(x)
         x = self.top_layer(x)
         logits = self.evidence(x)

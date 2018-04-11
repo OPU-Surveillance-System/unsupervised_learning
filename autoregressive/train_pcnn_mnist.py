@@ -187,7 +187,11 @@ def main(args):
             f.write('{}:{}\n'.format(k, d[k]))
 
     #Variables
-    pcnn = autoregressive.pixelcnn_mnist.PixelCNN(args.f, args.n, args.d, args.m)
+    if args.bn == 0:
+        bn = False
+    else:
+        bn = True
+    pcnn = autoregressive.pixelcnn_mnist.PixelCNN(args.f, args.n, args.d, bn)
     pcnn = pcnn.cuda()
     print(pcnn)
     if args.model != '':
@@ -222,7 +226,7 @@ if __name__ == '__main__':
     parser.add_argument('-f', dest='f', type=int, default=128, help='Number of hidden features')
     parser.add_argument('-d', dest='d', type=int, default=32, help='Number of top layer features')
     parser.add_argument('-n', dest='n', type=int, default=15, help='Number of residual blocks')
-    parser.add_argument('-m', dest='m', type=float, default=0.1, help='Batch norm momentum')
+    parser.add_argument('--bn', dest='bn', type=int, default=0, help='Use batch norm or not (0/1)')
     args = parser.parse_args()
 
     main(args)
