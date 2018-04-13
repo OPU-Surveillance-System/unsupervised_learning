@@ -60,21 +60,18 @@ def test(pcnn, testset, batch_size, directory):
         probs = torch.log(probs)
         probs = probs.view((-1, 64 * 64))
         probs = torch.sum(probs, dim=1)
-        probs = probs.data.cpu().numpy()
-        try:
-            probs[probs == -np.inf] = probs[probs != -np.inf].min() #Fix infinite log likelihood
-        except ValueError:
-            pass
-        likelihood += probs.tolist()
+        probs = probs.data.cpu().numpy().tolist()
+        likelihood += probs
 
-        for i in range(img.size(0)):
-            items[sample['name'][i]] = probs[i]
+    likelihood = np.array(likelihood)
+    likelihood[likelihood == -np.inf] = likelihood[likelihood != -np.inf].min() #Remove -inf
 
-        for i in range(len(sample['lbl'])):
-            if sample['lbl'][i] == 0:
-                likelihood_distributions['abnormal'].append(probs[i])
-            else:
-                likelihood_distributions['normal'].append(probs[i])
+    for i in range(len(likelihood)):
+        items[testset[i]['name']] = likelihood[i]
+        if testset[i]['lbl'] == 0:
+            likelihood_distributions['abnormal'].append(likelihood[i])
+        else:
+            likelihood_distributions['normal'].append(likelihood[i])
 
     #Print sorted log likelihood
     sorted_items = sorted(items.items(), key=operator.itemgetter(1))
