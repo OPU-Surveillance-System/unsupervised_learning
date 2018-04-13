@@ -48,16 +48,15 @@ def test(pcnn, testset, batch_size, directory):
         probs = torch.sum(probs, 1)
 
         #Draw probabilities images
-        if i_batch == 0:
-            for i in range(probs.size(0)):
-                plt.clf()
-                imgprobs = probs[i]
-                imgprobs = imgprobs.data.cpu().numpy()
-                plt.imshow(imgprobs)
-                name = sample['name'][i]
-                if '.png' in name:
-                    name = name[:-4]
-                plt.savefig(os.path.join(directory, 'plots', 'imgprobs_{}.svg'.format(name)), bbox_inches='tight')
+        for i in range(probs.size(0)):
+            plt.clf()
+            imgprobs = probs[i]
+            imgprobs = imgprobs.data.cpu().numpy()
+            plt.imshow(imgprobs)
+            name = sample['name'][i]
+            if '.png' in name:
+                name = name[:-4]
+            plt.savefig(os.path.join(directory, 'plots', 'imgprobs_{}.svg'.format(name)), bbox_inches='tight')
 
         #Compute log likelihood
         probs = torch.log(probs)
