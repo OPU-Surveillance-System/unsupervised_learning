@@ -54,7 +54,10 @@ def test(pcnn, testset, batch_size, directory):
                 imgprobs = probs[i]
                 imgprobs = imgprobs.data.cpu().numpy()
                 plt.imshow(imgprobs)
-                plt.savefig(os.path.join(directory, 'plots', 'imgprobs_{}.svg'.format(sample['name'][i])), bbox_inches='tight')
+                name = sample['name'][i]
+                if '.png' in name:
+                    name = name[:-4]
+                plt.savefig(os.path.join(directory, 'plots', 'imgprobs_{}.svg'.format(name)), bbox_inches='tight')
 
         #Compute log likelihood
         probs = torch.log(probs)
@@ -97,9 +100,9 @@ def test(pcnn, testset, batch_size, directory):
     print('Intersection: {}'.format(intersection))
 
     plt.clf()
-    weights = np.ones_like(n)/(len(n))
+    weights = np.ones_like(normal_distribution)/(len(normal_distribution))
     plt.hist(n, bins=100, alpha=0.5, weights=weights, label='Normal', color='blue')
-    weights = np.ones_like(a)/(len(n))
+    weights = np.ones_like(abnormal_distribution)/(len(normal_distribution))
     x2, bins2, p2 = plt.hist(a, bins=100, alpha=0.5, weights=weights, label='Abnormal', color='red')
     for item2 in p2:
         item2.set_height(item2.get_height()/sum(x2))
