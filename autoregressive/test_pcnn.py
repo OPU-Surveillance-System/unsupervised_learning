@@ -3,6 +3,7 @@ import os
 import torch
 import operator
 import numpy as np
+import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
 from torch.autograd import Variable
 from tqdm import tqdm
