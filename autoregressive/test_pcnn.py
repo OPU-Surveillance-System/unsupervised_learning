@@ -48,12 +48,13 @@ def test(pcnn, testset, batch_size, directory):
         probs = torch.sum(probs, 1)
 
         #Draw probabilities images
-        for i in range(probs.size(0)):
-            plt.clf()
-            imgprobs = probs[i]
-            imgprobs = imgprobs.data.cpu().numpy()
-            plt.imshow(imgprobs)
-            plt.savefig(os.path.join(directory, 'plots', 'imgprobs_{}.svg'.format(sample['name'][i])), bbox_inches='tight')
+        if i_batch == 0
+            for i in range(probs.size(0)):
+                plt.clf()
+                imgprobs = probs[i]
+                imgprobs = imgprobs.data.cpu().numpy()
+                plt.imshow(imgprobs)
+                plt.savefig(os.path.join(directory, 'plots', 'imgprobs_{}.svg'.format(sample['name'][i])), bbox_inches='tight')
 
         #Compute log likelihood
         probs = torch.log(probs)
@@ -80,6 +81,8 @@ def test(pcnn, testset, batch_size, directory):
     likelihood[likelihood == -np.inf] = likelihood[likelihood != -np.inf].min()
 
     #Compute AUC
+    groundtruth = np.array(groundtruth)
+    print(likelihood.shape, groundtruth.shape)
     fpr, tpr, thresholds = metrics.roc_curve(groundtruth, likelihood)
     auc = metrics.auc(fpr, tpr)
     print('AUC:', auc)
