@@ -53,7 +53,7 @@ def test(pcnn, testset, batch_size, directory):
             imgprobs = probs[i]
             imgprobs = imgprobs.data.cpu().numpy()
             plt.imshow(imgprobs)
-            plt.savefig(os.path.join(directory, 'plots', 'imgprobs_{}.svg'.format(sample['name'][i]), bbox_inches='tight'))
+            plt.savefig(os.path.join(directory, 'plots', 'imgprobs_{}.svg'.format(sample['name'][i])), bbox_inches='tight')
 
         #Compute log likelihood
         probs = torch.log(probs)
