@@ -61,7 +61,10 @@ def test(pcnn, testset, batch_size, directory):
         probs = probs.view((-1, 64 * 64))
         probs = torch.sum(probs, dim=1)
         probs = probs.data.cpu().numpy()
-        probs[probs == -np.inf] = probs[probs != -np.inf].min() #Fix infinite log likelihood
+        try:
+            probs[probs == -np.inf] = probs[probs != -np.inf].min() #Fix infinite log likelihood
+        except ValueError:
+            pass
         likelihood += probs.tolist()
 
         for i in range(img.size(0)):
