@@ -81,6 +81,7 @@ def test(pcnn, testset, batch_size, directory):
     print(sorted_items)
 
     #Compute AUC
+    likelihood = np.array(likelihood)
     groundtruth = np.array(groundtruth)
     print(likelihood.shape, groundtruth.shape)
     fpr, tpr, thresholds = metrics.roc_curve(groundtruth, likelihood)
