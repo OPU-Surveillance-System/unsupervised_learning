@@ -124,7 +124,7 @@ def main(args):
     else:
         model = args.model
     #Load the trained model
-    pcnn.load_state_dict(torch.load(models))
+    pcnn.load_state_dict(torch.load(model))
 
     testset = dataset.VideoDataset(args.testset, args.root_dir, 'L', args.image_size)
 
