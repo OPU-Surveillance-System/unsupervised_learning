@@ -94,8 +94,30 @@ def test(pcnn, testset, batch_size, directory):
     hist_a, _ = np.histogram(abnormal_distribution, bins=50, range=[abnormal_distribution.min(), normal_distribution.max()])
     minima = np.minimum(hist_n, hist_a)
     intersection = np.true_divide(np.sum(minima), np.sum(hist_a))
-    utils.plot.plot_likelihood_hist(normal_distribution, abnormal_distribution, os.path.join(directory, 'plots', 'loglikelihood_hist.svg'))
     print('Intersection: {}'.format(intersection))
+
+    plt.clf()
+    weights = np.ones_like(n)/(len(n))
+    plt.hist(n, bins=100, alpha=0.5, weights=weights, label='Normal', color='blue')
+    weights = np.ones_like(a)/(len(n))
+    x2, bins2, p2 = plt.hist(a, bins=100, alpha=0.5, weights=weights, label='Abnormal', color='red')
+    for item2 in p2:
+        item2.set_height(item2.get_height()/sum(x2))
+    plt.xlabel('Log likelihood')
+    plt.ylabel('Normalized number of images')
+    plt.legend(loc='upper right')
+    plt.savefig(os.path.join(directory, 'plots', 'loglikelihood_hist'), format='svg', bbox_inches='tight')
+
+    #Plot time series log likelihood
+    x = np.array([i for i in range(len(groundtruth))])
+    likelihood = likelihood / np.linalg.norm(likelihood)
+    plt.clf()
+    plt.plot(x, groundtruth, '--', c='blue', label='Groundtruth')
+    plt.plot(x, likelihood, '-', c='red', label='Norm. log likelihood')
+    plt.xlabel('Frames')
+    plt.ylabel('Probability')
+    plt.legend(loc='upper right')
+    plt.savefig(os.path.join(directory, 'plots', 'abnormal_score_series'), format='svg', bbox_inches='tight')
 
     return 0
 
