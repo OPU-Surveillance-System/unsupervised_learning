@@ -115,10 +115,10 @@ def test(pcnn, testset, batch_size, directory):
     x = np.array([i for i in range(len(groundtruth))])
     likelihood = (likelihood - likelihood.min()) / (likelihood.max() - likelihood.min())
     plt.clf()
-    plt.plot(x, groundtruth, '--', c='blue', label='Groundtruth')
+    plt.plot(x, groundtruth, '--', c='green', label='Groundtruth')
     plt.plot(x, likelihood, '-', c='red', label='Norm. log likelihood')
     plt.xlabel('Frames')
-    plt.ylabel('Probability')
+    plt.ylabel('Likelihood')
     plt.legend(loc='upper right')
     plt.savefig(os.path.join(directory, 'plots', 'abnormal_score_series'), format='svg', bbox_inches='tight')
 
