@@ -43,7 +43,7 @@ def test(pcnn, testset, batch_size, directory):
         #Compute pixel probabilities
         probs = pcnn(img)[0]
         probs = torch.nn.functional.softmax(probs, dim=1)
-        probs = output * onehot_lbl
+        probs = probs * onehot_lbl
         probs = torch.sum(probs, 1)
 
         #Draw probabilities images
