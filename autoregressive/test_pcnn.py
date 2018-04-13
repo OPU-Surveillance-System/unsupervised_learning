@@ -61,12 +61,15 @@ def test(pcnn, testset, batch_size, directory):
         probs = probs.view((-1, 64 * 64))
         probs = torch.sum(probs, dim=1)
         probs = probs.data.cpu().numpy().tolist()
+        probs = np.array(probs)
+        probs[probs == -np.inf] = probs[probs != -np.inf].min() #Fix infinite log likelihood
         likelihood += probs
 
         for i in range(img.size(0)):
             items[sample['name'][i]] = probs[i]
 
         for i in range(len(sample['lbl'])):
+            probs =
             if sample['lbl'][i] == 0:
                 likelihood_distributions['abnormal'].append(probs[i])
             else:
@@ -75,10 +78,6 @@ def test(pcnn, testset, batch_size, directory):
     #Print sorted log likelihood
     sorted_items = sorted(items.items(), key=operator.itemgetter(1))
     print(sorted_items)
-
-    #Fix infinite log likelihood
-    likelihood = np.array(likelihood)
-    likelihood[likelihood == -np.inf] = likelihood[likelihood != -np.inf].min()
 
     #Compute AUC
     groundtruth = np.array(groundtruth)
