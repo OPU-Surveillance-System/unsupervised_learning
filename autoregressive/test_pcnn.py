@@ -113,7 +113,7 @@ def test(pcnn, testset, batch_size, directory):
 
     #Plot time series log likelihood
     x = np.array([i for i in range(len(groundtruth))])
-    likelihood = likelihood / np.linalg.norm(likelihood)
+    likelihood = (likelihood - likelihood.min()) / (likelihood.max() - likelihood.min())
     plt.clf()
     plt.plot(x, groundtruth, '--', c='blue', label='Groundtruth')
     plt.plot(x, likelihood, '-', c='red', label='Norm. log likelihood')
