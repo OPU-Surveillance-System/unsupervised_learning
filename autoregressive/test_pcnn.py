@@ -48,7 +48,7 @@ def test(pcnn, testset, batch_size, directory):
         probs = torch.sum(probs, 1)
 
         #Draw probabilities images
-        if i_batch == 0
+        if i_batch == 0:
             for i in range(probs.size(0)):
                 plt.clf()
                 imgprobs = probs[i]
