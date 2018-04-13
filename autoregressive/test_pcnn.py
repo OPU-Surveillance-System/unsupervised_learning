@@ -101,7 +101,7 @@ def test(pcnn, testset, batch_size, directory):
 
     plt.clf()
     weights = np.ones_like(normal_distribution)/(len(normal_distribution))
-    plt.hist(n, bins=100, alpha=0.5, weights=weights, label='Normal', color='blue')
+    plt.hist(normal_distribution, bins=100, alpha=0.5, weights=weights, label='Normal', color='blue')
     weights = np.ones_like(abnormal_distribution)/(len(normal_distribution))
     x2, bins2, p2 = plt.hist(a, bins=100, alpha=0.5, weights=weights, label='Abnormal', color='red')
     for item2 in p2:
