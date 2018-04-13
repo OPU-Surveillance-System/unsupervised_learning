@@ -69,7 +69,6 @@ def test(pcnn, testset, batch_size, directory):
             items[sample['name'][i]] = probs[i]
 
         for i in range(len(sample['lbl'])):
-            probs =
             if sample['lbl'][i] == 0:
                 likelihood_distributions['abnormal'].append(probs[i])
             else:
