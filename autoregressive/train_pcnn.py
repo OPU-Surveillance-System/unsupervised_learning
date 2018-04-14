@@ -83,7 +83,10 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, ims, directory):
                 infidx = np.argwhere(np.isinf(likelihood))
                 for infx in infidx:
                     print(name[infx[0]])
-                likelihood[likelihood == -np.inf] = likelihood[likelihood != -np.inf].min() #Remove -inf
+                try:
+                    likelihood[likelihood == -np.inf] = likelihood[likelihood != -np.inf].min() #Remove -inf
+                except ValueError:
+                    likelihood[likelihood == -np.inf] = -20000.0
                 if (likelihood.dtype.char in np.typecodes['AllFloat'] and not np.isfinite(likelihood.sum()) and not np.isfinite(likelihood).all()):
                     import pudb; pudb.set_trace()
                 fpr, tpr, thresholds = metrics.roc_curve(groundtruth, likelihood)
