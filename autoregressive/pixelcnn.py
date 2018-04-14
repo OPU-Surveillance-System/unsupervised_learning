@@ -48,7 +48,7 @@ class ResidualBlock(torch.nn.Module):
         layers.append(torch.nn.SELU())
         layers.append(torch.nn.Conv2d(self.h, 2 * self.h, (1, 1)))
         if self.bn:
-            layers.append(torch.nn.BatchNorm2d(self.h))
+            layers.append(torch.nn.BatchNorm2d(2 * self.h))
         self.layers = torch.nn.Sequential(*layers)
 
         #Weights initialization
