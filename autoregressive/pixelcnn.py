@@ -34,21 +34,23 @@ class ResidualBlock(torch.nn.Module):
         self.bn = bn
 
         layers = []
-        # layers.append(torch.nn.ReLU())
-        layers.append(torch.nn.SELU())
-        layers.append(torch.nn.Conv2d(2 * self.h, self.h, (1, 1)))
         if self.bn:
+            layers.append(torch.nn.ReLU())
+            layers.append(torch.nn.Conv2d(2 * self.h, self.h, (1, 1)))
             layers.append(torch.nn.BatchNorm2d(self.h))
-        # layers.append(torch.nn.ReLU())
-        layers.append(torch.nn.SELU())
-        layers.append(MaskedConvolution(self.h, self.h, (3, 3), 'B', 1))
-        if self.bn:
+            layers.append(torch.nn.ReLU())
+            layers.append(MaskedConvolution(self.h, self.h, (3, 3), 'B', 1))
             layers.append(torch.nn.BatchNorm2d(self.h))
-        # layers.append(torch.nn.ReLU())
-        layers.append(torch.nn.SELU())
-        layers.append(torch.nn.Conv2d(self.h, 2 * self.h, (1, 1)))
-        if self.bn:
+            layers.append(torch.nn.ReLU())
+            layers.append(torch.nn.Conv2d(self.h, 2 * self.h, (1, 1)))
             layers.append(torch.nn.BatchNorm2d(2 * self.h))
+        else:
+            layers.append(torch.nn.SELU())
+            layers.append(torch.nn.Conv2d(2 * self.h, self.h, (1, 1)))
+            layers.append(torch.nn.SELU())
+            layers.append(MaskedConvolution(self.h, self.h, (3, 3), 'B', 1))
+            layers.append(torch.nn.SELU())
+            layers.append(torch.nn.Conv2d(self.h, 2 * self.h, (1, 1)))
         self.layers = torch.nn.Sequential(*layers)
 
         #Weights initialization
