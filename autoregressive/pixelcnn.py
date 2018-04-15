@@ -45,11 +45,14 @@ class ResidualBlock(torch.nn.Module):
             layers.append(torch.nn.Conv2d(self.h, 2 * self.h, (1, 1)))
             layers.append(torch.nn.BatchNorm2d(2 * self.h))
         else:
-            layers.append(torch.nn.SELU())
+            layers.append(torch.nn.ReLU())
+            #layers.append(torch.nn.SELU())
             layers.append(torch.nn.Conv2d(2 * self.h, self.h, (1, 1)))
-            layers.append(torch.nn.SELU())
+            layers.append(torch.nn.ReLU())
+            #layers.append(torch.nn.SELU())
             layers.append(MaskedConvolution(self.h, self.h, (3, 3), 'B', 1))
-            layers.append(torch.nn.SELU())
+            layers.append(torch.nn.ReLU())
+            #layers.append(torch.nn.SELU())
             layers.append(torch.nn.Conv2d(self.h, 2 * self.h, (1, 1)))
         self.layers = torch.nn.Sequential(*layers)
 
@@ -80,8 +83,8 @@ class PixelCNN(torch.nn.Module):
         if self.bn:
             self.top_layer = torch.nn.Sequential(*[torch.nn.ReLU(), torch.nn.Conv2d(2 * self.h, self.d, (1, 1)), torch.nn.BatchNorm2d(self.d), torch.nn.ReLU()])
         else:
-            # self.top_layer = torch.nn.Sequential(*[torch.nn.ReLU(), torch.nn.Conv2d(2 * self.h, self.d, (1, 1)), torch.nn.ReLU()])
-            self.top_layer = torch.nn.Sequential(*[torch.nn.SELU(), torch.nn.Conv2d(2 * self.h, self.d, (1, 1)), torch.nn.SELU()])
+            self.top_layer = torch.nn.Sequential(*[torch.nn.ReLU(), torch.nn.Conv2d(2 * self.h, self.d, (1, 1)), torch.nn.ReLU()])
+            #self.top_layer = torch.nn.Sequential(*[torch.nn.SELU(), torch.nn.Conv2d(2 * self.h, self.d, (1, 1)), torch.nn.SELU()])
         self.evidence = torch.nn.Conv2d(self.d, 256, (1, 1))
 
         #Weights initialization
