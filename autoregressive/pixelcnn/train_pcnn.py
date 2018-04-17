@@ -45,7 +45,7 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, ims, directory):
             running_loss = 0
             pcnn.train(p == 'train')
 
-            dataloader = DataLoader(sets[p], batch_size=batch_size, shuffle=(p == 'train'), num_workers=4)
+            dataloader = DataLoader(sets[p], batch_size=batch_size, shuffle=True, num_workers=4)
 
             for i_batch, sample in enumerate(tqdm(dataloader)):
                 optimizer.zero_grad()
