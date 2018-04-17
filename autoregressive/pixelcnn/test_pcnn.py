@@ -156,8 +156,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
     #Test arguments
     parser.add_argument('-m', dest='model', type=str, default='', help='Serialized model')
-    parser.add_argument('--tes', dest='testset', type=str, default='data/summaries/umn/testset', help='Path to the testset summary')
-    parser.add_argument('--rd', dest='root_dir', type=str, default='/datasets', help='Path to the images')
+    parser.add_argument('--tes', dest='testset', type=str, default='data/summaries/umn_testset', help='Path to the testset summary')
+    parser.add_argument('--rd', dest='root_dir', type=str, default='/home/scom/data/umn64', help='Path to the images')
     parser.add_argument('--bs', dest='batch_size', type=int, default=16, help='Mini batch size')
     parser.add_argument('--dir', dest='directory', type=str, default='train_autoencoder', help='Directory to store results')
     parser.add_argument('--ims', dest='image_size', type=str, default='64,64,1', help='Image size')
