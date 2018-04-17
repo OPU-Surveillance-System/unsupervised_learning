@@ -6,3 +6,6 @@ tqdm
 sklearn
 tensorboardX
 tensorflow
+torch
+torchvision
+imageio
