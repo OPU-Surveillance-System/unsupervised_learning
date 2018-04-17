@@ -115,7 +115,7 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, ims, directory):
                 plt.imshow(synthetic)
                 plt.savefig(os.path.join(directory, 'generation', '{}.svg'.format(e)), format='svg', bbox_inches='tight')
 
-            if auc > best_auc:
+            if auc > best_auc and e > 0:
                 best_model = copy.deepcopy(pcnn)
                 torch.save(pcnn.state_dict(), os.path.join(directory, 'serial', 'best_model'.format(e)))
                 print('Best model saved.')
