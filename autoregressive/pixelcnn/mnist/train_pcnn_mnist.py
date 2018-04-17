@@ -11,11 +11,7 @@ from sklearn import metrics
 from tensorboardX import SummaryWriter
 import matplotlib.pyplot as plt
 
-import dataset
-import autoregressive.pixelcnn_mnist
-import utils.metrics
-import utils.plot
-import utils.process
+import autoregressive.pixelcnn.mnist.pixelcnn_mnist
 import utils.debug
 
 def train(pcnn, optimizer, trainset, testset, epoch, batch_size, directory, translate=False):
@@ -192,7 +188,7 @@ def main(args):
         bn = False
     else:
         bn = True
-    pcnn = autoregressive.pixelcnn_mnist.PixelCNN(args.f, args.n, args.d, bn)
+    pcnn = autoregressive.pixelcnn.mnist.pixelcnn_mnist.PixelCNN(args.f, args.n, args.d, bn)
     pcnn = pcnn.cuda()
     print(pcnn)
     if args.model != '':

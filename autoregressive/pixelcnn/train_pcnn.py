@@ -11,11 +11,8 @@ from sklearn import metrics
 from tensorboardX import SummaryWriter
 import matplotlib.pyplot as plt
 
-import dataset
-import autoregressive.pixelcnn
-import utils.metrics
-import utils.plot
-import utils.process
+import data.dataset
+import autoregressive.pixelcnn.model
 import utils.debug
 
 def train(pcnn, optimizer, datasets, epoch, batch_size, ims, directory):
@@ -173,14 +170,14 @@ def main(args):
             f.write('{}:{}\n'.format(k, d[k]))
 
     #Variables
-    pcnn = autoregressive.pixelcnn.PixelCNN(args.f, args.n, args.d)
+    pcnn = autoregressive.pixelcnn.model.PixelCNN(args.f, args.n, args.d)
     pcnn = pcnn.cuda()
     print(pcnn)
     optimizer = torch.optim.Adam(pcnn.parameters(), args.learning_rate)
     ims = [int(s) for s in args.image_size.split(',')]
 
-    trainset = dataset.VideoDataset(args.trainset, args.root_dir, 'L', args.image_size)
-    testset = dataset.VideoDataset(args.testset, args.root_dir, 'L', args.image_size)
+    trainset = data.dataset.VideoDataset(args.trainset, args.root_dir, 'L', args.image_size)
+    testset = data.dataset.VideoDataset(args.testset, args.root_dir, 'L', args.image_size)
     datasets = [trainset, testset]
 
     #Train the model and save it
@@ -191,8 +188,8 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
     #Training arguments
-    parser.add_argument('--trs', dest='trainset', type=str, default='data/umn_normal_trainset', help='Path to the trainset summary')
-    parser.add_argument('--tes', dest='testset', type=str, default='data/umn_testset', help='Path to the testset summary')
+    parser.add_argument('--trs', dest='trainset', type=str, default='data/summaries/umn_normal_trainset', help='Path to the trainset summary')
+    parser.add_argument('--tes', dest='testset', type=str, default='data/summaries/umn_testset', help='Path to the testset summary')
     parser.add_argument('--rd', dest='root_dir', type=str, default='/datasets/umn64', help='Path to the images')
     parser.add_argument('--bs', dest='batch_size', type=int, default=16, help='Mini batch size')
     parser.add_argument('--lr', dest='learning_rate', type=float, default=0.001, help='Learning rate')

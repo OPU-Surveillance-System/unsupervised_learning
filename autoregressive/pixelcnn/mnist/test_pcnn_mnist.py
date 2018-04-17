@@ -9,11 +9,8 @@ from torch.autograd import Variable
 from tqdm import tqdm
 from sklearn import metrics
 
-import dataset
-import autoregressive.pixelcnn_mnist
-import utils.metrics
+import autoregressive.pixelcnn.mnist.pixelcnn_mnist
 import utils.plot
-import utils.process
 
 def test(pcnn, testset, batch_size, directory):
     """
@@ -107,7 +104,7 @@ def test(pcnn, testset, batch_size, directory):
     hist_a, _ = np.histogram(alphabet_distribution, bins=50, range=[mnist_distribution.min(), alphabet_distribution.max()])
     minima = np.minimum(hist_m, hist_a)
     intersection = np.true_divide(np.sum(minima), np.sum(hist_a))
-    utils.plot.plot_likelihood_hist(mnist_distribution, alphabet_distribution, os.path.join(directory, 'plots', 'loglikelihood_hist.svg'))
+    utils.plot.plot_mnist_likelihood_hist(mnist_distribution, alphabet_distribution, os.path.join(directory, 'plots', 'loglikelihood_hist.svg'))
     print('Intersection: {}'.format(intersection))
 
     return 0
@@ -126,7 +123,7 @@ def main(args):
         with open(os.path.join(args.directory, 'hyper-parameters'), 'r') as f:
             hp = f.read().split('\n')[:-1]
         hp = {e.split(':')[0]:e.split(':')[1] for e in hp}
-        pcnn = autoregressive.pixelcnn_mnist.PixelCNN(int(hp['f']), int(hp['n']), int(hp['d']))
+        pcnn = autoregressive.pixelcnn.mnist.pixelcnn_mnist.PixelCNN(int(hp['f']), int(hp['n']), int(hp['d']))
     pcnn.cuda()
     print(pcnn)
     #Load the trained model
@@ -143,8 +140,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
     #Test arguments
     parser.add_argument('-m', dest='model', type=str, default='', help='Serialized model')
-    parser.add_argument('--tes', dest='testset', type=str, default='data/umn/testset', help='Path to the testset summary')
-    parser.add_argument('--rd', dest='root_dir', type=str, default='/datasets', help='Path to the images')
     parser.add_argument('--bs', dest='batch_size', type=int, default=16, help='Mini batch size')
     parser.add_argument('--dir', dest='directory', type=str, default='train_autoencoder', help='Directory to store results')
     args = parser.parse_args()

@@ -9,11 +9,8 @@ from torch.autograd import Variable
 from tqdm import tqdm
 from sklearn import metrics
 
-import dataset
-import autoregressive.pixelcnn
-import utils.metrics
-import utils.plot
-import utils.process
+import data.dataset
+import autoregressive.pixelcnn.model
 
 def test(pcnn, testset, batch_size, directory):
     """
@@ -141,7 +138,7 @@ def main(args):
             bn = False
         else:
             bn = True
-        pcnn = autoregressive.pixelcnn.PixelCNN(int(hp['f']), int(hp['n']), int(hp['d']), bn)
+        pcnn = autoregressive.pixelcnn.model.PixelCNN(int(hp['f']), int(hp['n']), int(hp['d']), bn)
     pcnn.cuda()
     print(pcnn)
 
@@ -152,7 +149,7 @@ def main(args):
     #Load the trained model
     pcnn.load_state_dict(torch.load(model))
 
-    testset = dataset.VideoDataset(args.testset, args.root_dir, 'L', args.image_size)
+    testset = data.dataset.VideoDataset(args.testset, args.root_dir, 'L', args.image_size)
 
     #Evaluate the model
     test(pcnn, testset, args.batch_size, args.directory)
@@ -163,7 +160,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
     #Test arguments
     parser.add_argument('-m', dest='model', type=str, default='', help='Serialized model')
-    parser.add_argument('--tes', dest='testset', type=str, default='data/umn/testset', help='Path to the testset summary')
+    parser.add_argument('--tes', dest='testset', type=str, default='data/summaries/umn/testset', help='Path to the testset summary')
     parser.add_argument('--rd', dest='root_dir', type=str, default='/datasets', help='Path to the images')
     parser.add_argument('--bs', dest='batch_size', type=int, default=16, help='Mini batch size')
     parser.add_argument('--dir', dest='directory', type=str, default='train_autoencoder', help='Directory to store results')
