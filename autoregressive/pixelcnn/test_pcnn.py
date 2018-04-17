@@ -134,11 +134,7 @@ def main(args):
         with open(os.path.join(args.directory, 'hyper-parameters'), 'r') as f:
             hp = f.read().split('\n')[:-1]
         hp = {e.split(':')[0]:e.split(':')[1] for e in hp}
-        if hp['bn'] == '0':
-            bn = False
-        else:
-            bn = True
-        pcnn = autoregressive.pixelcnn.model.PixelCNN(int(hp['f']), int(hp['n']), int(hp['d']), bn)
+        pcnn = autoregressive.pixelcnn.model.PixelCNN(int(hp['f']), int(hp['n']), int(hp['d']))
     pcnn.cuda()
     print(pcnn)
 
