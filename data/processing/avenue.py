@@ -64,7 +64,7 @@ for f in tqdm(files):
         for frame in range(nb_frames):
             try: #Sometimes a RuntimeError occurs while fetching the last frame
                 f_data = v.get_data(frame)
-                if args.resize is not '':
+                if resize is not None:
                     misc.imsave('{}_{}.png'.format(os.path.join(args.target, 'test', filename), frame), misc.imresize(f_data, (resize[0], resize[1])))
                 else:
                     misc.imsave('{}_{}.png'.format(os.path.join(args.target, 'test', filename), frame), f_data)
