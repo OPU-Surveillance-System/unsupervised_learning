@@ -49,7 +49,7 @@ for f in tqdm(files):
                     misc.imsave('{}_{}.png'.format(os.path.join(args.target, 'train', filename), frame), f_data)
             except RuntimeError:
                 pass
-            fi.write('{}_{}.png\t1\n'.format(os.path.join(args.target, 'train', filename), frame))
+            fi.write('{}_{}.png\t1\n'.format(os.path.join('train', filename), frame))
 
 print('Process test set')
 with open(os.path.join(args.target, 'test', 'avenue_testset'), 'w') as fi:
@@ -71,4 +71,4 @@ for f in tqdm(files):
             except RuntimeError:
                 pass
             l = int(not np.any(labels[frame]))
-            fi.write('{}_{}.png\t{}\n'.format(os.path.join(args.target, 'test', filename), frame, l))
+            fi.write('{}_{}.png\t{}\n'.format(os.path.join('test', filename), frame, l))
