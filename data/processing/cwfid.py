@@ -83,5 +83,5 @@ for t in test_elements:
             for x in range(inimg.shape[1] // patch[1]):
                 l = int(not np.any(gtimg[y * patch[0]:(y * patch[0]) + patch[0], x * patch[1]:(x * patch[1]) + patch[1]]))
                 misc.imsave('{}_{}.png'.format(os.path.join(args.target, 'test', str(t)), count), inimg[y * patch[0]:(y * patch[0]) + patch[0], x * patch[1]:(x * patch[1]) + patch[1]])
-                count += 1
                 fi.write('{}_{}.png\t{}\n'.format(os.path.join('test', str(t)), count, l))
+                count += 1
