@@ -44,7 +44,7 @@ with open('/home/scom/Downloads/dataset-1.0/train_test_split.yaml', 'r') as f:
     test_elements = content['test']
 
 print('Process train set')
-with open(os.path.join(args.target, 'train', 'cwfid_trainset'), 'w') as fi: #Empty summary file
+with open(os.path.join(args.target, 'cwfid_trainset'), 'w') as fi: #Empty summary file
     pass
 for t in train_elements:
     index = str(t)
@@ -54,8 +54,8 @@ for t in train_elements:
     if resize:
         inimg = misc.imresize(inimg, (resize[0], resize[1]))
         gtimg = misc.imresize(gtimg, (resize[0], resize[1]))
-    gtimg = gtimg[:, :, 0]
-    with open(os.path.join(args.target, 'train', 'cwfid_trainset'), 'a') as fi:
+    gtimg = gtimg[:, :, 1]
+    with open(os.path.join(args.target, 'cwfid_trainset'), 'a') as fi:
         count = 0
         for y in range(inimg.shape[0] // patch[0]):
             for x in range(inimg.shape[1] // patch[1]):
@@ -66,7 +66,7 @@ for t in train_elements:
                 count += 1
 
 print('Process test set')
-with open(os.path.join(args.target, 'test', 'cwfid_testset'), 'w') as fi: #Empty summary file
+with open(os.path.join(args.target, 'cwfid_testset'), 'w') as fi: #Empty summary file
     pass
 for t in test_elements:
     index = str(t)
@@ -76,8 +76,8 @@ for t in test_elements:
     if resize:
         inimg = misc.imresize(inimg, (resize[0], resize[1]))
         gtimg = misc.imresize(gtimg, (resize[0], resize[1]))
-    gtimg = gtimg[:, :, 0]
-    with open(os.path.join(args.target, 'test', 'cwfid_testset'), 'a') as fi:
+    gtimg = gtimg[:, :, 1]
+    with open(os.path.join(args.target, 'cwfid_testset'), 'a') as fi:
         count = 0
         for y in range(inimg.shape[0] // patch[0]):
             for x in range(inimg.shape[1] // patch[1]):
