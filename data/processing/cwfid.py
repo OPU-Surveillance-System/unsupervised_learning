@@ -11,6 +11,8 @@ from scipy import io
 from tqdm import tqdm
 from sklearn.feature_extraction import image
 
+import matplotlib.pyplot as plt
+
 parser = argparse.ArgumentParser()
 
 parser.add_argument('-d', dest='dataset', type=str, default='/home/scom/Downloads/dataset-1.0', help='Path to the CWFID dataset')
@@ -59,8 +61,9 @@ for t in train_elements:
         count = 0
         for y in range(inimg.shape[0] // patch[0]):
             for x in range(inimg.shape[1] // patch[1]):
-                l = not np.any(gtimg[y * patch[0]:(y * patch[0]) + patch[0], x * patch[1]:(x * patch[1]) + patch[1]])
-                if l:
+                #l = not np.any(gtimg[y * patch[0]:(y * patch[0]) + patch[0], x * patch[1]:(x * patch[1]) + patch[1]])
+                nz = np.count_nonzero(gtimg[y * patch[0]:(y * patch[0]) + patch[0], x * patch[1]:(x * patch[1]) + patch[1]])
+                if nz < 50:
                     misc.imsave('{}_{}.png'.format(os.path.join(args.target, 'train', str(t)), count), inimg[y * patch[0]:(y * patch[0]) + patch[0], x * patch[1]:(x * patch[1]) + patch[1]])
                     fi.write('{}_{}.png\t1\n'.format(os.path.join('train', str(t)), count))
                 count += 1
@@ -68,6 +71,7 @@ for t in train_elements:
 print('Process test set')
 with open(os.path.join(args.target, 'cwfid_testset'), 'w') as fi: #Empty summary file
     pass
+ratio = []
 for t in test_elements:
     index = str(t)
     index = '0' * (3 - len(index)) + index #Image name includes one or more "0" before the image's index
@@ -82,6 +86,9 @@ for t in test_elements:
         for y in range(inimg.shape[0] // patch[0]):
             for x in range(inimg.shape[1] // patch[1]):
                 l = int(not np.any(gtimg[y * patch[0]:(y * patch[0]) + patch[0], x * patch[1]:(x * patch[1]) + patch[1]]))
-                misc.imsave('{}_{}.png'.format(os.path.join(args.target, 'test', str(t)), count), inimg[y * patch[0]:(y * patch[0]) + patch[0], x * patch[1]:(x * patch[1]) + patch[1]])
-                fi.write('{}_{}.png\t{}\n'.format(os.path.join('test', str(t)), count, l))
-                count += 1
+                nz = np.count_nonzero(gtimg[y * patch[0]:(y * patch[0]) + patch[0], x * patch[1]:(x * patch[1]) + patch[1]])
+                if nz > 50:
+                    misc.imsave('{}_{}.png'.format(os.path.join(args.target, 'test', str(t)), count), inimg[y * patch[0]:(y * patch[0]) + patch[0], x * patch[1]:(x * patch[1]) + patch[1]])
+                    fi.write('{}_{}.png\t{}\n'.format(os.path.join('test', str(t)), count, l))
+                    count += 1
+                    misc.imsave('{}gt_{}.png'.format(os.path.join(args.target, 'test', str(t)), count), gtimg[y * patch[0]:(y * patch[0]) + patch[0], x * patch[1]:(x * patch[1]) + patch[1]])
