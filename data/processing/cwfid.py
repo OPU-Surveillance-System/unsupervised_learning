@@ -94,4 +94,4 @@ for t in test_elements:
                 misc.imsave('{}_{}.png'.format(os.path.join(args.target, 'test', str(t)), count), inimg[y * patch[0]:(y * patch[0]) + patch[0], x * patch[1]:(x * patch[1]) + patch[1]])
                 fi.write('{}_{}.png\t{}\n'.format(os.path.join('test', str(t)), count, l))
                 count += 1
-                misc.imsave('{}gt_{}.png'.format(os.path.join(args.target, 'test', str(t)), count), gtimg[y * patch[0]:(y * patch[0]) + patch[0], x * patch[1]:(x * patch[1]) + patch[1]])
+                #misc.imsave('{}gt_{}.png'.format(os.path.join(args.target, 'test', str(t)), count), gtimg[y * patch[0]:(y * patch[0]) + patch[0], x * patch[1]:(x * patch[1]) + patch[1]])
