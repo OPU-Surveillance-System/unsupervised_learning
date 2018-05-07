@@ -1,6 +1,7 @@
 from torch.utils.data import Dataset, DataLoader
 from scipy import misc
 import os
+import random
 import numpy as np
 
 import utils.process
@@ -10,18 +11,24 @@ class VideoDataset(Dataset):
     Create a dataset
     """
 
-    def __init__(self, summary, root_dir, mode='RGB', size='256,256'):
+    def __init__(self, summary, root_dir, mode='RGB', size='256,256', val=0):
         """
         VideoDataset constructor
         Args:
             summary (str): Path to a dataset summary file
             root_dir (str): Path to the dataset frames
             model (str): Image color mode (L: black and white, RGB: RGB)
+            val (float): Ratio of elements used as validation
         """
 
         self.root_dir = root_dir
         with open(summary, 'r') as f:
             content = f.read().split('\n')[:-1]
+        if val != 0:
+            random.seed(a=1203)
+            random.shuffle(content)
+            bound = int(len(content) * val)
+            content = content[0:val]
         self.frames = [os.path.join(self.root_dir, '{}'.format(c.split('\t')[0])) for c in content]
         self.labels = [int(c.split('\t')[1]) for c in content]
         self.mode = mode

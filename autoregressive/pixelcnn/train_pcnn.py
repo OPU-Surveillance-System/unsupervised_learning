@@ -177,7 +177,7 @@ def main(args):
     ims = [int(s) for s in args.image_size.split(',')]
 
     trainset = data.dataset.VideoDataset(args.trainset, args.root_dir, 'L', args.image_size)
-    testset = data.dataset.VideoDataset(args.testset, args.root_dir, 'L', args.image_size)
+    testset = data.dataset.VideoDataset(args.testset, args.root_dir, 'L', args.image_size, val=args.validation_size)
     datasets = [trainset, testset]
 
     #Train the model and save it
@@ -196,6 +196,7 @@ if __name__ == '__main__':
     parser.add_argument('--ep', dest='epoch', type=int, default=100, help='Number of training epochs')
     parser.add_argument('--dir', dest='directory', type=str, default='train_autoencoder', help='Directory to store results')
     parser.add_argument('--ims', dest='image_size', type=str, default='64,64,1', help='Image size')
+    parser.add_argument('--val', dest='validation_size', type=float, default=0.3, help='Ratio of testset\'s elements used for validation')
     #Model arguments
     parser.add_argument('-f', dest='f', type=int, default=128, help='Number of hidden features')
     parser.add_argument('-d', dest='d', type=int, default=32, help='Number of top layer features')
