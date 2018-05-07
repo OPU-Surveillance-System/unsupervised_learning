@@ -28,7 +28,7 @@ class VideoDataset(Dataset):
             random.seed(a=1203)
             random.shuffle(content)
             bound = int(len(content) * val)
-            content = content[0:val]
+            content = content[0:bound]
         self.frames = [os.path.join(self.root_dir, '{}'.format(c.split('\t')[0])) for c in content]
         self.labels = [int(c.split('\t')[1]) for c in content]
         self.mode = mode
