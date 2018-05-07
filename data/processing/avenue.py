@@ -16,9 +16,13 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-d', dest='dataset', type=str, default='/home/scom/Downloads/Avenue Dataset', help='Path to the avenue dataset')
 parser.add_argument('-t', dest='target', type=str, default='/home/scom/avenue64', help='Directory to store resulting frames')
 parser.add_argument('-r', dest='resize', type=str, default='64,64', help='Specify the size at which the frames should be resized (format: heigt,width)')
-parser.add_argument('-s', dest='avenue17', type=int, default=0, help='Avenue17 (0 or 1)')
+parser.add_argument('-s', dest='avenue17', type=int, default=0, help='If 1 the testset produced is Avenue17 as proposed in https://arxiv.org/abs/1709.09121')
+parser.add_argument('-e', dest='avenueext', type=int, default=0, help='If 1 the testset include and label (as abnormal) the frame removed in Avenue17')
 
 args = parser.parse_args()
+
+if args.avenue17 == 1 and args.avenueext == 1:
+    raise Exception('Avenue17 and Avenueext cannot be activated together')
 
 if not os.path.exists(args.target):
     os.makedirs(args.target)
@@ -34,6 +38,8 @@ else:
 
 if args.avenue17 == 1:
     addon = '17'
+elif args.avenueext == 1:
+    addon = 'ext'
 else:
     addon = ''
 
@@ -80,5 +86,8 @@ for f in tqdm(files):
                     misc.imsave('{}_{}.png'.format(os.path.join(args.target, 'test', filename), frame), f_data)
             except RuntimeError:
                 pass
-            l = int(not np.any(labels[frame]))
+            if args.avenueext == 1 and any(clip in f for clip in avenue17):
+                l = 0
+            else:
+                l = int(not np.any(labels[frame]))
             fi.write('{}_{}.png\t{}\n'.format(os.path.join('test', filename), frame, l))
