@@ -119,6 +119,15 @@ def test(pcnn, testset, batch_size, directory):
     plt.legend(loc='upper right')
     plt.savefig(os.path.join(directory, 'plots', 'abnormal_score_series'), format='svg', bbox_inches='tight')
 
+    #Store results into a file
+    with open(os.path.join(directory, 'evaluation'), 'w') as f:
+        f.write('AUC:\t{}\n'.format(auc))
+        f.write('Normal:\tmean={},\tvar={},\tstd={}\n'.format(normal_distribution.mean(), normal_distribution.var(), normal_distribution.std()))
+        f.write("Anomaly:\tmean={},\tvar={},\tstd={}\n".format(abnormal_distribution.mean(), abnormal_distribution.var(), abnormal_distribution.std()))
+        f.write('Intersection:\t{}\t'.format(intersection))
+        for s in sorted_items:
+            f.write('{}\n'.format(s))
+            
     return 0
 
 def main(args):
