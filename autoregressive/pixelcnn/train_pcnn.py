@@ -151,7 +151,7 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, ims, direc
             ax.imshow(argmax)
             plt.savefig(os.path.join(directory, 'reconstruction_{}'.format(p), '{}.svg'.format(epoch)), format='svg', bbox_inches='tight')
 
-            if p == 'train':
+            if p == 'test':
                 epoch += 1
 
     writer.export_scalars_to_json(os.path.join(directory, 'logs', 'scalars.json'))
