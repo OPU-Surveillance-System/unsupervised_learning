@@ -62,10 +62,10 @@ datasets = [trainset, valset]
 
 #Train the model and save it
 print('Start training.')
-best_model = train(pcnn, optimizer, datasets, args.epoch, args.batch_size, args.patience, ims, args.directory)
+best_model = train.train(pcnn, optimizer, datasets, args.epoch, args.batch_size, args.patience, ims, args.directory)
 print('Training complete.')
 
 #Evaluate the model
 print('Start evaluation.')
-test(best_model, testset, args.batch_size, args.directory)
+test.test(best_model, testset, args.batch_size, args.directory)
 print('Evaluation complete.')
