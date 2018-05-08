@@ -15,13 +15,14 @@ import data.dataset
 import autoregressive.pixelcnn.model
 import utils.debug
 
-def train(pcnn, optimizer, datasets, epoch, batch_size, ims, directory):
+def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, ims, directory):
     """
     pcnn (autoregressive.pixelcnn.PixelCNN): Model to train
     optimizer (torch.optim.Optimizer): Optimizer
     datasets (list of torch.utils.data.Dataset): Trainset and testset
     epoch (int): Number of training epochs
     batch_size (int): Mini-batch size
+    max_patience (int):
     ims (list of int): Images' dimension
     directory (str): Path to a directory to store results
     """
@@ -35,7 +36,11 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, ims, directory):
     best_auc = 0.0
     best_model = copy.deepcopy(pcnn)
 
-    for e in range(epoch):
+    patience = 0
+    epoch = 0
+
+    while patience < max_patience:
+    # for e in range(epoch):
 
         likelihood = []
         groundtruth = []
@@ -92,11 +97,11 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, ims, directory):
                 auc = 0
 
             epoch_loss = running_loss / (i_batch + 1)
-            writer.add_scalar('learning_curve/{}'.format(p), epoch_loss, e)
-            writer.add_scalar('auc/{}'.format(p), auc, e)
-            print('Epoch {} ({}): loss = {}, AUC = {}'.format(e, p, epoch_loss, auc))
+            writer.add_scalar('learning_curve/{}'.format(p), epoch_loss, epoch)
+            writer.add_scalar('auc/{}'.format(p), auc, epoch)
+            print('Epoch {} ({}): loss = {}, AUC = {}'.format(epoch, p, epoch_loss, auc))
 
-            if p == 'test' and e % 10 == 0:
+            if p == 'test' and epoch % 10 == 0:
                 synthetic = torch.zeros(16, 1, ims[0], ims[1]).cuda()
                 for i in tqdm(range(ims[0])):
                     for j in range(ims[1]):
@@ -110,13 +115,15 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, ims, directory):
                 synthetic = np.reshape(synthetic, (ims[0] * 4, ims[1] * 4))
                 plt.clf()
                 plt.imshow(synthetic)
-                plt.savefig(os.path.join(directory, 'generation', '{}.svg'.format(e)), format='svg', bbox_inches='tight')
+                plt.savefig(os.path.join(directory, 'generation', '{}.svg'.format(epoch)), format='svg', bbox_inches='tight')
 
-            if auc > best_auc and e > 0:
+            if auc > best_auc and p == 'test':
                 best_model = copy.deepcopy(pcnn)
-                torch.save(pcnn.state_dict(), os.path.join(directory, 'serial', 'best_model'.format(e)))
+                torch.save(pcnn.state_dict(), os.path.join(directory, 'serial', 'best_model'.format(epoch)))
                 print('Best model saved.')
                 best_auc = auc
+            else:
+                patience += 1
 
             #Plot reconstructions
             logits = logits.permute(0, 2, 3, 1)
@@ -139,7 +146,10 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, ims, directory):
             argmax = np.reshape(argmax, (ims[0], nb_img * ims[1]))
             ax = plt.subplot2grid((2, 1), (1, 0), rowspan=1, colspan=1)
             ax.imshow(argmax)
-            plt.savefig(os.path.join(directory, 'reconstruction_{}'.format(p), '{}.svg'.format(e)), format='svg', bbox_inches='tight')
+            plt.savefig(os.path.join(directory, 'reconstruction_{}'.format(p), '{}.svg'.format(epoch)), format='svg', bbox_inches='tight')
+
+            if p == 'train':
+                epoch += 1
 
     writer.export_scalars_to_json(os.path.join(directory, 'logs', 'scalars.json'))
     writer.close()
@@ -181,7 +191,7 @@ def main(args):
     datasets = [trainset, testset]
 
     #Train the model and save it
-    best_model = train(pcnn, optimizer, datasets, args.epoch, args.batch_size, ims, args.directory)
+    best_model = train(pcnn, optimizer, datasets, args.epoch, args.batch_size, args.patience, ims, args.directory)
 
     return best_model
 
@@ -197,6 +207,7 @@ if __name__ == '__main__':
     parser.add_argument('--dir', dest='directory', type=str, default='train_autoencoder', help='Directory to store results')
     parser.add_argument('--ims', dest='image_size', type=str, default='64,64,1', help='Image size')
     parser.add_argument('--val', dest='validation_size', type=float, default=0.3, help='Ratio of testset\'s elements used for validation')
+    parser.add_argument('-p', dest='patience', type=int, default=100, help='Early stopping max patience')
     #Model arguments
     parser.add_argument('-f', dest='f', type=int, default=128, help='Number of hidden features')
     parser.add_argument('-d', dest='d', type=int, default=32, help='Number of top layer features')
