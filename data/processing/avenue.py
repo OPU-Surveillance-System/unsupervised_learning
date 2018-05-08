@@ -2,6 +2,7 @@
 Split and label videos from the Avenue dataset (http://www.cse.cuhk.edu.hk/leojia/projects/detectabnormal/dataset.html)
 """
 
+import random
 import argparse
 import os
 import imageio
@@ -66,6 +67,7 @@ for f in tqdm(files):
             fi.write('{}_{}.png\t1\n'.format(os.path.join('train', filename), frame))
 
 print('Process test set')
+valset = []
 with open(os.path.join(args.target, 'avenue_testset' + addon), 'w') as fi:
     pass
 files = sorted([os.path.join(os.path.join(args.dataset, 'testing_videos', f)) for f in os.listdir(os.path.join(args.dataset, 'testing_videos'))])
@@ -91,3 +93,9 @@ for f in tqdm(files):
             else:
                 l = int(not np.any(labels[frame]))
             fi.write('{}_{}.png\t{}\n'.format(os.path.join('test', filename), frame, l))
+            valset.append('{}_{}.png\t{}'.format(os.path.join('test', filename), frame, l))
+random.seed(a=1204)
+random.shuffle(valset)
+with open(os.path.join(args.target, 'avenue_valset' + addon), 'w') as fi:
+    for v in valset:
+        fi.write('{}\n'.format(v))
