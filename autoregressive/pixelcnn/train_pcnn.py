@@ -101,30 +101,31 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, ims, direc
             writer.add_scalar('auc/{}'.format(p), auc, epoch)
             print('Epoch {} ({}): loss = {}, AUC = {}'.format(epoch, p, epoch_loss, auc))
 
-            if p == 'test' and epoch % 10 == 0:
-                synthetic = torch.zeros(16, 1, ims[0], ims[1]).cuda()
-                for i in tqdm(range(ims[0])):
-                    for j in range(ims[1]):
-                        probs = pcnn(Variable(synthetic, volatile=True))[0]
-                        probs = torch.nn.functional.softmax(probs[:, :, i, j]).data
-                        synthetic[:, :, i, j] = torch.multinomial(probs, 1).float() / 255.
+            if p == 'test':
+                if epoch % 10 == 0:
+                    synthetic = torch.zeros(16, 1, ims[0], ims[1]).cuda()
+                    for i in tqdm(range(ims[0])):
+                        for j in range(ims[1]):
+                            probs = pcnn(Variable(synthetic, volatile=True))[0]
+                            probs = torch.nn.functional.softmax(probs[:, :, i, j]).data
+                            synthetic[:, :, i, j] = torch.multinomial(probs, 1).float() / 255.
 
-                synthetic = synthetic.cpu().numpy()
-                synthetic = np.reshape(synthetic, (4, 4, ims[0], ims[1]))
-                synthetic = np.swapaxes(synthetic, 1, 2)
-                synthetic = np.reshape(synthetic, (ims[0] * 4, ims[1] * 4))
-                plt.clf()
-                plt.imshow(synthetic)
-                plt.savefig(os.path.join(directory, 'generation', '{}.svg'.format(epoch)), format='svg', bbox_inches='tight')
+                    synthetic = synthetic.cpu().numpy()
+                    synthetic = np.reshape(synthetic, (4, 4, ims[0], ims[1]))
+                    synthetic = np.swapaxes(synthetic, 1, 2)
+                    synthetic = np.reshape(synthetic, (ims[0] * 4, ims[1] * 4))
+                    plt.clf()
+                    plt.imshow(synthetic)
+                    plt.savefig(os.path.join(directory, 'generation', '{}.svg'.format(epoch)), format='svg', bbox_inches='tight')
 
-            if auc > best_auc and p == 'test':
-                best_model = copy.deepcopy(pcnn)
-                torch.save(pcnn.state_dict(), os.path.join(directory, 'serial', 'best_model'.format(epoch)))
-                print('Best model saved.')
-                best_auc = auc
-            else:
-                patience += 1
-                print('Patience {}/{}'.format(patience, max_patience))
+                if auc > best_auc:
+                    best_model = copy.deepcopy(pcnn)
+                    torch.save(pcnn.state_dict(), os.path.join(directory, 'serial', 'best_model'.format(epoch)))
+                    print('Best model saved.')
+                    best_auc = auc
+                else:
+                    patience += 1
+                    print('Patience {}/{}'.format(patience, max_patience))
 
             #Plot reconstructions
             logits = logits.permute(0, 2, 3, 1)
