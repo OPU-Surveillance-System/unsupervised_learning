@@ -157,6 +157,8 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, ims, direc
     writer.export_scalars_to_json(os.path.join(directory, 'logs', 'scalars.json'))
     writer.close()
 
+    return best_model
+
 def main(args):
     """
     Train an autoencoder and save it
