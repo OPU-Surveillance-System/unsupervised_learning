@@ -124,6 +124,7 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, ims, direc
                 best_auc = auc
             else:
                 patience += 1
+                print('Patience {}/{}'.format(patience, max_patience))
 
             #Plot reconstructions
             logits = logits.permute(0, 2, 3, 1)
