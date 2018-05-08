@@ -1,5 +1,6 @@
 import argparse
 import os
+import torch
 
 import data.dataset
 import autoregressive.pixelcnn.model
