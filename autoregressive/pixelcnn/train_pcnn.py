@@ -123,6 +123,7 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, ims, direc
                     torch.save(pcnn.state_dict(), os.path.join(directory, 'serial', 'best_model'.format(epoch)))
                     print('Best model saved.')
                     best_auc = auc
+                    patience = 0
                 else:
                     patience += 1
                     print('Patience {}/{}'.format(patience, max_patience))
