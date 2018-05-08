@@ -17,7 +17,7 @@ parser.add_argument('--lr', dest='learning_rate', type=float, default=0.001, hel
 parser.add_argument('--ep', dest='epoch', type=int, default=100, help='Number of training epochs')
 parser.add_argument('--dir', dest='directory', type=str, default='train_autoencoder', help='Directory to store results')
 parser.add_argument('--ims', dest='image_size', type=str, default='64,64,1', help='Image size')
-parser.add_argument('--val', dest='validation_size', type=float, default=0.3, help='Ratio of testset\'s elements used for validation')
+parser.add_argument('-v', dest='validation_size', type=float, default=0.3, help='Ratio of testset\'s elements used for validation')
 parser.add_argument('-p', dest='patience', type=int, default=100, help='Early stopping max patience')
 #Model arguments
 parser.add_argument('-f', dest='f', type=int, default=128, help='Number of hidden features')
