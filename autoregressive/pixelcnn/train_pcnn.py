@@ -57,6 +57,9 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims,
 
         for p in phase:
             running_loss = 0
+            running_xentropy = 0
+            running_entropy = 0
+
             pcnn.train(p == 'train')
 
             dataloader = DataLoader(sets[p], batch_size=batch_size, shuffle=True, num_workers=4)
@@ -70,9 +73,11 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims,
                 logits = pcnn(img)[0]
 
                 cross_entropy = torch.nn.functional.cross_entropy(logits, lbl)
-                mean_entropy = compute_entropy()
+                mean_entropy = compute_entropy(logits)
                 loss = cross_entropy - beta * mean_entropy
                 running_loss += loss.data[0]
+                running_xentropy += cross_entropy.data[0]
+                running_entropy += entropy.data[0]
                 if p == 'train':
                     loss.backward()
                     optimizer.step()
@@ -108,9 +113,13 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims,
                 auc = 0
 
             epoch_loss = running_loss / (i_batch + 1)
-            writer.add_scalar('learning_curve/{}'.format(p), epoch_loss, epoch)
+            epoch_xentropy = running_xentropy / (i_batch + 1)
+            epoch_entropy = running_entropy / (i_batch + 1)
+            writer.add_scalar('learning_curve/{}/loss'.format(p), epoch_loss, epoch)
+            writer.add_scalar('learning_curve/{}/cross_entropy'.format(p), epoch_xentropy, epoch)
+            writer.add_scalar('learning_curve/{}/entropy'.format(p), epoch_entropy, epoch)
             writer.add_scalar('auc/{}'.format(p), auc, epoch)
-            print('Epoch {} ({}): loss = {}, AUC = {}'.format(epoch, p, epoch_loss, auc))
+            print('Epoch {} ({}): loss = {} (xentropy = {}, entropy = {}), AUC = {}'.format(epoch, p, epoch_loss, , auc))
 
             if p == 'test':
                 if epoch % 10 == 0:
