@@ -20,7 +20,7 @@ def compute_entropy(logits):
     probs = torch.nn.functional.softmax(logits, 1)
     entropy = -torch.sum(probs * torch.log(probs), 1)
     mean_entropy = entropy.mean()
-    if mean_entropy.cpu().data.numpy().isnan():
+    if np.isnan(mean_entropy.cpu().data.numpy()):
         print('Mean entropy is NaN')
         print(probs)
         print(entropy)
