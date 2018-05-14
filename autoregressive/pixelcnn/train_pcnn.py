@@ -74,10 +74,11 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims,
 
                 cross_entropy = torch.nn.functional.cross_entropy(logits, lbl)
                 mean_entropy = compute_entropy(logits)
+                print(mean_entropy.data[0])
                 loss = cross_entropy - beta * mean_entropy
                 running_loss += loss.data[0]
                 running_xentropy += cross_entropy.data[0]
-                print(cross_entropy.data[0])
+                #print(cross_entropy.data[0])
                 running_entropy += mean_entropy.data[0]
                 if p == 'train':
                     loss.backward()
