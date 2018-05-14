@@ -119,7 +119,7 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims,
             writer.add_scalar('learning_curve/{}/cross_entropy'.format(p), epoch_xentropy, epoch)
             writer.add_scalar('learning_curve/{}/entropy'.format(p), epoch_entropy, epoch)
             writer.add_scalar('auc/{}'.format(p), auc, epoch)
-            print('Epoch {} ({}): loss = {} (xentropy = {}, entropy = {}), AUC = {}'.format(epoch, p, epoch_loss, , auc))
+            print('Epoch {} ({}): loss = {} (xentropy = {}, entropy = {}), AUC = {}'.format(epoch, p, epoch_loss, epoch_xentropy, epoch_entropy, auc))
 
             if p == 'test':
                 if epoch % 10 == 0:
