@@ -74,16 +74,11 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims,
 
                 cross_entropy = torch.nn.functional.cross_entropy(logits, lbl)
                 mean_entropy = compute_entropy(logits)
-                print(mean_entropy.data[0])
                 loss = cross_entropy - beta * mean_entropy
-                running_loss += loss.data[0]
-                running_xentropy += cross_entropy.data[0]
-                #print(cross_entropy.data[0])
-                running_entropy += mean_entropy.data[0]
                 if p == 'train':
                     loss.backward()
                     optimizer.step()
-                if p == 'test':
+                else:
                     lbl = torch.unsqueeze(lbl, 1)
                     groundtruth += sample['lbl'].numpy().tolist()
                     onehot_lbl = torch.FloatTensor(img.size(0), 256, ims[0], ims[1]).zero_().cuda()
@@ -97,6 +92,10 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims,
                     probs = torch.sum(probs, dim=1)
                     probs = probs.data.cpu().numpy().tolist()
                     likelihood += probs
+
+                running_loss += loss.data[0]
+                running_xentropy += cross_entropy.data[0]
+                running_entropy += mean_entropy.data[0]
 
             if p == 'test':
                 likelihood = np.array(likelihood)
