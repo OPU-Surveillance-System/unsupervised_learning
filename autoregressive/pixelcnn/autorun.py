@@ -20,6 +20,8 @@ parser.add_argument('--dir', dest='directory', type=str, default='train_autoenco
 parser.add_argument('--ims', dest='image_size', type=str, default='64,64,1', help='Image size')
 parser.add_argument('-v', dest='validation_size', type=float, default=0.3, help='Ratio of testset\'s elements used for validation')
 parser.add_argument('-p', dest='patience', type=int, default=100, help='Early stopping max patience')
+parser.add_argument('-b', dest='beta', type=float, default=0.1, help='Entropy regularization coefficient')
+
 #Model arguments
 parser.add_argument('-f', dest='f', type=int, default=128, help='Number of hidden features')
 parser.add_argument('-d', dest='d', type=int, default=32, help='Number of top layer features')
@@ -62,7 +64,7 @@ datasets = [trainset, valset]
 
 #Train the model and save it
 print('Start training.')
-best_model = train.train(pcnn, optimizer, datasets, args.epoch, args.batch_size, args.patience, ims, args.directory)
+best_model = train.train(pcnn, optimizer, datasets, args.epoch, args.batch_size, args.patience, args.beta, ims, args.directory)
 print('Training complete.')
 
 #Evaluate the model
