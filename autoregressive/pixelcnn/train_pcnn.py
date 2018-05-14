@@ -77,7 +77,7 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims,
                 loss = cross_entropy - beta * mean_entropy
                 running_loss += loss.data[0]
                 running_xentropy += cross_entropy.data[0]
-                running_entropy += entropy.data[0]
+                running_entropy += mean_entropy.data[0]
                 if p == 'train':
                     loss.backward()
                     optimizer.step()
