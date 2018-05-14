@@ -75,7 +75,7 @@ def test(pcnn, testset, batch_size, directory):
 
     #Print sorted log likelihood
     sorted_items = sorted(items.items(), key=operator.itemgetter(1))
-    print(sorted_items)
+    #print(sorted_items)
 
     #Compute AUC
     likelihood = np.array(likelihood)
@@ -127,7 +127,7 @@ def test(pcnn, testset, batch_size, directory):
         f.write('Intersection:\t{}\t'.format(intersection))
         for s in sorted_items:
             f.write('{}\n'.format(s))
-            
+
     return 0
 
 def main(args):
