@@ -17,7 +17,7 @@ import utils.debug
 
 def compute_entropy(logits):
     logits = logits.view((-1, 256))
-    logits += 0.000001
+    logits = logits + 0.000001
     probs = torch.nn.functional.softmax(logits, 1)
     entropy = -torch.sum(probs * torch.log(probs), 1)
     mean_entropy = entropy.mean()
