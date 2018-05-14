@@ -15,14 +15,23 @@ import data.dataset
 import autoregressive.pixelcnn.model
 import utils.debug
 
-def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, ims, directory):
+def compute_entropy(logits):
+    logits = logits.view((-1, 256))
+    probs = torch.nn.functional.softmax(logits, 1)
+    entropy = -torch.sum(probs * torch.log(probs), 1)
+    mean_entropy = entropy.mean()
+
+    return mean_entropy
+
+def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims, directory):
     """
     pcnn (autoregressive.pixelcnn.PixelCNN): Model to train
     optimizer (torch.optim.Optimizer): Optimizer
     datasets (list of torch.utils.data.Dataset): Trainset and testset
     epoch (int): Number of training epochs
     batch_size (int): Mini-batch size
-    max_patience (int):
+    max_patience (int): Early stopping algorithm's maximum patience
+    beta (float): Entropy regularization coefficient (https://arxiv.org/abs/1701.06548)
     ims (list of int): Images' dimension
     directory (str): Path to a directory to store results
     """
@@ -60,7 +69,9 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, ims, direc
 
                 logits = pcnn(img)[0]
 
-                loss = torch.nn.functional.cross_entropy(logits, lbl)
+                cross_entropy = torch.nn.functional.cross_entropy(logits, lbl)
+                mean_entropy = compute_entropy()
+                loss = cross_entropy - beta * mean_entropy
                 running_loss += loss.data[0]
                 if p == 'train':
                     loss.backward()
@@ -196,7 +207,7 @@ def main(args):
     datasets = [trainset, testset]
 
     #Train the model and save it
-    best_model = train(pcnn, optimizer, datasets, args.epoch, args.batch_size, args.patience, ims, args.directory)
+    best_model = train(pcnn, optimizer, datasets, args.epoch, args.batch_size, args.patience, args.beta, ims, args.directory)
 
     return best_model
 
@@ -213,6 +224,7 @@ if __name__ == '__main__':
     parser.add_argument('--ims', dest='image_size', type=str, default='64,64,1', help='Image size')
     parser.add_argument('--val', dest='validation_size', type=float, default=0.3, help='Ratio of testset\'s elements used for validation')
     parser.add_argument('-p', dest='patience', type=int, default=100, help='Early stopping max patience')
+    parser.add_argument('-b', dest='beta', type=float, default=0.1, help='Entropy regularization coefficient')
     #Model arguments
     parser.add_argument('-f', dest='f', type=int, default=128, help='Number of hidden features')
     parser.add_argument('-d', dest='d', type=int, default=32, help='Number of top layer features')
