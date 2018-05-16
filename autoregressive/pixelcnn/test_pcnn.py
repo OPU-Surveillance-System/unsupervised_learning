@@ -72,7 +72,7 @@ def test(pcnn, testset, batch_size, directory):
 
         #Reconstruction error
         reconstruction = utils.process.preprocess(argmax)
-        tmp = utils.metrics.per_image_error(dist, reconstruction, img)
+        tmp = utils.metrics.per_image_error(dist, reconstruction.float(), img)
         reconstruction_error += tmp.data.cpu().numpy().tolist()
 
     likelihood = np.array(likelihood)
