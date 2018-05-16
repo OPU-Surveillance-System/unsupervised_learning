@@ -99,6 +99,7 @@ def test(pcnn, testset, batch_size, directory):
     auc = metrics.auc(fpr, tpr)
     print('AUC likelihood:', auc)
 
+    #Compute AUC reconstruction
     reconstruction_error = np.array(reconstruction_error)
     fpr_r, tpr_r, thresholds_r = metrics.roc_curve(groundtruth, reconstruction_error)
     auc_r = metrics.auc(fpr_r, tpr_r)
@@ -126,6 +127,29 @@ def test(pcnn, testset, batch_size, directory):
     plt.ylabel('Normalized number of images')
     plt.legend(loc='upper right')
     plt.savefig(os.path.join(directory, 'plots', 'loglikelihood_hist'), format='svg', bbox_inches='tight')
+
+    #Get reconstruction errors histogram for normal and abnormal patterns
+    normal_distribution = np.array(reconstruction_distributions['normal'])
+    abnormal_distribution = np.array(reconstruction_distributions['abnormal'])
+    print("Normal (reconstruction): mean={}, var={}, std={}".format(normal_distribution.mean(), normal_distribution.var(), normal_distribution.std()))
+    print("Anomaly (reconstruction): mean={}, var={}, std={}".format(abnormal_distribution.mean(), abnormal_distribution.var(), abnormal_distribution.std()))
+    hist_n, _ = np.histogram(normal_distribution, bins=50, range=[abnormal_distribution.min(), normal_distribution.max()])
+    hist_a, _ = np.histogram(abnormal_distribution, bins=50, range=[abnormal_distribution.min(), normal_distribution.max()])
+    minima = np.minimum(hist_n, hist_a)
+    intersection = np.true_divide(np.sum(minima), np.sum(hist_a))
+    print('Intersection (reconstruction): {}'.format(intersection))
+
+    plt.clf()
+    weights = np.ones_like(normal_distribution)/(len(normal_distribution))
+    plt.hist(normal_distribution, bins=100, alpha=0.5, weights=weights, label='Normal', color='blue')
+    weights = np.ones_like(abnormal_distribution)/(len(normal_distribution))
+    x2, bins2, p2 = plt.hist(abnormal_distribution, bins=100, alpha=0.5, weights=weights, label='Abnormal', color='red')
+    for item2 in p2:
+        item2.set_height(item2.get_height()/sum(x2))
+    plt.xlabel('L2 norm')
+    plt.ylabel('Normalized number of images')
+    plt.legend(loc='upper right')
+    plt.savefig(os.path.join(directory, 'plots', 'reconstruction_hist'), format='svg', bbox_inches='tight')
 
     #Plot time series log likelihood
     x = np.array([i for i in range(len(groundtruth))])
