@@ -171,14 +171,8 @@ def test(pcnn, testset, batch_size, directory):
         b = beta / 10
         score = ((1 - b) * norm_likelihood) + (b * norm_reconstruction)
         fpr_mix, tpr_mix, thresholds_mix = metrics.roc_curve(groundtruth, score)
-        auc_mix = metrics.auc(fpr, tpr)
+        auc_mix = metrics.auc(fpr_mix, tpr_mix)
         print('AUC mix (beta={})'.format(b), auc_mix)
-
-    #Compute AUC reconstruction
-    reconstruction_error = np.array(reconstruction_error)
-    fpr_r, tpr_r, thresholds_r = metrics.roc_curve(groundtruth, reconstruction_error)
-    auc_r = metrics.auc(fpr_r, tpr_r)
-    print('AUC reconstruction:', auc_r)
 
     #Store results into a file
     with open(os.path.join(directory, 'evaluation'), 'w') as f:
