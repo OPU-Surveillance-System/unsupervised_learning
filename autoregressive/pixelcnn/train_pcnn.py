@@ -22,10 +22,10 @@ def compute_entropy(logits):
     # probs = probs + 0.000001
     entropy = -torch.sum(probs * torch.log(probs), 1)
     mean_entropy = entropy.mean()
-    if np.isnan(mean_entropy.cpu().data.numpy()):
-        print('Mean entropy is NaN', mean_entropy)
-        print(probs)
-        print(entropy)
+    # if np.isnan(mean_entropy.cpu().data.numpy()):
+    #     print('Mean entropy is NaN', mean_entropy)
+    #     print(probs)
+    #     print(entropy)
 
     return mean_entropy
 
