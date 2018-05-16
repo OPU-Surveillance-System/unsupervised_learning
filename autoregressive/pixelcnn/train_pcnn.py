@@ -78,7 +78,7 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims,
 
                 logits = pcnn(img)[0]
 
-                #cross_entropy = torch.nn.functional.cross_entropy(logits, lbl)
+                cross_entropy = torch.nn.functional.cross_entropy(logits, lbl)
                 #mean_entropy = compute_entropy(logits)
                 loss = cross_entropy #- beta * mean_entropy
                 if p == 'train':
