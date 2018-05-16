@@ -128,6 +128,17 @@ def test(pcnn, testset, batch_size, directory):
     plt.legend(loc='upper right')
     plt.savefig(os.path.join(directory, 'plots', 'loglikelihood_hist'), format='svg', bbox_inches='tight')
 
+    #Plot time series log likelihood
+    x = np.array([i for i in range(len(groundtruth))])
+    likelihood = (likelihood - likelihood.min()) / (likelihood.max() - likelihood.min())
+    plt.clf()
+    plt.plot(x, groundtruth, '--', c='green', label='Groundtruth')
+    plt.plot(x, likelihood, '-', c='red', label='Norm. log likelihood')
+    plt.xlabel('Frames')
+    plt.ylabel('Likelihood')
+    plt.legend(loc='upper right')
+    plt.savefig(os.path.join(directory, 'plots', 'abnormal_score_series'), format='svg', bbox_inches='tight')
+
     #Get reconstruction errors histogram for normal and abnormal patterns
     normal_distribution = np.array(reconstruction_distributions['normal'])
     abnormal_distribution = np.array(reconstruction_distributions['abnormal'])
@@ -151,16 +162,21 @@ def test(pcnn, testset, batch_size, directory):
     plt.legend(loc='upper right')
     plt.savefig(os.path.join(directory, 'plots', 'reconstruction_hist'), format='svg', bbox_inches='tight')
 
-    #Plot time series log likelihood
-    x = np.array([i for i in range(len(groundtruth))])
-    likelihood = (likelihood - likelihood.min()) / (likelihood.max() - likelihood.min())
-    plt.clf()
-    plt.plot(x, groundtruth, '--', c='green', label='Groundtruth')
-    plt.plot(x, likelihood, '-', c='red', label='Norm. log likelihood')
-    plt.xlabel('Frames')
-    plt.ylabel('Likelihood')
-    plt.legend(loc='upper right')
-    plt.savefig(os.path.join(directory, 'plots', 'abnormal_score_series'), format='svg', bbox_inches='tight')
+    #AUC Mix
+    norm_likelihood = (likelihood - likelihood.min()) / (likelihood.max() - likelihood.min())
+    norm_reconstruction = (reconstruction_error - reconstruction_error.min()) / (reconstruction_error.max() - reconstruction_error.min())
+    for beta in range(11):
+        b = beta / 10
+        score = ((1 - b) * norm_likelihood) + (b * norm_reconstruction)
+        fpr_mix, tpr_mix, thresholds_mix = metrics.roc_curve(groundtruth, score)
+        auc_mix = metrics.auc(fpr, tpr)
+        print('AUC mix (beta={})'.format(b), auc)
+
+    #Compute AUC reconstruction
+    reconstruction_error = np.array(reconstruction_error)
+    fpr_r, tpr_r, thresholds_r = metrics.roc_curve(groundtruth, reconstruction_error)
+    auc_r = metrics.auc(fpr_r, tpr_r)
+    print('AUC reconstruction:', auc_r)
 
     #Store results into a file
     with open(os.path.join(directory, 'evaluation'), 'w') as f:
