@@ -168,6 +168,7 @@ def test(pcnn, testset, batch_size, directory):
     for beta in range(11):
         b = beta / 10
         score = ((1 - b) * norm_likelihood) + (b * norm_reconstruction)
+        print(score.shape, groundtruth.shape)
         fpr_mix, tpr_mix, thresholds_mix = metrics.roc_curve(groundtruth, score)
         auc_mix = metrics.auc(fpr, tpr)
         print('AUC mix (beta={})'.format(b), auc)
