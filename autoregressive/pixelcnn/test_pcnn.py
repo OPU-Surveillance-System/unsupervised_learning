@@ -11,6 +11,8 @@ from sklearn import metrics
 
 import data.dataset
 import autoregressive.pixelcnn.model
+import utils.process
+import utils.metrics
 
 def test(pcnn, testset, batch_size, directory):
     """
@@ -28,6 +30,10 @@ def test(pcnn, testset, batch_size, directory):
     likelihood_distributions = {'normal': [], 'abnormal': []}
     items = {}
 
+    dist = torch.nn.PairwiseDistance(p=2, eps=1e-06)
+    reconstruction_distributions = {'normal': [], 'abnormal': []}
+    reconstruction_error = []
+
     #Process the testset
     for i_batch, sample in enumerate(tqdm(dataloader)):
         groundtruth += sample['lbl'].numpy().tolist()
@@ -41,6 +47,7 @@ def test(pcnn, testset, batch_size, directory):
         #Compute pixel probabilities
         probs = pcnn(img)[0]
         probs = torch.nn.functional.softmax(probs, dim=1)
+        _, argmax = torch.max(probs, dim=1)
         probs = probs * onehot_lbl
         probs = torch.sum(probs, 1)
 
@@ -63,6 +70,11 @@ def test(pcnn, testset, batch_size, directory):
         probs = probs.data.cpu().numpy().tolist()
         likelihood += probs
 
+        #Reconstruction error
+        reconstruction = utils.process.preprocess(argmax)
+        tmp = utils.metrics.per_image_error(dist, reconstruction, img)
+        reconstruction_error += tmp.data.cpu().numpy().tolist()
+
     likelihood = np.array(likelihood)
     likelihood[likelihood == -np.inf] = likelihood[likelihood != -np.inf].min() #Remove -inf
 
@@ -70,20 +82,27 @@ def test(pcnn, testset, batch_size, directory):
         items[testset[i]['name']] = likelihood[i]
         if testset[i]['lbl'] == 0:
             likelihood_distributions['abnormal'].append(likelihood[i])
+            reconstruction_distributions['abnormal'].append(reconstruction_error[i])
         else:
             likelihood_distributions['normal'].append(likelihood[i])
+            reconstruction_distributions['normal'].append(reconstruction_error[i])
 
     #Print sorted log likelihood
     sorted_items = sorted(items.items(), key=operator.itemgetter(1))
     #print(sorted_items)
 
-    #Compute AUC
+    #Compute AUC likelihood
     likelihood = np.array(likelihood)
     groundtruth = np.array(groundtruth)
     print(likelihood.shape, groundtruth.shape)
     fpr, tpr, thresholds = metrics.roc_curve(groundtruth, likelihood)
     auc = metrics.auc(fpr, tpr)
-    print('AUC:', auc)
+    print('AUC likelihood:', auc)
+
+    reconstruction_error = np.array(reconstruction_error)
+    fpr_r, tpr_r, thresholds_r = metrics.roc_curve(groundtruth, reconstruction_error)
+    auc_r = metrics.auc(fpr_r, tpr_r)
+    print('AUC reconstruction:', auc_r)
 
     #Get log likelihood histogram for normal and abnormal patterns
     normal_distribution = np.array(likelihood_distributions['normal'])
