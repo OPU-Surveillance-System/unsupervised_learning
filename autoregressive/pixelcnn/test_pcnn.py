@@ -165,6 +165,7 @@ def test(pcnn, testset, batch_size, directory):
     #AUC Mix
     norm_likelihood = (likelihood - likelihood.min()) / (likelihood.max() - likelihood.min())
     norm_reconstruction = (reconstruction_error - reconstruction_error.min()) / (reconstruction_error.max() - reconstruction_error.min())
+    print(norm_likelihood.shape, norm_reconstruction.shape)
     for beta in range(11):
         b = beta / 10
         score = ((1 - b) * norm_likelihood) + (b * norm_reconstruction)
