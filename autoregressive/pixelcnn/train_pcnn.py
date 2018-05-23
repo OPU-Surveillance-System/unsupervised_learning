@@ -19,7 +19,7 @@ def compute_entropy(logits):
     logits = logits.view((-1, 256))
     logits = logits + 0.01
     probs = torch.nn.functional.softmax(logits, 1)
-    # probs = probs + 0.000001
+    probs = probs + 0.000001
     entropy = -torch.sum(probs * torch.log(probs), 1)
     mean_entropy = entropy.mean()
     # if np.isnan(mean_entropy.cpu().data.numpy()):
@@ -80,7 +80,7 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims,
 
                 cross_entropy = torch.nn.functional.cross_entropy(logits, lbl)
                 mean_entropy = compute_entropy(logits)
-                loss = cross_entropy #- beta * mean_entropy
+                loss = cross_entropy - beta * mean_entropy
                 if p == 'train':
                     loss.backward()
                     optimizer.step()
