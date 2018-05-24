@@ -3,6 +3,7 @@ import os
 import torch
 import operator
 import numpy as np
+import copy
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
 from torch.autograd import Variable
@@ -77,7 +78,7 @@ def test(pcnn, testset, batch_size, directory):
         reconstruction_error += tmp.data.cpu().numpy().tolist()
 
     likelihood = np.array(likelihood)
-    likelihood2 = likelihood
+    likelihood2 = copy.deepcopy(likelihood)
     print(likelihood[likelihood != -np.inf].min())
     likelihood[likelihood == -np.inf] = likelihood[likelihood != -np.inf].min() - 1000.0 #Remove -inf
     print(likelihood.min())
