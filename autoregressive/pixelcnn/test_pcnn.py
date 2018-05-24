@@ -80,8 +80,10 @@ def test(pcnn, testset, batch_size, directory):
     likelihood2 = likelihood
     print(likelihood[likelihood != -np.inf].min())
     likelihood[likelihood == -np.inf] = likelihood[likelihood != -np.inf].min() - 1000.0 #Remove -inf
-    print(likelihood[likelihood != -np.inf].min())
+    print(likelihood.min())
+    print(likelihood2[likelihood2 != -np.inf].min())
     likelihood2[likelihood2 == -np.inf] = likelihood2[likelihood2 != -np.inf].min()
+    print(likelihood2.min())
     for i in range(len(likelihood)):
         items[testset[i]['name']] = likelihood[i]
         if testset[i]['lbl'] == 0:
