@@ -105,7 +105,7 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims,
                 running_loss += loss.data[0]
                 running_xentropy += cross_entropy.data[0]
                 running_entropy += mean_entropy.data[0]
-                running_non_fixed_entropy += non_fixed_mean_entropy2.data[0]
+                running_non_fixed_entropy += non_fixed_mean_entropy.data[0]
 
             if p == 'test':
                 likelihood = np.array(likelihood)
