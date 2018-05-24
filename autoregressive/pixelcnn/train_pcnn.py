@@ -67,7 +67,7 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims,
             running_loss = 0
             running_xentropy = 0
             running_entropy = 0
-            running_entropy2 = 0
+            running_non_fixed_entropy = 0
 
             pcnn.train(p == 'train')
 
