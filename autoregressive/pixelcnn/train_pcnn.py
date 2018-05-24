@@ -17,7 +17,6 @@ import utils.debug
 
 def compute_entropy(logits):
     logits = logits.view((-1, 256))
-    logits = logits + 0.01
     probs = torch.nn.functional.softmax(logits, 1)
     probs = probs + 0.000001
     entropy = -torch.sum(probs * torch.log(probs), 1)
@@ -106,8 +105,8 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims,
             if p == 'test':
                 likelihood = np.array(likelihood)
                 infidx = np.argwhere(np.isinf(likelihood))
-                for infx in infidx:
-                    print(name[infx[0]])
+                # for infx in infidx:
+                #     print(name[infx[0]])
                 try:
                     likelihood[likelihood == -np.inf] = likelihood[likelihood != -np.inf].min() #Remove -inf
                 except ValueError:
