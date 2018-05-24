@@ -19,7 +19,7 @@ def compute_entropy(logits):
     logits = logits.view((-1, 256))
     probs = torch.nn.functional.softmax(logits, 1)
     non_fixed_probs = probs
-    probs[probs == 0.0] = 0.000001
+    probs = probs + 0.000001
     entropy = -torch.sum(probs * torch.log(probs), 1)
     non_fixed_entropy = -torch.sum(non_fixed_probs * torch.log(non_fixed_probs), 1)
     mean_entropy = entropy.mean()
