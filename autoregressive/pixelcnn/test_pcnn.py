@@ -3,7 +3,6 @@ import os
 import torch
 import operator
 import numpy as np
-import copy
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
 from torch.autograd import Variable
@@ -29,7 +28,6 @@ def test(pcnn, testset, batch_size, directory):
     groundtruth = []
     dataloader = DataLoader(testset, batch_size=batch_size, shuffle=False, num_workers=4)
     likelihood_distributions = {'normal': [], 'abnormal': []}
-    likelihood_distributions2 = {'normal': [], 'abnormal': []}
     items = {}
 
     dist = torch.nn.PairwiseDistance(p=2, eps=1e-06)
@@ -78,13 +76,8 @@ def test(pcnn, testset, batch_size, directory):
         reconstruction_error += tmp.data.cpu().numpy().tolist()
 
     likelihood = np.array(likelihood)
-    likelihood2 = copy.deepcopy(likelihood)
-    print(likelihood[likelihood != -np.inf].min())
-    likelihood[likelihood == -np.inf] = likelihood[likelihood != -np.inf].min() - 1000.0 #Remove -inf
-    print(likelihood.min())
-    print(likelihood2[likelihood2 != -np.inf].min())
-    likelihood2[likelihood2 == -np.inf] = likelihood2[likelihood2 != -np.inf].min()
-    print(likelihood2.min())
+    likelihood[likelihood == -np.inf] = likelihood[likelihood != -np.inf].min() #Remove -inf
+
     for i in range(len(likelihood)):
         items[testset[i]['name']] = likelihood[i]
         if testset[i]['lbl'] == 0:
@@ -94,16 +87,8 @@ def test(pcnn, testset, batch_size, directory):
             likelihood_distributions['normal'].append(likelihood[i])
             reconstruction_distributions['normal'].append(reconstruction_error[i])
 
-    for i in range(len(likelihood2)):
-        items[testset[i]['name']] = likelihood2[i]
-        if testset[i]['lbl'] == 0:
-            likelihood_distributions2['abnormal'].append(likelihood2[i])
-        else:
-            likelihood_distributions2['normal'].append(likelihood2[i])
-
-    #Print sorted log likelihood
+    #Sorted log likelihood
     sorted_items = sorted(items.items(), key=operator.itemgetter(1))
-    #print(sorted_items)
 
     #Compute AUC likelihood
     likelihood = np.array(likelihood)
@@ -112,13 +97,6 @@ def test(pcnn, testset, batch_size, directory):
     fpr, tpr, thresholds = metrics.roc_curve(groundtruth, likelihood)
     auc = metrics.auc(fpr, tpr)
     print('AUC likelihood:', auc)
-
-    likelihood2 = np.array(likelihood2)
-    groundtruth = np.array(groundtruth)
-    print(likelihood2.shape, groundtruth.shape)
-    fpr, tpr, thresholds = metrics.roc_curve(groundtruth, likelihood2)
-    auc2 = metrics.auc(fpr, tpr)
-    print('AUC likelihood2:', auc2)
 
     #Compute AUC reconstruction
     reconstruction_error = np.array(reconstruction_error)
@@ -148,28 +126,6 @@ def test(pcnn, testset, batch_size, directory):
     plt.ylabel('Normalized number of images')
     plt.legend(loc='upper right')
     plt.savefig(os.path.join(directory, 'plots', 'loglikelihood_hist'), format='svg', bbox_inches='tight')
-
-    normal_distribution2 = np.array(likelihood_distributions2['normal'])
-    abnormal_distribution2 = np.array(likelihood_distributions2['abnormal'])
-    print("Normal: mean={}, var={}, std={}".format(normal_distribution.mean(), normal_distribution.var(), normal_distribution.std()))
-    print("Anomaly: mean={}, var={}, std={}".format(abnormal_distribution.mean(), abnormal_distribution.var(), abnormal_distribution.std()))
-    hist_n, _ = np.histogram(normal_distribution, bins=50, range=[abnormal_distribution.min(), normal_distribution.max()])
-    hist_a, _ = np.histogram(abnormal_distribution, bins=50, range=[abnormal_distribution.min(), normal_distribution.max()])
-    minima = np.minimum(hist_n, hist_a)
-    intersection = np.true_divide(np.sum(minima), np.sum(hist_a))
-    print('Intersection: {}'.format(intersection))
-
-    plt.clf()
-    weights = np.ones_like(normal_distribution2)/(len(normal_distribution2))
-    plt.hist(normal_distribution2, bins=100, alpha=0.5, weights=weights, label='Normal', color='blue')
-    weights = np.ones_like(abnormal_distribution2)/(len(normal_distribution2))
-    x2, bins2, p2 = plt.hist(abnormal_distribution2, bins=100, alpha=0.5, weights=weights, label='Abnormal', color='red')
-    for item2 in p2:
-        item2.set_height(item2.get_height()/sum(x2))
-    plt.xlabel('Log likelihood')
-    plt.ylabel('Normalized number of images')
-    plt.legend(loc='upper right')
-    plt.savefig(os.path.join(directory, 'plots', 'loglikelihood_hist2'), format='svg', bbox_inches='tight')
 
     #Plot time series log likelihood
     x = np.array([i for i in range(len(groundtruth))])
