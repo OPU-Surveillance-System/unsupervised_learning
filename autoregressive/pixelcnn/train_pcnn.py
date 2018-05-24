@@ -18,15 +18,18 @@ import utils.debug
 def compute_entropy(logits):
     logits = logits.view((-1, 256))
     probs = torch.nn.functional.softmax(logits, 1)
+    probs2 = probs
     probs = probs + 0.000001
     entropy = -torch.sum(probs * torch.log(probs), 1)
+    entropy2 = -torch.sum(probs2 * torch.log(probs2), 1)
     mean_entropy = entropy.mean()
+    mean_entropy2 = entropy2.mean()
     # if np.isnan(mean_entropy.cpu().data.numpy()):
     #     print('Mean entropy is NaN', mean_entropy)
     #     print(probs)
     #     print(entropy)
 
-    return mean_entropy
+    return mean_entropy, mean_entropy2
 
 def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims, directory):
     """
@@ -64,6 +67,7 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims,
             running_loss = 0
             running_xentropy = 0
             running_entropy = 0
+            running_entropy2 = 0
 
             pcnn.train(p == 'train')
 
@@ -78,7 +82,7 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims,
                 logits = pcnn(img)[0]
 
                 cross_entropy = torch.nn.functional.cross_entropy(logits, lbl)
-                mean_entropy = compute_entropy(logits)
+                mean_entropy, mean_entropy2 = compute_entropy(logits)
                 loss = cross_entropy - beta * mean_entropy
                 if p == 'train':
                     loss.backward()
@@ -101,6 +105,7 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims,
                 running_loss += loss.data[0]
                 running_xentropy += cross_entropy.data[0]
                 running_entropy += mean_entropy.data[0]
+                running_entropy2 += mean_entropy2.data[0]
 
             if p == 'test':
                 likelihood = np.array(likelihood)
@@ -121,9 +126,11 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims,
             epoch_loss = running_loss / (i_batch + 1)
             epoch_xentropy = running_xentropy / (i_batch + 1)
             epoch_entropy = running_entropy / (i_batch + 1)
+            epoch_entropy2 = running_entropy2 / (i_batch + 1)
             writer.add_scalar('learning_curve/{}/loss'.format(p), epoch_loss, epoch)
             writer.add_scalar('learning_curve/{}/cross_entropy'.format(p), epoch_xentropy, epoch)
             writer.add_scalar('learning_curve/{}/entropy'.format(p), epoch_entropy, epoch)
+            writer.add_scalar('learning_curve/{}/entropy2'.format(p), epoch_entropy2, epoch)
             writer.add_scalar('auc/{}'.format(p), auc, epoch)
             print('Epoch {} ({}): loss = {} (xentropy = {}, entropy = {}), AUC = {}'.format(epoch, p, epoch_loss, epoch_xentropy, epoch_entropy, auc))
 
