@@ -24,22 +24,21 @@ def test(pcnn, testset, batch_size, directory):
         directory (str): Directory to save results
     """
 
-    likelihood = []
-    groundtruth = []
-    dataloader = DataLoader(testset, batch_size=batch_size, shuffle=False, num_workers=4)
-    likelihood_distributions = {'normal': [], 'abnormal': []}
-    items = {}
-
-    dist = torch.nn.PairwiseDistance(p=2, eps=1e-06)
-    reconstruction_distributions = {'normal': [], 'abnormal': []}
-    reconstruction_error = []
-
     threshold_probs = np.arange(0.0,1.1,0.1)
 
     for t in threshold_probs:
         #Process the testset
         if not os.path.exists(os.path.join(args.directory, 'plots2', '{}'.format(t))):
             os.makedirs(os.path.join(args.directory, 'plots2', '{}'.format(t)))
+        likelihood = []
+        groundtruth = []
+        dataloader = DataLoader(testset, batch_size=batch_size, shuffle=False, num_workers=4)
+        likelihood_distributions = {'normal': [], 'abnormal': []}
+        items = {}
+
+        dist = torch.nn.PairwiseDistance(p=2, eps=1e-06)
+        reconstruction_distributions = {'normal': [], 'abnormal': []}
+        reconstruction_error = []
         for i_batch, sample in enumerate(tqdm(dataloader)):
             groundtruth += sample['lbl'].numpy().tolist()
 
