@@ -148,8 +148,8 @@ def main(args):
     """
 
     #Create directories
-    if not os.path.exists(os.path.join(args.directory, 'plots')):
-        os.makedirs(os.path.join(args.directory, 'plots'))
+    if not os.path.exists(os.path.join(args.directory, 'plots2')):
+        os.makedirs(os.path.join(args.directory, 'plots2'))
 
     #Create a model with the hyper-parameters used during training
     if os.path.exists(os.path.join(args.directory, 'hyper-parameters')):
