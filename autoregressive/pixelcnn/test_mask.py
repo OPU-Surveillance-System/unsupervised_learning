@@ -24,7 +24,7 @@ def test(pcnn, testset, batch_size, directory):
         directory (str): Directory to save results
     """
 
-    threshold_probs = np.arange(0.0,1.1,0.1)
+    threshold_probs = np.arange(0.0,1.1,0.01)
 
     for t in threshold_probs:
 
@@ -36,7 +36,7 @@ def test(pcnn, testset, batch_size, directory):
         dataloader = DataLoader(testset, batch_size=batch_size, shuffle=False, num_workers=4)
         likelihood_distributions = {'normal': [], 'abnormal': []}
         items = {}
-        
+
         #Process the testset
         for i_batch, sample in enumerate(tqdm(dataloader)):
             groundtruth += sample['lbl'].numpy().tolist()
