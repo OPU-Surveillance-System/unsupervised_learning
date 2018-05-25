@@ -38,6 +38,8 @@ def test(pcnn, testset, batch_size, directory):
 
     for t in threshold_probs:
         #Process the testset
+        if not os.path.exists(os.path.join(args.directory, 'plots2', '{}'.format(t))):
+            os.makedirs(os.path.join(args.directory, 'plots2', '{}'.format(t)))
         for i_batch, sample in enumerate(tqdm(dataloader)):
             groundtruth += sample['lbl'].numpy().tolist()
 
