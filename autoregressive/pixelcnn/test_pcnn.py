@@ -76,7 +76,7 @@ def test(pcnn, testset, batch_size, directory):
         reconstruction_error += tmp.data.cpu().numpy().tolist()
 
     likelihood = np.array(likelihood)
-    likelihood[likelihood == -np.inf] = likelihood[likelihood != -np.inf].min() - 1000.0 #Remove -inf
+    likelihood[likelihood == -np.inf] = likelihood[likelihood != -np.inf].min() #Remove -inf
 
     for i in range(len(likelihood)):
         items[testset[i]['name']] = likelihood[i]
@@ -203,17 +203,16 @@ def main(args):
     print(pcnn)
 
     if args.model == '':
-        print(args.directory)
         model = os.path.join(args.directory, 'serial', 'best_model')
     else:
         model = args.model
     #Load the trained model
     pcnn.load_state_dict(torch.load(model))
 
-    testset = data.dataset.VideoDataset(args.testset, args.root_dir, 'L', args.image_size)
+    testset = data.dataset.VideoDataset(hp['testset'], hp['root_dir'], 'L', hp['image_size'])
 
     #Evaluate the model
-    test(pcnn, testset, args.batch_size, args.directory)
+    test(pcnn, testset, hp['batch_size'], args.directory)
 
     return 0
 
