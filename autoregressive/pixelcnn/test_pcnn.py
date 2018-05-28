@@ -203,6 +203,7 @@ def main(args):
     print(pcnn)
 
     if args.model == '':
+        print(args.directory)
         model = os.path.join(args.directory, 'serial', 'best_model')
     else:
         model = args.model
