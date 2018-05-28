@@ -11,6 +11,7 @@ from sklearn import metrics
 
 import autoregressive.pixelcnn.mnist.pixelcnn_mnist
 import utils.plot
+import data.dataset
 
 def test(pcnn, testset, batch_size, directory):
     """
@@ -58,7 +59,7 @@ def test(pcnn, testset, batch_size, directory):
         likelihood_distributions['mnist'] += probs
 
     alphabet_dir = '/home/scom/data/alphabet_mnist'
-    alphabetset = dataset.VideoDataset('data/alphabet_mnist', alphabet_dir, 'L', '28,28,1')
+    alphabetset = data.dataset.VideoDataset('data/alphabet_mnist', alphabet_dir, 'L', '28,28,1')
     dataloader = DataLoader(alphabetset, batch_size=batch_size, shuffle=True, num_workers=4)
     items = {}
     #Process the testset
