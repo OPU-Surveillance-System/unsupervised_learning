@@ -76,7 +76,7 @@ def test(pcnn, testset, batch_size, directory):
         reconstruction_error += tmp.data.cpu().numpy().tolist()
 
     likelihood = np.array(likelihood)
-    likelihood[likelihood == -np.inf] = likelihood[likelihood != -np.inf].min() #Remove -inf
+    likelihood[likelihood == -np.inf] = likelihood[likelihood != -np.inf].min() - 1000.0 #Remove -inf
 
     for i in range(len(likelihood)):
         items[testset[i]['name']] = likelihood[i]
