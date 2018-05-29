@@ -76,7 +76,7 @@ def test(pcnn, testset, batch_size, directory):
             probs = torch.log(probs)
             probs = probs.view((-1, 64 * 64))
             probs = torch.sum(probs, dim=1)
-            try;
+            try:
                 probs[probs != probs] = probs[probs == probs].min()
             except ValueError:
                 pass
