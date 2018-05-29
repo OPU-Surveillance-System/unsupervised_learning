@@ -54,10 +54,7 @@ def test(pcnn, testset, batch_size, directory):
             probs = probs * onehot_lbl
             probs = torch.sum(probs, 1)
             probs[probs >= t] = 1.0
-            maxp = probs[probs < 1.0].max()
-            minp = probs[probs < 1.0].min()
             probs[probs < 1.0] -= (probs[probs < 1.0].min() / (probs[probs < 1.0].max() - probs[probs < 1.0].min()))
-            print(probs.min())
             # if not torch.nonzero(probs):
             #     probs[probs == 0.0] -= likelihood[likelihood != 0.0].min() / 10.0
 
@@ -81,6 +78,7 @@ def test(pcnn, testset, batch_size, directory):
             likelihood += probs
 
         likelihood = np.array(likelihood)
+        print(likelihood.min())
         likelihood[likelihood == -np.inf] = likelihood[likelihood != -np.inf].min() #Remove -inf
 
         for i in range(len(likelihood)):
