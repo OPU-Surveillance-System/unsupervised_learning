@@ -53,6 +53,7 @@ def test(pcnn, testset, batch_size, directory):
             _, argmax = torch.max(probs, dim=1)
             probs = probs * onehot_lbl
             probs = torch.sum(probs, 1)
+            print(probs.max(), probs.min())
             probs[probs >= t] = 1.0
             maxp = probs[probs < 1.0].max()
             minp = probs[probs < 1.0].min()
