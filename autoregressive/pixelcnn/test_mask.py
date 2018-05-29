@@ -78,7 +78,7 @@ def test(pcnn, testset, batch_size, directory):
             probs = torch.sum(probs, dim=1)
             try:
                 probs[probs != probs] = probs[probs == probs].min()
-            except ValueError:
+            except RuntimeError:
                 pass
             probs = probs.data.cpu().numpy().tolist()
             likelihood += probs
