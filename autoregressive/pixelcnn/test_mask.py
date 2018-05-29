@@ -59,6 +59,7 @@ def test(pcnn, testset, batch_size, directory):
             probs[probs < 1.0] -= minp
             probs[probs < 1.0] /= maxp - minp
             probs[probs == 0] -= probs[probs != 0].min() / 10.0
+            print(probs.min(), probs.max())
 
             #Draw probabilities images
             if i_batch < 10:
