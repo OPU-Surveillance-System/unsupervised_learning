@@ -84,7 +84,10 @@ def test(pcnn, testset, batch_size, directory):
             likelihood += probs
 
         likelihood = np.array(likelihood)
-        print(likelihood.min(), likelihood.max())
+        try:
+            likelihood[likelihood != likelihood] = likelihood[likelihood == likelihood].min()
+        except RuntimeError:
+            pass
         likelihood[likelihood == -np.inf] = likelihood[likelihood != -np.inf].min() #Remove -inf
 
         for i in range(len(likelihood)):
