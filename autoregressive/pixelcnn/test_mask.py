@@ -80,6 +80,7 @@ def test(pcnn, testset, batch_size, directory):
         likelihood = np.array(likelihood)
 
         likelihood[likelihood == np.nan] = likelihood[likelihood != np.nan].max()
+        print(likelihood.max(), likelihood.min())
         likelihood[likelihood == -np.inf] = likelihood[likelihood != -np.inf].min() #Remove -inf
         likelihood[likelihood == np.inf] = likelihood[likelihood != np.inf].max()
 
