@@ -59,7 +59,6 @@ def test(pcnn, testset, batch_size, directory):
             probs[probs < 1.0] -= minp
             probs[probs < 1.0] /= maxp - minp
             probs[probs == 0] -= probs[probs != 0].min() / 10.0
-            print(probs.min(), probs.max())
 
             #Draw probabilities images
             if i_batch < 10:
@@ -77,6 +76,7 @@ def test(pcnn, testset, batch_size, directory):
             probs = torch.log(probs)
             probs = probs.view((-1, 64 * 64))
             probs = torch.sum(probs, dim=1)
+            print(probs.min(), probs.max())
             probs = probs.data.cpu().numpy().tolist()
             likelihood += probs
 
