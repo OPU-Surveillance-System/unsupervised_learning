@@ -74,7 +74,7 @@ def test(pcnn, testset, batch_size, directory):
 
             #Compute log likelihood
             probs = torch.log(probs)
-            print(probs.max())
+            print(probs.min())
             probs = probs.view((-1, 64 * 64))
             probs = torch.sum(probs, dim=1)
             probs = probs.data.cpu().numpy().tolist()
