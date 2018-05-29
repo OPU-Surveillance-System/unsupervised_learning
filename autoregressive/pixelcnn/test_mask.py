@@ -56,7 +56,7 @@ def test(pcnn, testset, batch_size, directory):
             probs[probs >= t] = 1.0
             maxp = probs[probs < 1.0].max()
             minp = probs[probs < 1.0].min()
-            probs[probs < 1.0] = minp / (maxp - minp)
+            probs[probs < 1.0] -= minp / (maxp - minp)
             # if not torch.nonzero(probs):
             #     probs[probs == 0.0] -= likelihood[likelihood != 0.0].min() / 10.0
 
