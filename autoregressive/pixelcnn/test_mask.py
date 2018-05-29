@@ -58,7 +58,8 @@ def test(pcnn, testset, batch_size, directory):
             minp = probs[probs < 1.0].min()
             print(minp - minp)
             #print(maxp, minp)
-            probs[probs < 1.0] -= minp / (maxp - minp)
+            probs[probs < 1.0] -= minp
+            probs[probs < 1.0] /= maxp - minp
             print(probs.min(), probs.max())
             #print(probs[probs == 0.0])
             # if not torch.nonzero(probs):
