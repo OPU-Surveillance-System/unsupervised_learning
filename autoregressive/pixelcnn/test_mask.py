@@ -54,6 +54,8 @@ def test(pcnn, testset, batch_size, directory):
             probs = probs * onehot_lbl
             probs = torch.sum(probs, 1)
             probs[probs >= t] = 1.0
+            maxp = probs[probs < 1.0].max()
+            print(maxp) 
             probs[probs < 1.0] -= (probs[probs < 1.0].min() / (probs[probs < 1.0].max() - probs[probs < 1.0].min()))
 
             #Draw probabilities images
