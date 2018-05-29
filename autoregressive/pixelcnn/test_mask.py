@@ -55,6 +55,7 @@ def test(pcnn, testset, batch_size, directory):
             probs = torch.sum(probs, 1)
             print(probs.max(), probs.min())
             probs[probs >= t] = 1.0
+            print(probs.max(), probs.min())
             maxp = probs[probs < 1.0].max()
             minp = probs[probs < 1.0].min()
             print(maxp, minp, maxp - minp)
