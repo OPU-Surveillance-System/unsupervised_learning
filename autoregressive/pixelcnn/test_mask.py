@@ -24,7 +24,7 @@ def test(pcnn, testset, batch_size, directory):
         directory (str): Directory to save results
     """
 
-    threshold_probs = np.arange(0.0,1.1,0.01)
+    threshold_probs = np.arange(0.01,1.1,0.01)
 
     for t in threshold_probs:
 
@@ -53,12 +53,9 @@ def test(pcnn, testset, batch_size, directory):
             _, argmax = torch.max(probs, dim=1)
             probs = probs * onehot_lbl
             probs = torch.sum(probs, 1)
-            print(probs.max(), probs.min())
             probs[probs >= t] = 1.0
-            print(probs.max(), probs.min())
             maxp = probs[probs < 1.0].max()
             minp = probs[probs < 1.0].min()
-            print(maxp, minp, maxp - minp)
             probs[probs < 1.0] -= (probs[probs < 1.0].min() / (probs[probs < 1.0].max() - probs[probs < 1.0].min()))
 
             #Draw probabilities images
