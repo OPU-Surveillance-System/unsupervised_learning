@@ -78,8 +78,10 @@ def test(pcnn, testset, batch_size, directory):
             likelihood += probs
 
         likelihood = np.array(likelihood)
-        print(likelihood.max())
+
+        likelihood[likelihood == np.nan] = likelihood[likelihood != np.nan].max()
         likelihood[likelihood == -np.inf] = likelihood[likelihood != -np.inf].min() #Remove -inf
+        likelihood[likelihood == np.inf] = likelihood[likelihood != np.inf].max()
 
         for i in range(len(likelihood)):
             items[testset[i]['name']] = likelihood[i]
