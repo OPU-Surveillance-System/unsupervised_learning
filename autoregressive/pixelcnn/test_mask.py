@@ -50,11 +50,11 @@ def test(pcnn, testset, batch_size, directory):
             #Compute pixel probabilities
             probs = pcnn(img)[0]
             probs = torch.nn.functional.softmax(probs, dim=1)
-            _, argmax = torch.max(probs, dim=1)
+            #_, argmax = torch.max(probs, dim=1)
             probs = probs * onehot_lbl
             probs = torch.sum(probs, 1)
             probs[probs >= t] = 1.0
-            probs[probs < 1.0] -= (probs[probs < 1.0].min() / (probs[probs < 1.0].max() - probs[probs < 1.0].min()))
+            probs[probs < 1.0] = (probs[probs < 1.0].min() / (probs[probs < 1.0].max() - probs[probs < 1.0].min()))
             # if not torch.nonzero(probs):
             #     probs[probs == 0.0] -= likelihood[likelihood != 0.0].min() / 10.0
 
@@ -78,11 +78,7 @@ def test(pcnn, testset, batch_size, directory):
             likelihood += probs
 
         likelihood = np.array(likelihood)
-        print(likelihood)
-        likelihood[likelihood == np.nan] = likelihood[likelihood != np.nan].max()
-        print(likelihood.max(), likelihood.min())
         likelihood[likelihood == -np.inf] = likelihood[likelihood != -np.inf].min() #Remove -inf
-        likelihood[likelihood == np.inf] = likelihood[likelihood != np.inf].max()
 
         for i in range(len(likelihood)):
             items[testset[i]['name']] = likelihood[i]
