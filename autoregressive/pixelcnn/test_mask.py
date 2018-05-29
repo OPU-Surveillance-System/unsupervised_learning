@@ -77,8 +77,9 @@ def test(pcnn, testset, batch_size, directory):
             probs = probs.view((-1, 64 * 64))
             probs = torch.sum(probs, dim=1)
             print(probs != probs, probs == probs, probs[probs == probs].min())
+            probs = probs.data.cpu().numpy()#.tolist()
             probs[probs != probs] = probs[probs == probs].min()
-            probs = probs.data.cpu().numpy().tolist()
+            probs = probs.tolist()
             likelihood += probs
 
         likelihood = np.array(likelihood)
