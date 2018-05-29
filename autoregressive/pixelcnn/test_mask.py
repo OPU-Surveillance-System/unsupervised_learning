@@ -56,6 +56,7 @@ def test(pcnn, testset, batch_size, directory):
             probs[probs >= t] = 1.0
             maxp = probs[probs < 1.0].max()
             minp = probs[probs < 1.0].min()
+            print(minp - minp)
             #print(maxp, minp)
             probs[probs < 1.0] -= minp / (maxp - minp)
             print(probs.min(), probs.max())
