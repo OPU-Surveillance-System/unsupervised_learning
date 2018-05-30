@@ -76,6 +76,8 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims,
             for i_batch, sample in enumerate(tqdm(dataloader)):
                 optimizer.zero_grad()
                 img = Variable(sample['img'], volatile=(p == 'test')).float().cuda()
+                noise = torch.randn(img.size()) * beta
+                img = img + noise.cuda()
                 lbl = Variable(img.data[:, 0] * 255, volatile=(p == 'test')).long().cuda()
                 name += sample['name']
 
@@ -83,7 +85,7 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims,
 
                 cross_entropy = torch.nn.functional.cross_entropy(logits, lbl)
                 mean_entropy, non_fixed_mean_entropy = compute_entropy(logits)
-                loss = cross_entropy - beta * mean_entropy
+                loss = cross_entropy #- beta * mean_entropy
                 if p == 'train':
                     loss.backward()
                     optimizer.step()
@@ -113,7 +115,7 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims,
                 # for infx in infidx:
                 #     print(name[infx[0]])
                 try:
-                    likelihood[likelihood == -np.inf] = likelihood[likelihood != -np.inf].min() - 1000.0 #Remove -inf
+                    likelihood[likelihood == -np.inf] = likelihood[likelihood != -np.inf].min() #Remove -inf
                 except ValueError:
                     likelihood[likelihood == -np.inf] = -20000.0
                 if (likelihood.dtype.char in np.typecodes['AllFloat'] and not np.isfinite(likelihood.sum()) and not np.isfinite(likelihood).all()):
@@ -153,7 +155,7 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims,
 
                 if auc > best_auc:
                     best_model = copy.deepcopy(pcnn)
-                    torch.save(pcnn.state_dict(), os.path.join(directory, 'serial', 'best_model'.format(epoch)))
+                    torch.save(pcnn.state_dict(), os.path.join(directory, 'serial', 'best_model'))
                     print('Best model saved.')
                     best_auc = auc
                     patience = 0
