@@ -26,6 +26,9 @@ def test(pcnn, testset, batch_size, directory):
 
     threshold_probs = np.arange(0.01,1.1,0.01)
 
+    with open(os.path.join(args.directory, 'thresholds'), 'w') as f:
+        pass
+
     for t in threshold_probs:
 
         if not os.path.exists(os.path.join(args.directory, 'plots2', '{}'.format(t))):
@@ -107,6 +110,9 @@ def test(pcnn, testset, batch_size, directory):
         fpr, tpr, thresholds = metrics.roc_curve(groundtruth, likelihood)
         auc = metrics.auc(fpr, tpr)
         print('AUC likelihood:', auc)
+
+        with open(os.path.join(args.directory, 'thresholds'), 'a') as f:
+            f.write('{}\t{}'.format(t, auc))
 
         #Get log likelihood histogram for normal and abnormal patterns
         normal_distribution = np.array(likelihood_distributions['normal'])
