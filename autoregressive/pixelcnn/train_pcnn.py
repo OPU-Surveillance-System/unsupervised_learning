@@ -76,15 +76,15 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims,
             for i_batch, sample in enumerate(tqdm(dataloader)):
                 optimizer.zero_grad()
                 img = Variable(sample['img'], volatile=(p == 'test')).float().cuda()
-                noise = torch.randn(img.size()) * beta
-                img = img + Variable(noise).cuda()
+                noise = Variable(torch.randn(img.size()) * beta).cuda()
+                img = img + noise
                 lbl = Variable(img.data[:, 0] * 255, volatile=(p == 'test')).long().cuda()
                 name += sample['name']
 
                 logits = pcnn(img)[0]
 
                 cross_entropy = torch.nn.functional.cross_entropy(logits, lbl)
-                mean_entropy, non_fixed_mean_entropy = 0#compute_entropy(logits)
+                mean_entropy, non_fixed_mean_entropy = compute_entropy(logits)
                 loss = cross_entropy #- beta * mean_entropy
                 if p == 'train':
                     loss.backward()
