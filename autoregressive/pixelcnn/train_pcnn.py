@@ -77,7 +77,7 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims,
                 optimizer.zero_grad()
                 img = Variable(sample['img'], volatile=(p == 'test')).float().cuda()
                 noise = torch.randn(img.size()) * beta
-                img = img + noise.cuda()
+                img = img + Variable(noise).cuda()
                 lbl = Variable(img.data[:, 0] * 255, volatile=(p == 'test')).long().cuda()
                 name += sample['name']
 
