@@ -47,6 +47,7 @@ class VideoDataset(Dataset):
         """
 
         img = misc.imread(self.frames[idx], mode=self.mode)
+        img = misc.imresize(img, self.size)
         if self.mode == 'L':
             img = img.reshape((self.size[0], self.size[1], 1))
         img = utils.process.preprocess(img) #Normalize the image
