@@ -112,7 +112,7 @@ def test(pcnn, testset, batch_size, directory):
         print('AUC likelihood:', auc)
 
         with open(os.path.join(args.directory, 'thresholds'), 'a') as f:
-            f.write('{}\t{}'.format(t, auc))
+            f.write('{}\t{}\n'.format(t, auc))
 
         #Get log likelihood histogram for normal and abnormal patterns
         normal_distribution = np.array(likelihood_distributions['normal'])
