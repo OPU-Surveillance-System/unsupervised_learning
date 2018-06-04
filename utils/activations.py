@@ -72,6 +72,7 @@ def main(args):
     print(pcnn)
 
     pixels = [(int(c) for c in p.split(',')) for p in args.pixels.split(';')]
+    print(pixels)
 
     if args.model == '':
         model = os.path.join(args.directory, 'serial', 'best_model')
