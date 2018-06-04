@@ -71,6 +71,7 @@ def main(args):
     pcnn.cuda()
     print(pcnn)
 
+    print(args.pixels.split(';'))
     pixels = [(int(c) for c in p.split(',')) for p in args.pixels.split(';')]
     print(pixels)
 
