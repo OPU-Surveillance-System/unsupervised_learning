@@ -72,7 +72,7 @@ def main(args):
     print(pcnn)
 
     print(args.pixels.split(';'))
-    pixels = [(int(c) for c in p.split(',')) for p in args.pixels.split(';')]
+    pixels = [(int(p.split(',')[0]), int(p.split(',')[1])) for p in args.pixels.split(';')]
     print(pixels)
 
     if args.model == '':
