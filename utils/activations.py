@@ -38,6 +38,7 @@ def test(pcnn, testset, pixel, batch_size, directory):
         probs = torch.nn.functional.softmax(probs, dim=1)
         _, argmax = torch.max(probs, dim=1)
 
+        print(sample['name'][0])
         for i in range(img.size(0)):
             if sample['name'][i] == 'test/16_737.png':
                 distribution = probs[i].data.cpu().numpy()
