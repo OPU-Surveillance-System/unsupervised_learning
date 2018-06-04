@@ -40,7 +40,7 @@ def test(pcnn, testset, pixel, batch_size, directory):
 
         print(sample['name'][0])
         for i in range(img.size(0)):
-            if sample['name'][i] == 'test/16_737.png':
+            if sample['name'][i] == '16_737.png':
                 distribution = probs[i].data.cpu().numpy()
 
     print(distribution)
