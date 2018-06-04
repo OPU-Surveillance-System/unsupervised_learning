@@ -40,7 +40,7 @@ def test(pcnn, testset, pixel, batch_size, directory):
 
         for p in range(len(pixel)):
             for b in range(img.size(0)):
-                print(pixel)
+                print(argmax.data.cpu().numpy().shape)
                 hist[p].append(argmax.data.cpu().numpy()[b, 0, pixel[p][0], pixel[p][1]])
 
     for p in range(len(pixel)):
@@ -71,9 +71,7 @@ def main(args):
     pcnn.cuda()
     print(pcnn)
 
-    print(args.pixels.split(';'))
     pixels = [(int(p.split(',')[0]), int(p.split(',')[1])) for p in args.pixels.split(';')]
-    print(pixels)
 
     if args.model == '':
         model = os.path.join(args.directory, 'serial', 'best_model')
