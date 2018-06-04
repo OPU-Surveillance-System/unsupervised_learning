@@ -38,18 +38,24 @@ def test(pcnn, testset, pixel, batch_size, directory):
         probs = torch.nn.functional.softmax(probs, dim=1)
         _, argmax = torch.max(probs, dim=1)
 
-        for p in range(len(pixel)):
-            for b in range(img.size(0)):
-                hist[p].append(probs.data.cpu().numpy()[b, pixel[p][0], pixel[p][1]])
+        for i in range(img.size(0)):
+            if sample['name'][i] == 'test/16_737.png'
+                distribution = probs[i].data.cpu().numpy()
 
-    for p in range(len(pixel)):
-        histogram = np.array(hist[p])
-        plt.clf()
-        plt.hist(histogram, bins=128, alpha=0.5, color='blue')
-        plt.xlabel('Intensities')
-        plt.ylabel('Frequency')
-        plt.xlim(0,255)
-        plt.savefig(os.path.join(directory, 'activations_{}_{}.svg'.format(pixel[p][0], pixel[p][1])), bbox_inches='tight')
+    print(distribution)
+
+        # for p in range(len(pixel)):
+        #     for b in range(img.size(0)):
+        #         hist[p].append(argmax.data.cpu().numpy()[b, pixel[p][0], pixel[p][1]])
+
+    # for p in range(len(pixel)):
+    #     histogram = np.array(hist[p])
+    #     plt.clf()
+    #     plt.hist(histogram, bins=128, alpha=0.5, color='blue')
+    #     plt.xlabel('Intensities')
+    #     plt.ylabel('Frequency')
+    #     plt.xlim(0,255)
+    #     plt.savefig(os.path.join(directory, 'activations_{}_{}.svg'.format(pixel[p][0], pixel[p][1])), bbox_inches='tight')
     return 0
 
 def main(args):
