@@ -43,7 +43,7 @@ def test(pcnn, testset, pixel, batch_size, directory):
                 distribution = probs[i].data.cpu().numpy()
     distribution = distribution.reshape(64, 64, 256)
     plt.clf()
-    plt.plot([x for x in range(256)], distribution[5, 30])
+    plt.plot([x for x in range(256)], distribution[0, 0])
     plt.savefig(os.path.join(directory, 'act.svg'), bbox_inches='tight')
     print(distribution.shape)
 
