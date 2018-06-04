@@ -70,6 +70,8 @@ def main(args):
     pcnn.cuda()
     print(pcnn)
 
+    pixels = [(int(c) for c in p.split(',')) for p in pixels.split(';')]
+
     if args.model == '':
         model = os.path.join(args.directory, 'serial', 'best_model')
     else:
@@ -80,7 +82,7 @@ def main(args):
     testset = data.dataset.VideoDataset(hp['testset'], hp['root_dir'], 'L', hp['image_size'])
 
     #Evaluate the model
-    test(pcnn, testset, int(hp['batch_size']), args.directory)
+    test(pcnn, testset, pixels, int(hp['batch_size']), args.directory)
 
     return 0
 
@@ -91,6 +93,7 @@ if __name__ == '__main__':
     parser.add_argument('--tes', dest='testset', type=str, default='data/summaries/umn_testset', help='Path to the testset summary')
     parser.add_argument('--rd', dest='root_dir', type=str, default='/home/scom/data/umn64', help='Path to the images')
     parser.add_argument('--bs', dest='batch_size', type=int, default=16, help='Mini batch size')
+    parser.add_argument('-p', dest='pixels', type=str, default='0,0;0,63;63,0;63,63;5,30', help='Path to the images')
     parser.add_argument('--dir', dest='directory', type=str, default='train_autoencoder', help='Directory to store results')
     parser.add_argument('--ims', dest='image_size', type=str, default='64,64,1', help='Image size')
     args = parser.parse_args()
