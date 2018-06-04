@@ -70,7 +70,7 @@ def main(args):
     pcnn.cuda()
     print(pcnn)
 
-    pixels = [(int(c) for c in p.split(',')) for p in pixels.split(';')]
+    pixels = [(int(c) for c in p.split(',')) for p in args.pixels.split(';')]
 
     if args.model == '':
         model = os.path.join(args.directory, 'serial', 'best_model')
