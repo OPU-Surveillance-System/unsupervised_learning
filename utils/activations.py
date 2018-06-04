@@ -44,7 +44,7 @@ def test(pcnn, testset, pixel, batch_size, directory):
     distribution = distribution.reshape(64, 64, 256)
     plt.clf()
     plt.plot([x for x in range(256)], distribution[5, 30])
-    plt.savefig(os.path.join(directory, 'act.svg'.format(pixel[p][0], pixel[p][1])), bbox_inches='tight')
+    plt.savefig(os.path.join(directory, 'act.svg'), bbox_inches='tight')
     print(distribution.shape)
 
         # for p in range(len(pixel)):
