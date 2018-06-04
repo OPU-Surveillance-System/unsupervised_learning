@@ -26,7 +26,7 @@ def test(pcnn, testset, pixel, batch_size, directory):
     """
 
     dataloader = DataLoader(testset, batch_size=batch_size, shuffle=False, num_workers=4)
-    hist = []
+    hist = [[] for p in range(len(pixel))]
 
     #Process the testset
     for i_batch, sample in enumerate(tqdm(dataloader)):
