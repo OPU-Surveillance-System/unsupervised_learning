@@ -39,7 +39,7 @@ def test(pcnn, testset, pixel, batch_size, directory):
         _, argmax = torch.max(probs, dim=1)
 
         for i in range(img.size(0)):
-            if sample['name'][i] == 'test/16_737.png'
+            if sample['name'][i] == 'test/16_737.png':
                 distribution = probs[i].data.cpu().numpy()
 
     print(distribution)
