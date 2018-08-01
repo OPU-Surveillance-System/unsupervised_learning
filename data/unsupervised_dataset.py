@@ -55,7 +55,7 @@ class UnsupervisedDataset(Dataset):
         """
 
         img = misc.imread(self.frames[idx], mode='L')
-        img = misc.imresize(img, [64, 64])
+        # img = misc.imresize(img, [64, 64])
         img = img.reshape((64, 64, 1))
         img = utils.process.preprocess(img) #Normalize the image
         img = np.rollaxis(img, 2, 0)
