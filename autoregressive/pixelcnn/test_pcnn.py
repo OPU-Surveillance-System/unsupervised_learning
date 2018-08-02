@@ -24,6 +24,9 @@ def test(pcnn, testset, batch_size, directory):
         directory (str): Directory to save results
     """
 
+    with open(os.path.join(directory, 'output'), 'w') as outf:
+        pass
+        
     likelihood = []
     groundtruth = []
     dataloader = DataLoader(testset, batch_size=batch_size, shuffle=False, num_workers=4)
@@ -69,6 +72,10 @@ def test(pcnn, testset, batch_size, directory):
         probs = torch.sum(probs, dim=1)
         probs = probs.data.cpu().numpy().tolist()
         likelihood += probs
+
+        with open(os.path.join(directory, 'output'), 'a') as outf:
+            for elt in range(len(probs)):
+                outf.write('{}\t{}\n'.format(sample['name'][elt], probs[elt]))
 
         #Reconstruction error
         reconstruction = utils.process.preprocess(argmax)
