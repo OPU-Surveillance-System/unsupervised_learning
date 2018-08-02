@@ -31,7 +31,7 @@ def compute_entropy(logits):
 
     return mean_entropy, non_fixed_mean_entropy
 
-def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims, directory):
+def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims, directory, generation):
     """
     pcnn (autoregressive.pixelcnn.PixelCNN): Model to train
     optimizer (torch.optim.Optimizer): Optimizer
@@ -42,6 +42,7 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims,
     beta (float): Entropy regularization coefficient (https://arxiv.org/abs/1701.06548)
     ims (list of int): Images' dimension
     directory (str): Path to a directory to store results
+    generation (bool): Weither or not generate random images
     """
 
     phase = ('train', 'test')
@@ -136,8 +137,8 @@ def train(pcnn, optimizer, datasets, epoch, batch_size, max_patience, beta, ims,
             writer.add_scalar('auc/{}'.format(p), auc, epoch)
             print('Epoch {} ({}): loss = {} (xentropy = {}, entropy = {}), AUC = {}'.format(epoch, p, epoch_loss, epoch_xentropy, epoch_entropy, auc))
 
-            if p == 'test':
-                if epoch % 10 == 0:
+            if p == 'test' :
+                if epoch % 10 == 0 and generation:
                     synthetic = torch.zeros(16, 1, ims[0], ims[1]).cuda()
                     for i in tqdm(range(ims[0])):
                         for j in range(ims[1]):

@@ -66,7 +66,7 @@ for r in ratios:
 
         #Train the model and save it
         print('Start training.')
-        best_model = train.train(pcnn, optimizer, datasets, args.epoch, args.batch_size, args.patience, 0.0, ims, directory)
+        best_model = train.train(pcnn, optimizer, datasets, args.epoch, args.batch_size, args.patience, 0.0, ims, directory, generation=False)
         print('Training complete.')
 
         #Evaluate the model
