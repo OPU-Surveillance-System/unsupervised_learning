@@ -26,7 +26,7 @@ def test(pcnn, testset, batch_size, directory):
 
     with open(os.path.join(directory, 'output'), 'w') as outf:
         pass
-        
+
     likelihood = []
     groundtruth = []
     dataloader = DataLoader(testset, batch_size=batch_size, shuffle=False, num_workers=4)
@@ -75,7 +75,7 @@ def test(pcnn, testset, batch_size, directory):
 
         with open(os.path.join(directory, 'output'), 'a') as outf:
             for elt in range(len(probs)):
-                outf.write('{}\t{}\n'.format(sample['name'][elt], probs[elt]))
+                outf.write('{}\t{}\n'.format(sample['complete_name'][elt], probs[elt]))
 
         #Reconstruction error
         reconstruction = utils.process.preprocess(argmax)

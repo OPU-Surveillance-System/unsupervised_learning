@@ -57,6 +57,6 @@ class VideoDataset(Dataset):
 
         name = os.path.basename(self.frames[idx])
 
-        sample = {'img': img, 'lbl': lbl, 'name': name}
+        sample = {'img': img, 'lbl': lbl, 'name': name, 'complete_name': self.frames[idx]}
 
         return sample
