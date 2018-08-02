@@ -29,46 +29,47 @@ args = parser.parse_args()
 
 ratios = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 40, 50]
 for r in ratios:
-    directory = os.path.join(args.directory, 'r_{}'.format(r))
-    #Create directories if it don't exists
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-    if not os.path.exists(os.path.join(directory, 'serial')):
-        os.makedirs(os.path.join(directory, 'serial'))
-    if not os.path.exists(os.path.join(directory, 'reconstruction_train')):
-        os.makedirs(os.path.join(directory, 'reconstruction_train'))
-    if not os.path.exists(os.path.join(directory, 'reconstruction_test')):
-        os.makedirs(os.path.join(directory, 'reconstruction_test'))
-    if not os.path.exists(os.path.join(directory, 'generation')):
-        os.makedirs(os.path.join(directory, 'generation'))
-    if not os.path.exists(os.path.join(directory, 'logs')):
-        os.makedirs(os.path.join(directory, 'logs'))
-    if not os.path.exists(os.path.join(directory, 'plots')):
-        os.makedirs(os.path.join(directory, 'plots'))
+    for t in range(50):
+        directory = os.path.join(args.directory, 'r_{}_{}'.format(r, t))
+        #Create directories if it don't exists
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        if not os.path.exists(os.path.join(directory, 'serial')):
+            os.makedirs(os.path.join(directory, 'serial'))
+        if not os.path.exists(os.path.join(directory, 'reconstruction_train')):
+            os.makedirs(os.path.join(directory, 'reconstruction_train'))
+        if not os.path.exists(os.path.join(directory, 'reconstruction_test')):
+            os.makedirs(os.path.join(directory, 'reconstruction_test'))
+        if not os.path.exists(os.path.join(directory, 'generation')):
+            os.makedirs(os.path.join(directory, 'generation'))
+        if not os.path.exists(os.path.join(directory, 'logs')):
+            os.makedirs(os.path.join(directory, 'logs'))
+        if not os.path.exists(os.path.join(directory, 'plots')):
+            os.makedirs(os.path.join(directory, 'plots'))
 
-    #Write arguments in a file
-    d = vars(args)
-    with open(os.path.join(directory, 'hyper-parameters'), 'w') as f:
-        for k in d.keys():
-            f.write('{}:{}\n'.format(k, d[k]))
+        #Write arguments in a file
+        d = vars(args)
+        with open(os.path.join(directory, 'hyper-parameters'), 'w') as f:
+            for k in d.keys():
+                f.write('{}:{}\n'.format(k, d[k]))
 
-    #Variables
-    pcnn = autoregressive.pixelcnn.model.PixelCNN(args.f, args.n, args.d)
-    pcnn = pcnn.cuda()
-    print(pcnn)
-    optimizer = torch.optim.Adam(pcnn.parameters(), args.learning_rate)
-    ims = [int(s) for s in args.image_size.split(',')]
+        #Variables
+        pcnn = autoregressive.pixelcnn.model.PixelCNN(args.f, args.n, args.d)
+        pcnn = pcnn.cuda()
+        print(pcnn)
+        optimizer = torch.optim.Adam(pcnn.parameters(), args.learning_rate)
+        ims = [int(s) for s in args.image_size.split(',')]
 
-    trainset = data.unsupervised_dataset.UnsupervisedDataset(args.n_trainset, args.a_trainset, args.root_dir, r)
-    testset = data.dataset.VideoDataset(args.testset, args.root_dir, 'L', args.image_size)
-    datasets = [trainset, testset]
+        trainset = data.unsupervised_dataset.UnsupervisedDataset(args.n_trainset, args.a_trainset, args.root_dir, r)
+        testset = data.dataset.VideoDataset(args.testset, args.root_dir, 'L', args.image_size)
+        datasets = [trainset, testset]
 
-    #Train the model and save it
-    print('Start training.')
-    best_model = train.train(pcnn, optimizer, datasets, args.epoch, args.batch_size, args.patience, 0.0, ims, directory)
-    print('Training complete.')
+        #Train the model and save it
+        print('Start training.')
+        best_model = train.train(pcnn, optimizer, datasets, args.epoch, args.batch_size, args.patience, 0.0, ims, directory)
+        print('Training complete.')
 
-    #Evaluate the model
-    print('Start evaluation.')
-    test.test(best_model, testset, args.batch_size, directory)
-    print('Evaluation complete.')
+        #Evaluate the model
+        print('Start evaluation.')
+        test.test(best_model, testset, args.batch_size, directory)
+        print('Evaluation complete.')
