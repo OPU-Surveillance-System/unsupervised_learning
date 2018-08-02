@@ -29,7 +29,7 @@ args = parser.parse_args()
 
 ratios = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 40, 50]
 for r in ratios:
-    for t in range(50):
+    for t in range(10):
         directory = os.path.join(args.directory, 'r_{}_{}'.format(r, t))
         #Create directories if it don't exists
         if not os.path.exists(directory):
