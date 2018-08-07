@@ -27,7 +27,8 @@ parser.add_argument('-d', dest='d', type=int, default=32, help='Number of top la
 parser.add_argument('-n', dest='n', type=int, default=15, help='Number of residual blocks')
 args = parser.parse_args()
 
-ratios = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 40, 50]
+# ratios = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 40, 50]
+ratios = [40, 50, 60]
 for r in ratios:
     for t in range(10):
         directory = os.path.join(args.directory, 'r_{}_{}'.format(r, t))
