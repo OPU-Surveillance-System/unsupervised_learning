@@ -31,7 +31,7 @@ def compute_entropy(logits):
 
     return mean_entropy, non_fixed_mean_entropy
 
-def train(pcnn, optimizer, datasets, max_epoch, batch_size, max_patience, beta, ims, directory, generation):
+def train(pcnn, optimizer, datasets, max_epoch, batch_size, max_patience, beta, ims, directory, generation=True):
     """
     pcnn (autoregressive.pixelcnn.PixelCNN): Model to train
     optimizer (torch.optim.Optimizer): Optimizer
