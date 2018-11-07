@@ -219,7 +219,7 @@ def main(args):
     testset = data.dataset.VideoDataset(hp['testset'], hp['root_dir'], 'L', hp['image_size'])
 
     #Evaluate the model
-    test(pcnn, testset, int(hp['batch_size']), args.directory)
+    test(pcnn, testset, args.batch_size, args.directory)
 
     return 0
 
