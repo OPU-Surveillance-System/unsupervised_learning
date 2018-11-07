@@ -86,7 +86,7 @@ def test(pcnn, testset, batch_size, directory):
     likelihood[likelihood == -np.inf] = likelihood[likelihood != -np.inf].min() #Remove -inf
 
     for i in range(len(likelihood)):
-        items[testset[i]['name']] = likelihood[i]
+        items[testset[i]['complete_name']] = likelihood[i]
         if testset[i]['lbl'] == 0:
             likelihood_distributions['abnormal'].append(likelihood[i])
             reconstruction_distributions['abnormal'].append(reconstruction_error[i])
